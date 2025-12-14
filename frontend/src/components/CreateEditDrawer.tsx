@@ -29,10 +29,10 @@ type CreateEditDrawerProps = {
     onEditComplete?: () => void;
 };
 
-export default function CreateEditDrawer({ 
-    onCategoryCreated, 
-    editCategory, 
-    onEditComplete 
+export default function CreateEditDrawer({
+    onCategoryCreated,
+    editCategory,
+    onEditComplete
 }: CreateEditDrawerProps) {
     const { t } = useTranslation();
     const languages: ('en' | 'mk')[] = ['en', 'mk'];
@@ -81,9 +81,7 @@ export default function CreateEditDrawer({
     const onSubmit = async (data: CategoryFormValues) => {
         const formData = new FormData();
         formData.append('translations', JSON.stringify(data.translations));
-
         if (data.image) formData.append('image', data.image);
-        
         console.log("Form Data to be submitted:", data);
 
         try {

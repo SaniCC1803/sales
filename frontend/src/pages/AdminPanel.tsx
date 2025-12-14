@@ -48,10 +48,10 @@ export default function Page() {
 
   const handleDeleteCategory = (id: number) => {
     const category = categories.find(cat => cat.id === id);
-    const categoryName = category?.translations.find(t => t.language === 'en')?.name || 
-                        category?.translations[0]?.name || 
-                        'Unknown Category';
-    
+    const categoryName = category?.translations.find(t => t.language === 'en')?.name ||
+      category?.translations[0]?.name ||
+      'Unknown Category';
+
     setDeleteModal({
       open: true,
       type: 'category',
@@ -62,10 +62,10 @@ export default function Page() {
 
   const handleDeleteApp = (id: number) => {
     const app = apps.find(application => application.id === id);
-    const appName = app?.translations.find(t => t.language === 'en')?.name || 
-                   app?.translations[0]?.name || 
-                   'Unknown Application';
-    
+    const appName = app?.translations.find(t => t.language === 'en')?.name ||
+      app?.translations[0]?.name ||
+      'Unknown Application';
+
     setDeleteModal({
       open: true,
       type: 'application',
@@ -80,7 +80,7 @@ export default function Page() {
       const res = await fetch(`http://localhost:3000/${endpoint}/${deleteModal.id}`, {
         method: 'DELETE',
       });
-      
+
       if (res.ok) {
         if (deleteModal.type === 'category') {
           fetchCategories();
@@ -130,10 +130,7 @@ export default function Page() {
           <Separator orientation="vertical" className="mr-2 h-4 md:hidden" />
           <div className="w-full flex justify-between">
             <h1 className="text-xl font-semibold capitalize">{t(activeSection)}</h1>
-            {/* <Button onClick={() => console.log("onClick")} variant="outline" className="flex items-center gap-2">
-              <Plus size={16} />
-            </Button> */}
-            <CreateEditDrawer 
+            <CreateEditDrawer
               onCategoryCreated={fetchCategories}
               editCategory={editingCategory}
               onEditComplete={handleEditComplete}
@@ -146,17 +143,17 @@ export default function Page() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {activeSection === "categories"
               ? categories.map((cat) => (
-                <CardComponent 
-                  key={cat.id} 
-                  item={cat} 
+                <CardComponent
+                  key={cat.id}
+                  item={cat}
                   onDelete={handleDeleteCategory}
                   onEdit={handleEdit}
                 />
               ))
               : apps.map((app) => (
-                <CardComponent 
-                  key={app.id} 
-                  item={app} 
+                <CardComponent
+                  key={app.id}
+                  item={app}
                   onDelete={handleDeleteApp}
                   onEdit={handleEdit}
                 />

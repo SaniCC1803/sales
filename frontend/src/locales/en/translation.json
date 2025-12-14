@@ -1,5 +1,8 @@
 {
   "create": "Create",
+  "edit": "Edit",
+  "delete": "Delete",
+  "save": "Save",
   "categories": "Categories",
   "category": "Category",
   "applications": "Applications",

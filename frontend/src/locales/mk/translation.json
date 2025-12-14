@@ -1,5 +1,8 @@
 {
   "create": "Креирај",
+  "edit": "Уреди",
+  "delete": "Избриши",
+  "save": "Зачувај",
   "categories": "Категории",
   "category": "Категорија",
   "applications": "Апликации",
