@@ -1,0 +1,18 @@
+{
+  "create": "Креирај",
+  "categories": "Категории",
+  "category": "Категорија",
+  "applications": "Апликации",
+  "application": "Апликација",
+  "name": "Име",
+  "nameRequired": "Името е задолжително",
+  "description": "Опис",
+  "descriptionRequired": "Описот е задолжителен",
+  "image": "Слика",
+  "imageRequired": "Сликата е задолжителна",
+  "welcome": "Добредојдовте",
+  "signIn": "Најави се",
+  "view": "Погледни",
+  "collections": "Колекции",
+  "aboutUs": "За нас"
+}

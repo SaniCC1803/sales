@@ -1,0 +1,38 @@
+.scrollable-form::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollable-form::-webkit-scrollbar-track {
+  background-color: var(--muted); /* use muted color for track */
+}
+
+.scrollable-form::-webkit-scrollbar-thumb {
+  background-color: var(--primary); /* draggable thumb */
+  border-radius: 3px;
+}
+
+.scrollable-form::-webkit-scrollbar-thumb:hover {
+  background-color: oklch(0.3 0 0); /* slightly darker on hover */
+}
+
+/* Firefox */
+.scrollable-form {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) var(--muted);
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .scrollable-form::-webkit-scrollbar-track {
+    background-color: oklch(0.145 0 0); /* dark track */
+  }
+  .scrollable-form::-webkit-scrollbar-thumb {
+    background-color: var(--muted);
+  }
+  .scrollable-form::-webkit-scrollbar-thumb:hover {
+    background-color: oklch(0.65 0 0);
+  }
+  .scrollable-form {
+    scrollbar-color: var(--muted) oklch(0.145 0 0);
+  }
+}

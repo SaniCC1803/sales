@@ -1,0 +1,18 @@
+{
+  "create": "Create",
+  "categories": "Categories",
+  "category": "Category",
+  "applications": "Applications",
+  "application": "Application",
+  "name": "Name",
+  "nameRequired": "Name is required",
+  "description": "Description",
+  "descriptionRequired": "Description is required",
+  "image": "Image",
+  "imageRequired": "Image is required",
+  "welcome": "Welcome",
+  "signIn": "Sign In",
+  "view": "View",
+  "collections": "Collections",
+  "aboutUs": "About Us"
+}

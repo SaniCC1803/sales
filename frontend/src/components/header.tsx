@@ -1,0 +1,74 @@
+'use client';
+
+import type { Application } from "@/types/application";
+import { Link } from "react-router-dom";
+import { useLanguage } from "@/context/LanguageContext";
+import { t } from "i18next";
+import { Button } from "./ui/button";
+import { useState } from "react";
+import CloseIcon from "./icons/CloseIcon";
+import HamburgerMenu from "./icons/HamburgerMenu";
+import { ThemeSelector } from "./ThemeSelector";
+import { ThemeTabs } from "./dark-light-mode-button";
+
+type HeaderProps = {
+  application: Application
+}
+
+export default function Header({ application }: HeaderProps) {
+  const { language } = useLanguage();
+  const [open, setOpen] = useState(false);
+
+  return (
+    <header className="bg-background text-foreground sticky top-0 z-50 px-6 h-12 flex items-center justify-between relative">
+      <Link to="/">
+        <img
+          src={application.logo}
+          alt={`${application.translations.find((t) => t.language === language)?.name} logo`}
+          className="h-8 w-auto object-contain cursor-pointer"
+        />
+      </Link>
+
+      <ThemeSelector />
+      {/* Desktop */}
+      <div>
+        <nav className="hidden md:flex space-x-6 items-center">
+          <Link to="/admin" className="text-foreground">
+            {t("collections")}
+          </Link>
+          <Link to="/about-us" className="text-foreground">
+            {t("aboutUs")}
+          </Link>
+          <ThemeTabs />
+        </nav>
+      </div>
+
+      {/* Mobile */}
+      <Button
+        className="md:hidden p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background"
+        onClick={() => setOpen(!open)}
+        variant="outline"
+        size="icon"
+      >
+        {open ? (
+          <CloseIcon className="h-6 w-6 text-foreground" />
+        ) : (
+          <HamburgerMenu className="h-6 w-6 text-foreground" />
+        )}
+      </Button>
+
+      {open && (
+        <div className="absolute left-0 top-full w-full md:hidden bg-background shadow-md">
+          <nav className="flex flex-col p-4 space-y-2">
+            <Link onClick={() => setOpen(false)} className="text-foreground" to="/admin">
+              {t("collections")}
+            </Link>
+            <Link onClick={() => setOpen(false)} className="text-foreground" to="/about-us">
+              {t("aboutUs")}
+            </Link>
+          </nav>
+        </div>
+      )}
+    </header>
+  );
+}
