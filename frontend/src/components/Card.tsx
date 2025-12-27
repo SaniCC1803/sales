@@ -54,8 +54,10 @@ export default function CardComponent({ item, onDelete, onEdit }: CardProps) {
     // Helper function to get image for any item type
     const getDisplayImage = () => {
         if ('translations' in item) {
-            if ('image' in item) {
-                return getImageUrl(item.image || ''); // Category or Product
+            if ('images' in item && Array.isArray(item.images) && item.images.length > 0) {
+                return getImageUrl(item.images[0]); // Show first image for product
+            } else if ('image' in item) {
+                return getImageUrl(item.image || ''); // Category
             }
         } else if ('email' in item) {
             // User - return a default user avatar

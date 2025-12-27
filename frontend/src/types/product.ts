@@ -9,7 +9,7 @@ export interface ProductTranslation {
 
 export interface Product {
   id: number;
-  image?: string;
+  images: string[];
   price: number;
   categoryId?: number;
   category?: Category;

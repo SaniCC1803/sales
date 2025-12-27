@@ -49,6 +49,7 @@ export class ProductsController {
     @Body('translations') translations: string,
     @Body('price') price: string,
     @Body('categoryId') categoryId: string,
+    @Body('images') images: string,
     @UploadedFile() file?: Express.Multer.File,
   ) {
     // Validate that categoryId is provided and is a valid number
@@ -61,7 +62,7 @@ export class ProductsController {
       translations: JSON.parse(translations),
       price: parseFloat(price),
       categoryId: parsedCategoryId,
-      image: file ? `/uploads/products/${file.filename}` : 'https://www.shutterstock.com/image-vector/image-icon-trendy-flat-style-600nw-643080895.jpg',
+      images: file ? [`/uploads/products/${file.filename}`] : (images ? JSON.parse(images) : ['https://www.shutterstock.com/image-vector/image-icon-trendy-flat-style-600nw-643080895.jpg']),
     };
     return await this.productsService.create(dto, file);
   }
@@ -87,13 +88,14 @@ export class ProductsController {
     @Body('translations') translations: string,
     @Body('price') price: string,
     @Body('categoryId') categoryId: string,
+    @Body('images') images: string,
     @UploadedFile() file?: Express.Multer.File,
   ) {
     const dto: CreateProductDto = {
       translations: JSON.parse(translations),
       price: parseFloat(price),
       categoryId: parseInt(categoryId),
-      image: file ? `/uploads/products/${file.filename}` : '', // Will be handled by service
+      images: file ? [`/uploads/products/${file.filename}`] : (images ? JSON.parse(images) : []),
     };
     return this.productsService.update(id, dto, file);
   }

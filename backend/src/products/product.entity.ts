@@ -14,8 +14,8 @@ export class Product {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
-  image!: string;
+  @Column('simple-array')
+  images!: string[];
 
   @Column('float')
   price!: number;

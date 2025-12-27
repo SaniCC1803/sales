@@ -39,17 +39,17 @@ export class ProductsService {
     const entity = new Product();
     
     if (file) {
-      entity.image = `/uploads/products/${file.filename}`;
-    } else if (dto.image) {
-      entity.image = dto.image;
+      entity.images = [`/uploads/products/${file.filename}`];
+    } else if (dto.images && dto.images.length > 0) {
+      entity.images = dto.images;
     } else {
       // Provide default image if neither file nor URL is provided
-      entity.image = 'https://www.shutterstock.com/image-vector/image-icon-trendy-flat-style-600nw-643080895.jpg';
+      entity.images = ['https://www.shutterstock.com/image-vector/image-icon-trendy-flat-style-600nw-643080895.jpg'];
     }
-    
+
     entity.price = dto.price;
     entity.category = category;
-    
+
     entity.translations = dto.translations.map(
       (t: CreateProductTranslationDto) => {
         const translation = new ProductTranslation();
@@ -79,11 +79,11 @@ export class ProductsService {
       throw new Error(`Category not found. Please select a valid category.`);
     }
 
-    // Update image if file is provided, or if DTO has image URL
+    // Update images if file is provided, or if DTO has images
     if (file) {
-      product.image = `/uploads/products/${file.filename}`;
-    } else if (dto.image) {
-      product.image = dto.image;
+      product.images = [`/uploads/products/${file.filename}`];
+    } else if (dto.images && dto.images.length > 0) {
+      product.images = dto.images;
     }
 
     // Update price and category

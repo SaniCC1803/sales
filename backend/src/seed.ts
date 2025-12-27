@@ -234,27 +234,27 @@ async function seedProducts() {
   // Products are already cleared in seedCategories function
 
   // Get some categories to link products to
-  const chairsCategory = await categoryRepo.findOne({
-    where: { translations: { name: 'Chairs' } },
-    relations: ['translations'],
-  });
-  const tablesCategory = await categoryRepo.findOne({
-    where: { translations: { name: 'Tables' } },
-    relations: ['translations'],
-  });
 
-  if (!chairsCategory || !tablesCategory) {
-    console.error('Categories not found. Please seed categories first.');
+  // Find subcategories for seeding
+  const officeChairsCategory = await categoryRepo.findOne({ where: { translations: { name: 'Office Chairs' } }, relations: ['translations'] });
+  const homeChairsCategory = await categoryRepo.findOne({ where: { translations: { name: 'Home Chairs' } }, relations: ['translations'] });
+  const diningTablesCategory = await categoryRepo.findOne({ where: { translations: { name: 'Dining Tables' } }, relations: ['translations'] });
+  const coffeeTablesCategory = await categoryRepo.findOne({ where: { translations: { name: 'Coffee Tables' } }, relations: ['translations'] });
+
+  if (!officeChairsCategory || !homeChairsCategory || !diningTablesCategory || !coffeeTablesCategory) {
+    console.error('Subcategories not found. Please seed categories first.');
     await app.close();
     return;
   }
 
-  // ---- Office Chair Product ----
-  const officeChairDto = {
-    image:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmm4OL5iy_o4IHf9Pg8xqXoM3_tuzyUNgiWQ&s',
+  // ---- Office Chairs Products ----
+  await productsService.create({
+    images: [
+      'https://images.pexels.com/photos/1866149/pexels-photo-1866149.jpeg',
+      'https://images.pexels.com/photos/1166413/pexels-photo-1166413.jpeg',
+    ],
     price: 299.99,
-    categoryId: chairsCategory.id,
+    categoryId: officeChairsCategory.id,
     translations: [
       {
         language: Language.EN,
@@ -267,15 +267,36 @@ async function seedProducts() {
         description: 'Удобна канцелариска столица со поддршка за грбот',
       },
     ],
-  };
-  await productsService.create(officeChairDto);
+  });
+  await productsService.create({
+    images: [
+      'https://images.pexels.com/photos/776656/pexels-photo-776656.jpeg',
+      'https://images.pexels.com/photos/1571453/pexels-photo-1571453.jpeg',
+    ],
+    price: 349.99,
+    categoryId: officeChairsCategory.id,
+    translations: [
+      {
+        language: Language.EN,
+        name: 'Executive Office Chair',
+        description: 'Premium executive chair with adjustable height',
+      },
+      {
+        language: Language.MK,
+        name: 'Извршна канцелариска столица',
+        description: 'Премиум извршна столица со прилагодлива висина',
+      },
+    ],
+  });
 
-  // ---- Dining Table Product ----
-  const diningTableDto = {
-    image:
-      'https://media.ezlivingfurniture.ie/wysiwyg/Blog_Media/dining_table_perfect/mila_dining_table_insta.webp',
+  // ---- Dining Tables Products ----
+  await productsService.create({
+    images: [
+      'https://images.pexels.com/photos/1866143/pexels-photo-1866143.jpeg',
+      'https://images.pexels.com/photos/271816/pexels-photo-271816.jpeg',
+    ],
     price: 899.99,
-    categoryId: tablesCategory.id,
+    categoryId: diningTablesCategory.id,
     translations: [
       {
         language: Language.EN,
@@ -288,29 +309,49 @@ async function seedProducts() {
         description: 'Елегантна модерна трпезариска маса за 6 лица',
       },
     ],
-  };
-  await productsService.create(diningTableDto);
-
-  // ---- Gaming Chair Product ----
-  const gamingChairDto = {
-    image:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8KD6aDINbGiSvZ1XawrlMOqKADn8724aFhw&s',
-    price: 449.99,
-    categoryId: chairsCategory.id,
+  });
+  await productsService.create({
+    images: [
+      'https://images.pexels.com/photos/461382/pexels-photo-461382.jpeg',
+      'https://images.pexels.com/photos/276528/pexels-photo-276528.jpeg',
+    ],
+    price: 1099.99,
+    categoryId: diningTablesCategory.id,
     translations: [
       {
         language: Language.EN,
-        name: 'Gaming Chair Pro',
-        description: 'High-performance gaming chair with RGB lighting',
+        name: 'Classic Dining Table',
+        description: 'Classic wooden dining table for family gatherings',
       },
       {
         language: Language.MK,
-        name: 'Геминг столица Про',
-        description: 'Високо-перформансна геминг столица со RGB осветлување',
+        name: 'Класична трпезариска маса',
+        description: 'Класична дрвена трпезариска маса за семејни собири',
       },
     ],
-  };
-  await productsService.create(gamingChairDto);
+  });
+
+  // ---- Coffee Tables Product (single, for variety) ----
+  await productsService.create({
+    images: [
+      'https://images.pexels.com/photos/298842/pexels-photo-298842.jpeg',
+      'https://images.pexels.com/photos/276528/pexels-photo-276528.jpeg',
+    ],
+    price: 299.99,
+    categoryId: coffeeTablesCategory.id,
+    translations: [
+      {
+        language: Language.EN,
+        name: 'Modern Coffee Table',
+        description: 'Stylish coffee table for your living room',
+      },
+      {
+        language: Language.MK,
+        name: 'Модерна клуб маса',
+        description: 'Модерна клуб маса за вашата дневна соба',
+      },
+    ],
+  });
 
   console.log('Products seeded ✅');
   await app.close();

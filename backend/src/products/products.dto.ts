@@ -18,15 +18,16 @@ export class CreateProductDto {
   @ValidateNested({ each: true })
   @Type(() => CreateProductTranslationDto)
   translations!: CreateProductTranslationDto[];
-  
+
   @IsNumber()
   @IsPositive()
   price!: number;
-  
+
   @IsNumber()
   @Min(1, { message: 'Please select a valid category' })
   categoryId!: number;
-  
-  @IsNotEmpty()
-  image!: string;
+
+  @IsArray()
+  @ArrayMinSize(1)
+  images!: string[];
 }

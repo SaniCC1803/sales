@@ -50,7 +50,21 @@ const ProductDetailPage: React.FC = () => {
         </ol>
       </nav>
       <h1 className="text-2xl font-bold mb-4">{product.translations[0]?.name || 'Product'}</h1>
-      <img src={product.image} alt={product.translations[0]?.name} className="w-full max-w-md mb-6 rounded" />
+      <div className="flex gap-4 mb-6 overflow-x-auto">
+        {product.images && product.images.length > 0 ? (
+          product.images.map((img, idx) => (
+            <img
+              key={idx}
+              src={img}
+              alt={product.translations[0]?.name}
+              className="w-full max-w-xs rounded shadow border"
+              style={{ minWidth: 200, maxHeight: 220, objectFit: 'cover' }}
+            />
+          ))
+        ) : (
+          <div className="text-gray-400">No images</div>
+        )}
+      </div>
       <div className="mb-4 text-lg font-semibold">Price: {product.price}</div>
       <div className="mb-4">{product.translations[0]?.description}</div>
       <div className="text-gray-500 text-sm">Product ID: {product.id}</div>

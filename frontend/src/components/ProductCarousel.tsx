@@ -18,7 +18,7 @@ export default function ProductCarousel({ images }: ProductCarouselProps) {
   if (!images || images.length === 0) return null;
 
   return (
-    <div className="relative w-full h-64 md:h-96 flex items-center justify-center overflow-hidden bg-neutral-200">
+    <div className="relative w-full h-80 md:h-[32rem] flex items-center justify-center overflow-hidden bg-neutral-200">
       {images.map((img, i) => (
         <img
           key={img}
