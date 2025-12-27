@@ -7,12 +7,15 @@ import {
   CreateCategoryTranslationDto,
 } from './categories.dto';
 import { CategoryTranslation } from './category-translations.entity';
+import { Product } from '../products/product.entity';
 
 @Injectable()
 export class CategoriesService {
   constructor(
     @InjectRepository(Category)
     private readonly categoryRepo: Repository<Category>,
+    @InjectRepository(Product)
+    private readonly productRepo: Repository<Product>,
   ) {}
 
   async findAll(): Promise<Category[]> {
@@ -24,8 +27,27 @@ export class CategoriesService {
     return categories;
   }
 
-  findOne(id: number) {
-    return this.categoryRepo.findOne({ where: { id } });
+  async findOne(id: number) {
+    // Get the category with translations and parent
+    const category = await this.categoryRepo.findOne({
+      where: { id },
+      relations: ['translations', 'parent'],
+    });
+    if (!category) return null;
+
+    // Get subcategories (direct children)
+    const subcategories = await this.categoryRepo.find({
+      where: { parent: { id } },
+      relations: ['translations'],
+    });
+
+    // Get products for this category
+    const products = await this.productRepo.find({
+      where: { category: { id } },
+      relations: ['translations'],
+    });
+
+    return { category, subcategories, products };
   }
 
   async create(dto: CreateCategoryDto, file?: Express.Multer.File) {

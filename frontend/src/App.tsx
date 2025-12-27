@@ -1,6 +1,6 @@
 import "../i18n";
 import { useEffect, useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "./context/LanguageContext";
 import Header from "./components/header";
 import Footer from "./components/footer";
@@ -12,6 +12,9 @@ import type { Application } from "./types/application";
 import "@/App.css";
 import { SidebarProvider } from "./components/ui/sidebar";
 import { restoreTheme } from "./lib/utils";
+
+import CategoryViewPage from "./pages/CategoryViewPage";
+import ProductDetailPage from "./pages/ProductDetailPage";
 
 export default function App() {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -48,19 +51,19 @@ export default function App() {
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
       <LanguageProvider>
         <SidebarProvider>
-          <Router>
-            <div className="flex flex-col min-h-full w-full">
-              <Header application={applications[0]} />
-              <main className="flex-grow bg-muted text-background-foreground">
-                <Routes>
-                  <Route path="/" element={<HomePage application={applications[0]} />} />
-                  <Route path="/about-us" element={<AboutPage />} />
-                  <Route path="/admin" element={<AdminPanel />} />
-                </Routes>
-              </main>
-              <Footer availableLanguages={applications[0].languages} />
-            </div>
-          </Router>
+          <div className="flex flex-col min-h-full w-full">
+            <Header application={applications[0]} />
+            <main className="flex-grow bg-muted text-background-foreground">
+              <Routes>
+                <Route path="/" element={<HomePage application={applications[0]} />} />
+                <Route path="/about-us" element={<AboutPage />} />
+                <Route path="/admin" element={<AdminPanel />} />
+                <Route path="/category/:id" element={<CategoryViewPage />} />
+                <Route path="/product/:id" element={<ProductDetailPage />} />
+              </Routes>
+            </main>
+            <Footer availableLanguages={applications[0].languages} />
+          </div>
         </SidebarProvider>
       </LanguageProvider>
     </ThemeProvider>

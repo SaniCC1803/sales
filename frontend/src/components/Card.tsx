@@ -7,6 +7,8 @@ import type { Product } from "@/types/product";
 import type { User } from "@/types/user";
 import { Edit3, Trash2, User as UserIcon } from "lucide-react";
 
+import { useNavigate } from "react-router-dom";
+
 type CardProps = {
     item: Category | Product | User;
     onDelete?: (id: number) => void;
@@ -17,6 +19,8 @@ export default function CardComponent({ item, onDelete, onEdit }: CardProps) {
     const { t } = useTranslation();
     const { language } = useLanguage();
     const isAdmin = location.pathname.includes("/admin");
+
+    const navigate = useNavigate();
 
     // Helper function to get full image URL
     const getImageUrl = (imagePath: string) => {
@@ -68,11 +72,23 @@ export default function CardComponent({ item, onDelete, onEdit }: CardProps) {
             className={`overflow-hidden bg-background flex flex-col h-full ${isUser ? 'min-h-[180px]' : 'min-h-[320px]'}`}
         >
             {!isUser && (
-                <img
-                    src={getDisplayImage()}
-                    alt={getDisplayName()}
-                    className="w-full h-40 object-cover"
-                />
+                (() => {
+                    // Determine navigation target
+                    let onClick;
+                    if ('translations' in item && 'price' in item) {
+                        onClick = () => navigate(`/product/${item.id}`);
+                    } else if ('translations' in item && 'id' in item) {
+                        onClick = () => navigate(`/category/${item.id}`);
+                    }
+                    return (
+                        <img
+                            src={getDisplayImage()}
+                            alt={getDisplayName()}
+                            className={"w-full h-40 object-cover cursor-pointer"}
+                            onClick={onClick}
+                        />
+                    );
+                })()
             )}
             <div className={`p-4 ${isUser ? 'py-6' : ''} flex flex-col flex-1`}>
                 {isUser && (
@@ -104,9 +120,29 @@ export default function CardComponent({ item, onDelete, onEdit }: CardProps) {
                                     <Trash2 className="h-4 w-4" />
                                 </Button>
                             </div>
-                        ) : (
-                            <Button className="bg-primary text-primary-foreground w-full">{t("view")}</Button>
-                        )}
+                        ) :
+                            ('translations' in item && 'price' in item)
+                                ? (
+                                    <Button
+                                        className="bg-primary text-primary-foreground w-full"
+                                        onClick={() => navigate(`/product/${item.id}`)}
+                                    >
+                                        {t("view")}
+                                    </Button>
+                                )
+                            : ('translations' in item && 'id' in item)
+                                ? (
+                                    <Button
+                                        className="bg-primary text-primary-foreground w-full"
+                                        onClick={() => navigate(`/category/${item.id}`)}
+                                    >
+                                        {t("view")}
+                                    </Button>
+                                )
+                                : (
+                                    <Button className="bg-primary text-primary-foreground w-full">{t("view")}</Button>
+                                )
+                        }
                     </div>
                 </div>
             </div>
