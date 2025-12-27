@@ -2,19 +2,12 @@ import { Type } from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
-  IsEmail,
   IsNotEmpty,
   IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
 import { Language } from '../shared-types';
-
-class Owner {
-  @IsEmail()
-  @IsNotEmpty()
-  email!: string;
-}
 
 export class CreateApplicationTranslationDto {
   @IsNotEmpty()
@@ -28,11 +21,6 @@ export class CreateApplicationTranslationDto {
 }
 
 export class CreateApplicationDto {
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => Owner)
-  owner?: Owner;
-
   @IsNotEmpty()
   logo!: string;
 

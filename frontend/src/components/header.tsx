@@ -29,7 +29,6 @@ export default function Header({ application }: HeaderProps) {
         />
       </Link>
 
-      <ThemeSelector />
       {/* Desktop */}
       <div>
         <nav className="hidden md:flex space-x-6 items-center">
@@ -40,6 +39,8 @@ export default function Header({ application }: HeaderProps) {
             {t("aboutUs")}
           </Link>
           <ThemeTabs />
+          {/* ThemeSelector as dropdown with icon */}
+          <ThemeSelector dropdown />
         </nav>
       </div>
 
@@ -66,6 +67,10 @@ export default function Header({ application }: HeaderProps) {
             <Link onClick={() => setOpen(false)} className="text-foreground" to="/about-us">
               {t("aboutUs")}
             </Link>
+            {/* ThemeSelector as dropdown with icon for mobile */}
+            <div className="mt-2">
+              <ThemeSelector dropdown onSelect={() => setOpen(false)} />
+            </div>
           </nav>
         </div>
       )}

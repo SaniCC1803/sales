@@ -10,6 +10,7 @@ import { Category } from './categories/category.entity';
 import { Product } from './products/product.entity';
 import { CategoryTranslation } from './categories/category-translations.entity';
 import { ApplicationTranslation } from './applications/application-translations.entity';
+import { ProductTranslation } from './products/product-translations.entity';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { ApplicationTranslation } from './applications/application-translations.
         Category,
         CategoryTranslation,
         Product,
+        ProductTranslation,
       ],
       synchronize: true,
     }),

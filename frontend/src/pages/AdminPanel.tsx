@@ -10,18 +10,27 @@ import {
 } from "@/components/ui/sidebar";
 import type { Application } from "@/types/application";
 import type { Category } from "@/types/category";
+import type { Product } from "@/types/product";
+import type { User } from "@/types/user";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Edit3, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function Page() {
-  const [activeSection, setActiveSection] = useState<"categories" | "applications">("categories");
+  const [activeSection, setActiveSection] = useState<"categories" | "applications" | "products" | "users">("categories");
   const [categories, setCategories] = useState<Category[]>([]);
-  const [apps, setApps] = useState<Application[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [application, setApplication] = useState<Application | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editingApplication, setEditingApplication] = useState<boolean>(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
   const [deleteModal, setDeleteModal] = useState<{
     open: boolean;
-    type: 'category' | 'application';
+    type: 'category' | 'product' | 'user';
     id: number;
     name: string;
   }>({
@@ -39,11 +48,41 @@ export default function Page() {
       .catch(() => setError("Failed to load categories"));
   };
 
-  const fetchApps = () => {
-    fetch("http://localhost:3000/applications")
+  const fetchProducts = () => {
+    fetch("http://localhost:3000/products")
       .then((res) => res.json())
-      .then(setApps)
-      .catch(() => setError("Failed to load apps"));
+      .then(setProducts)
+      .catch(() => setError("Failed to load products"));
+  };
+
+  const fetchApplication = () => {
+    // Fetch current user's application - you may need to adjust this endpoint
+    // based on your authentication system
+    fetch("http://localhost:3000/applications/current")
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else if (res.status === 404) {
+          return null; // No application exists for this user
+        }
+        throw new Error('Failed to fetch application');
+      })
+      .then((data) => {
+        console.log('Application data:', data);
+        setApplication(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching application:", error);
+        setApplication(null);
+        // Don't set error state here since no application is normal
+      });
+  };
+
+  const fetchUsers = () => {
+    fetch("http://localhost:3000/users")
+      .then((res) => res.json())
+      .then(setUsers)
+      .catch(() => setError("Failed to load users"));
   };
 
   const handleDeleteCategory = (id: number) => {
@@ -60,23 +99,40 @@ export default function Page() {
     });
   };
 
-  const handleDeleteApp = (id: number) => {
-    const app = apps.find(application => application.id === id);
-    const appName = app?.translations.find(t => t.language === 'en')?.name ||
-      app?.translations[0]?.name ||
-      'Unknown Application';
-
+  const handleDeleteProduct = (id: number) => {
+    const product = products.find(p => p.id === id);
+    const productName = product?.translations.find(t => t.language === 'en')?.name ||
+      product?.translations[0]?.name ||
+      'Unknown Product';
     setDeleteModal({
       open: true,
-      type: 'application',
+      type: 'product',
       id,
-      name: appName,
+      name: productName,
+    });
+  };
+
+  const handleDeleteUser = (id: number) => {
+    const user = users.find(u => u.id === id);
+    setDeleteModal({
+      open: true,
+      type: 'user',
+      id,
+      name: user?.email || 'Unknown User',
     });
   };
 
   const confirmDelete = async () => {
     try {
-      const endpoint = deleteModal.type === 'category' ? 'categories' : 'applications';
+      let endpoint = '';
+      if (deleteModal.type === 'category') {
+        endpoint = 'categories';
+      } else if (deleteModal.type === 'product') {
+        endpoint = 'products';
+      } else if (deleteModal.type === 'user') {
+        endpoint = 'users';
+      }
+      
       const res = await fetch(`http://localhost:3000/${endpoint}/${deleteModal.id}`, {
         method: 'DELETE',
       });
@@ -84,8 +140,10 @@ export default function Page() {
       if (res.ok) {
         if (deleteModal.type === 'category') {
           fetchCategories();
-        } else {
-          fetchApps();
+        } else if (deleteModal.type === 'product') {
+          fetchProducts();
+        } else if (deleteModal.type === 'user') {
+          fetchUsers();
         }
         setDeleteModal({ ...deleteModal, open: false });
       } else {
@@ -96,12 +154,13 @@ export default function Page() {
     }
   };
 
-  const handleEdit = (item: Category | Application) => {
+  const handleEdit = (item: Category | Product | User) => {
     if (activeSection === 'categories') {
       setEditingCategory(item as Category);
-    } else {
-      // TODO: Implement application edit
-      console.log("Edit application:", item);
+    } else if (activeSection === 'products') {
+      setEditingProduct(item as Product);
+    } else if (activeSection === 'users') {
+      setEditingUser(item as User);
     }
   };
 
@@ -110,12 +169,39 @@ export default function Page() {
     fetchCategories(); // Refresh the list
   };
 
+  const handleProductEditComplete = () => {
+    setEditingProduct(null);
+    fetchProducts(); // Refresh the list
+  };
+
+  const handleUserEditComplete = () => {
+    setEditingUser(null);
+    fetchUsers(); // Refresh the list
+  };
+
+  const handleApplicationEdit = () => {
+    setEditingApplication(true);
+  };
+
+  const handleApplicationEditComplete = () => {
+    setEditingApplication(false);
+    fetchApplication(); // Refresh the application data
+  };
+
   useEffect(() => {
     fetchCategories();
   }, []);
 
   useEffect(() => {
-    fetchApps();
+    fetchProducts();
+  }, []);
+
+  useEffect(() => {
+    fetchApplication();
+  }, []);
+
+  useEffect(() => {
+    fetchUsers();
   }, []);
 
   return (
@@ -129,36 +215,116 @@ export default function Page() {
           <SidebarTrigger className="-ml-1 md:hidden" />
           <Separator orientation="vertical" className="mr-2 h-4 md:hidden" />
           <div className="w-full flex justify-between">
-            <h1 className="text-xl font-semibold capitalize">{t(activeSection)}</h1>
+            <h1 className="text-xl font-semibold capitalize">{activeSection === "applications" ? t("application") : activeSection === "users" ? t("user") : t(activeSection)}</h1>
             <CreateEditDrawer
               onCategoryCreated={fetchCategories}
+              onProductCreated={fetchProducts}
+              onApplicationCreated={fetchApplication}
+              onUserCreated={fetchUsers}
               editCategory={editingCategory}
+              editProduct={editingProduct}
+              editApplication={editingApplication ? application : null}
+              editUser={editingUser}
               onEditComplete={handleEditComplete}
+              onProductEditComplete={handleProductEditComplete}
+              onApplicationEditComplete={handleApplicationEditComplete}
+              onUserEditComplete={handleUserEditComplete}
+              activeSection={activeSection}
             />
           </div>
         </header>
 
         <section className="container mx-auto px-6 py-12">
           {error && <div className="text-red-500 mb-4">{error}</div>}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {activeSection === "categories"
-              ? categories.map((cat) => (
+          {activeSection === "applications" ? (
+            <div className="bg-card border rounded-xl p-8 shadow-sm">
+              {application ? (
+                <div className="space-y-8">
+                  <div className="flex justify-between items-start">
+                    <h2 className="text-3xl font-bold text-foreground">{t("applicationInformation")}</h2>
+                    <Button onClick={handleApplicationEdit} variant="outline" size="lg">
+                      <Edit3 className="h-4 w-4 mr-2" />
+                      {t("edit")}
+                    </Button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {application.logo && (
+                      <div className="lg:col-span-1">
+                        <label className="text-sm font-bold text-primary mb-3 block uppercase tracking-wide">{t("logo")}</label>
+                        <div className="bg-muted/30 border border-border rounded-lg p-6 flex items-center justify-center">
+                          <img 
+                            src={application.logo.startsWith('http') ? application.logo : `http://localhost:3000${application.logo}`}
+                            alt="Application Logo" 
+                            className="max-w-full max-h-48 object-contain rounded-lg"
+                          />
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className={`${application.logo ? 'lg:col-span-2' : 'lg:col-span-3'} space-y-6`}>
+                      <div>
+                        <label className="text-sm font-bold text-primary mb-3 block uppercase tracking-wide">{t("name")}</label>
+                        <p className="text-2xl font-bold text-foreground">
+                          {application.translations.find(t => t.language === 'en')?.name || 
+                           application.translations[0]?.name || 'Unnamed Application'}
+                        </p>
+                      </div>
+                      
+                      <div>
+                        <label className="text-sm font-bold text-primary mb-3 block uppercase tracking-wide">{t("description")}</label>
+                        <p className="text-lg text-muted-foreground leading-relaxed font-medium">
+                          {application.translations.find(t => t.language === 'en')?.description || 
+                           application.translations[0]?.description || 'No description provided'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-16">
+                  <div className="max-w-md mx-auto">
+                    <h3 className="text-xl font-semibold mb-4 text-muted-foreground">{t("noApplication")}</h3>
+                    <Button onClick={() => setEditingApplication(true)} size="lg">
+                      <Plus className="h-4 w-4 mr-2" />
+                      {t("createApplication")}
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : activeSection === "users" ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {users.map((user) => (
                 <CardComponent
-                  key={cat.id}
-                  item={cat}
-                  onDelete={handleDeleteCategory}
-                  onEdit={handleEdit}
-                />
-              ))
-              : apps.map((app) => (
-                <CardComponent
-                  key={app.id}
-                  item={app}
-                  onDelete={handleDeleteApp}
+                  key={user.id}
+                  item={user}
+                  onDelete={handleDeleteUser}
                   onEdit={handleEdit}
                 />
               ))}
-          </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {activeSection === "categories"
+                ? categories.map((cat) => (
+                  <CardComponent
+                    key={cat.id}
+                    item={cat}
+                    onDelete={handleDeleteCategory}
+                    onEdit={handleEdit}
+                  />
+                ))
+                : products.map((product) => (
+                  <CardComponent
+                    key={product.id}
+                    item={product}
+                    onDelete={handleDeleteProduct}
+                    onEdit={handleEdit}
+                  />
+                ))}
+            </div>
+          )}
         </section>
       </SidebarInset>
 
@@ -166,7 +332,7 @@ export default function Page() {
         open={deleteModal.open}
         onOpenChange={(open) => setDeleteModal({ ...deleteModal, open })}
         onConfirm={confirmDelete}
-        title={`Delete ${deleteModal.type === 'category' ? 'Category' : 'Application'}`}
+        title={`Delete ${deleteModal.type === 'category' ? 'Category' : deleteModal.type === 'product' ? 'Product' : 'User'}`}
         itemName={deleteModal.name}
       />
     </SidebarProvider>

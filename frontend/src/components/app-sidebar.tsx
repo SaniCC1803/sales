@@ -11,16 +11,18 @@ import {
 import { useTranslation } from "react-i18next";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-  activeSection: "categories" | "applications";
-  onSectionChange: (section: "categories" | "applications") => void;
+  activeSection: "categories" | "applications" | "products" | "users";
+  onSectionChange: (section: "categories" | "applications" | "products" | "users") => void;
 }
 
 export function AppSidebar({ activeSection, onSectionChange, ...props }: AppSidebarProps) {
   const { t } = useTranslation();
 
   const navItems = [
+    { title: "users", value: "users" },
+    { title: "application", value: "applications" },
     { title: "categories", value: "categories" },
-    { title: "applications", value: "applications" },
+    { title: "products", value: "products" },
   ];
 
   return (
@@ -34,7 +36,7 @@ export function AppSidebar({ activeSection, onSectionChange, ...props }: AppSide
                   <SidebarMenuButton
                     asChild
                     isActive={activeSection === item.value}
-                    onClick={() => onSectionChange(item.value as "categories" | "applications")}
+                    onClick={() => onSectionChange(item.value as "categories" | "applications" | "products" | "users")}
                   >
                     <button className="w-full text-left">
                       {t(item.title)}

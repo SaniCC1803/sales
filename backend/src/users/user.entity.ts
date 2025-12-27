@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Application } from '../applications/application.entity';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 export enum Role {
   USER = 'USER',
@@ -23,9 +22,4 @@ export class User {
     default: Role.USER,
   })
   role!: Role;
-
-  @OneToMany(() => Application, (app) => app.owner, {
-    nullable: true,
-  })
-  applications!: Application[];
 }

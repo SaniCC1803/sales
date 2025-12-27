@@ -2,10 +2,8 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
   OneToMany,
 } from 'typeorm';
-import { User } from '../users/user.entity';
 import { ApplicationTranslation } from './application-translations.entity';
 import { Language } from '../shared-types';
 
@@ -19,9 +17,6 @@ export class Application {
       'https://www.shutterstock.com/image-vector/image-icon-trendy-flat-style-600nw-643080895.jpg',
   })
   logo!: string;
-
-  @ManyToOne(() => User, (user) => user.applications, { onDelete: 'CASCADE' })
-  owner!: User;
 
   @Column({
     type: 'varchar',

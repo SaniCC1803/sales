@@ -2,28 +2,112 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from '../products/product.entity';
+import { ProductTranslation } from './product-translations.entity';
+import { Category } from '../categories/category.entity';
+import { CreateProductDto, CreateProductTranslationDto } from './products.dto';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepo: Repository<Product>,
+    @InjectRepository(Category)
+    private readonly categoryRepo: Repository<Category>,
   ) {}
 
   async findAll() {
-    const products = await this.productRepo.find({ relations: ['category'] });
+    const products = await this.productRepo.find({ 
+      relations: ['category', 'translations'] 
+    });
     return products;
   }
+  
   findOne(id: number) {
-    return this.productRepo.findOne({ where: { id }, relations: ['category'] });
+    return this.productRepo.findOne({ 
+      where: { id }, 
+      relations: ['category', 'translations'] 
+    });
   }
-  async create(data: Partial<Product>) {
-    return await this.productRepo.save(this.productRepo.create(data));
+  
+  async create(dto: CreateProductDto, file?: Express.Multer.File) {
+    // First, validate that the category exists
+    const category = await this.categoryRepo.findOne({ where: { id: dto.categoryId } });
+    if (!category) {
+      throw new Error(`Category not found. Please select a valid category.`);
+    }
+
+    const entity = new Product();
+    
+    if (file) {
+      entity.image = `/uploads/products/${file.filename}`;
+    } else if (dto.image) {
+      entity.image = dto.image;
+    } else {
+      // Provide default image if neither file nor URL is provided
+      entity.image = 'https://www.shutterstock.com/image-vector/image-icon-trendy-flat-style-600nw-643080895.jpg';
+    }
+    
+    entity.price = dto.price;
+    entity.category = category;
+    
+    entity.translations = dto.translations.map(
+      (t: CreateProductTranslationDto) => {
+        const translation = new ProductTranslation();
+        translation.language = t.language;
+        translation.name = t.name;
+        translation.description = t.description ?? '';
+        return translation;
+      },
+    );
+
+    return this.productRepo.save(entity);
   }
-  async update(id: number, data: Partial<Product>) {
-    await this.productRepo.update(id, data);
-    return this.findOne(id);
+  
+  async update(id: number, dto: CreateProductDto, file?: Express.Multer.File) {
+    const product = await this.productRepo.findOne({ 
+      where: { id },
+      relations: ['translations']
+    });
+    
+    if (!product) {
+      throw new Error(`Product with id ${id} not found`);
+    }
+
+    // Validate category exists
+    const category = await this.categoryRepo.findOne({ where: { id: dto.categoryId } });
+    if (!category) {
+      throw new Error(`Category not found. Please select a valid category.`);
+    }
+
+    // Update image if file is provided, or if DTO has image URL
+    if (file) {
+      product.image = `/uploads/products/${file.filename}`;
+    } else if (dto.image) {
+      product.image = dto.image;
+    }
+
+    // Update price and category
+    product.price = dto.price;
+    product.category = category;
+
+    // Update translations if provided
+    if (dto.translations) {
+      // Remove existing translations
+      product.translations = [];
+      
+      // Add new translations
+      product.translations = dto.translations.map((t: any) => {
+        const translation = new ProductTranslation();
+        translation.language = t.language;
+        translation.name = t.name;
+        translation.description = t.description ?? '';
+        return translation;
+      });
+    }
+
+    return this.productRepo.save(product);
   }
+  
   remove(id: number) {
     return this.productRepo.delete(id);
   }

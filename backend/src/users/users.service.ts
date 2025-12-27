@@ -14,7 +14,6 @@ export class UsersService {
   async findAll() {
     return await this.userRepo.find({
       select: ['id', 'email', 'role'],
-      relations: ['applications'],
     });
   }
 
@@ -22,7 +21,6 @@ export class UsersService {
     return this.userRepo.findOne({
       where: { id },
       select: ['id', 'email', 'role'],
-      relations: ['applications'],
     });
   }
 

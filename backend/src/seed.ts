@@ -5,12 +5,15 @@ import { CategoriesService } from './categories/categories.service';
 import { CreateCategoryDto } from './categories/categories.dto';
 import { Category } from './categories/category.entity';
 import { CategoryTranslation } from './categories/category-translations.entity';
-import { User } from './users/user.entity';
+import { User, Role } from './users/user.entity';
 import { CreateUserDto } from './users/users.dto';
 import { UsersService } from './users/users.service';
 import { Application } from './applications/application.entity';
 import { CreateApplicationDto } from './applications/applications.dto';
 import { ApplicationsService } from './applications/applications.service';
+import { Product } from './products/product.entity';
+import { ProductTranslation } from './products/product-translations.entity';
+import { ProductsService } from './products/products.service';
 import { Language } from './shared-types';
 
 async function seedUsers() {
@@ -28,12 +31,14 @@ async function seedUsers() {
   const userDto1: CreateUserDto = {
     email: 'a.gj.sani@gmail.com',
     password: 'sani$123',
+    role: Role.SUPERADMIN,
   };
   await userService.create(userDto1);
 
   const userDto2: CreateUserDto = {
     email: 'sani@codechem.com',
     password: 'sani$123',
+    role: Role.USER,
   };
   await userService.create(userDto2);
 
@@ -41,7 +46,7 @@ async function seedUsers() {
   await app.close();
 }
 
-async function seedApplications() {
+async function seedApplication() {
   const app = await NestFactory.createApplicationContext(AppModule);
   const dataSource = app.get(DataSource);
 
@@ -50,11 +55,10 @@ async function seedApplications() {
 
   // --- CLEAR EXISTING DATA ---
   await applicationRepo.createQueryBuilder().delete().execute();
-  console.log('Database cleared ✅');
+  console.log('Application database cleared ✅');
 
-  // ---- Applications Category ----
-  const applicationDto1: CreateApplicationDto = {
-    owner: { email: 'a.gj.sani@gmail.com' },
+  // ---- Single Application ----
+  const applicationDto: CreateApplicationDto = {
     logo: 'https://cdn.freebiesupply.com/images/large/2x/google-logo-transparent.png',
     languages: [Language.EN, Language.MK],
     translations: [
@@ -70,28 +74,10 @@ async function seedApplications() {
       },
     ],
   };
-  await applicationService.create(applicationDto1);
+  
+  await applicationService.create(applicationDto);
 
-  const applicationDto2: CreateApplicationDto = {
-    owner: { email: 'sani@codechem.com' },
-    logo: 'https://cdn.freebiesupply.com/images/large/2x/google-logo-transparent.png',
-    languages: [Language.EN],
-    translations: [
-      {
-        language: Language.EN,
-        name: 'Groceries Application',
-        description: 'Welcome to groceries application',
-      },
-      {
-        language: Language.MK,
-        name: 'Апликација за намирници',
-        description: 'Добредојдовте во апликацијата за намирници',
-      },
-    ],
-  };
-  await applicationService.create(applicationDto2);
-
-  console.log('Applications seeded ✅');
+  console.log('Application seeded ✅');
   await app.close();
 }
 
@@ -101,10 +87,15 @@ async function seedCategories() {
 
   const categoryRepo = dataSource.getRepository(Category);
   const translationRepo = dataSource.getRepository(CategoryTranslation);
+  const productRepo = dataSource.getRepository(Product);
+  const productTranslationRepo = dataSource.getRepository(ProductTranslation);
   const categoriesService = app.get(CategoriesService);
 
   // --- CLEAR EXISTING DATA ---
-  // Delete translations first (because of foreign key constraints)
+  // Delete products and their translations first (because of foreign key constraints)
+  await productTranslationRepo.createQueryBuilder().delete().execute();
+  await productRepo.createQueryBuilder().delete().execute();
+  // Then delete category translations and categories
   await translationRepo.createQueryBuilder().delete().execute();
   await categoryRepo.createQueryBuilder().delete().execute();
   console.log('Database cleared ✅');
@@ -227,11 +218,95 @@ async function seedCategories() {
   await app.close();
 }
 
+async function seedProducts() {
+  const app = await NestFactory.createApplicationContext(AppModule);
+  const dataSource = app.get(DataSource);
+
+  const productsService = app.get(ProductsService);
+  const categoryRepo = dataSource.getRepository(Category);
+
+  // Products are already cleared in seedCategories function
+
+  // Get some categories to link products to
+  const chairsCategory = await categoryRepo.findOne({ where: { translations: { name: 'Chairs' } }, relations: ['translations'] });
+  const tablesCategory = await categoryRepo.findOne({ where: { translations: { name: 'Tables' } }, relations: ['translations'] });
+
+  if (!chairsCategory || !tablesCategory) {
+    console.error('Categories not found. Please seed categories first.');
+    await app.close();
+    return;
+  }
+
+  // ---- Office Chair Product ----
+  const officeChairDto = {
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmm4OL5iy_o4IHf9Pg8xqXoM3_tuzyUNgiWQ&s',
+    price: 299.99,
+    categoryId: chairsCategory.id,
+    translations: [
+      {
+        language: Language.EN,
+        name: 'Ergonomic Office Chair',
+        description: 'Comfortable office chair with lumbar support',
+      },
+      {
+        language: Language.MK,
+        name: 'Ергономска канцелариска столица',
+        description: 'Удобна канцелариска столица со поддршка за грбот',
+      },
+    ],
+  };
+  await productsService.create(officeChairDto);
+
+  // ---- Dining Table Product ----
+  const diningTableDto = {
+    image: 'https://media.ezlivingfurniture.ie/wysiwyg/Blog_Media/dining_table_perfect/mila_dining_table_insta.webp',
+    price: 899.99,
+    categoryId: tablesCategory.id,
+    translations: [
+      {
+        language: Language.EN,
+        name: 'Modern Dining Table',
+        description: 'Sleek modern dining table for 6 people',
+      },
+      {
+        language: Language.MK,
+        name: 'Модерна трпезариска маса',
+        description: 'Елегантна модерна трпезариска маса за 6 лица',
+      },
+    ],
+  };
+  await productsService.create(diningTableDto);
+
+  // ---- Gaming Chair Product ----
+  const gamingChairDto = {
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8KD6aDINbGiSvZ1XawrlMOqKADn8724aFhw&s',
+    price: 449.99,
+    categoryId: chairsCategory.id,
+    translations: [
+      {
+        language: Language.EN,
+        name: 'Gaming Chair Pro',
+        description: 'High-performance gaming chair with RGB lighting',
+      },
+      {
+        language: Language.MK,
+        name: 'Геминг столица Про',
+        description: 'Високо-перформансна геминг столица со RGB осветлување',
+      },
+    ],
+  };
+  await productsService.create(gamingChairDto);
+
+  console.log('Products seeded ✅');
+  await app.close();
+}
+
 async function seedAll() {
   try {
     await seedUsers();
-    await seedApplications();
+    await seedApplication();
     await seedCategories();
+    await seedProducts();
     console.log('✅ All seeds completed');
   } catch (err) {
     console.error(err);
