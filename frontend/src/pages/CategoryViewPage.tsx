@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Breadcrumbs from '../components/Breadcrumbs';
 import CardComponent from '../components/Card';
 import type { Category } from '../types/category';
@@ -36,7 +36,7 @@ const CategoryViewPage: React.FC = () => {
   return (
     <div className="container mx-auto px-6 py-12">
       <Breadcrumbs category={data.category} />
-      <h1 className="text-2xl font-bold mb-4">{data.category.name}</h1>
+      <h1 className="text-2xl font-bold mb-4">{data.category.translations[0]?.name || 'Unnamed'}</h1>
       {data.subcategories.length > 0 && (
         <>
           <h2 className="text-xl font-semibold mb-6 text-center sm:text-left">Subcategories</h2>

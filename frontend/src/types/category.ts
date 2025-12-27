@@ -10,6 +10,7 @@ export interface CategoryTranslation {
 export interface Category {
   id: number;
   parentId?: number | null;
+  parent?: Category | null;
   subcategories?: Category[];
   image: string;
   products?: Product[];

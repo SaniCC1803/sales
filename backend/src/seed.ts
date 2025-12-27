@@ -234,8 +234,14 @@ async function seedProducts() {
   // Products are already cleared in seedCategories function
 
   // Get some categories to link products to
-  const chairsCategory = await categoryRepo.findOne({ where: { translations: { name: 'Chairs' } }, relations: ['translations'] });
-  const tablesCategory = await categoryRepo.findOne({ where: { translations: { name: 'Tables' } }, relations: ['translations'] });
+  const chairsCategory = await categoryRepo.findOne({
+    where: { translations: { name: 'Chairs' } },
+    relations: ['translations'],
+  });
+  const tablesCategory = await categoryRepo.findOne({
+    where: { translations: { name: 'Tables' } },
+    relations: ['translations'],
+  });
 
   if (!chairsCategory || !tablesCategory) {
     console.error('Categories not found. Please seed categories first.');
@@ -245,7 +251,8 @@ async function seedProducts() {
 
   // ---- Office Chair Product ----
   const officeChairDto = {
-    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmm4OL5iy_o4IHf9Pg8xqXoM3_tuzyUNgiWQ&s',
+    image:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmm4OL5iy_o4IHf9Pg8xqXoM3_tuzyUNgiWQ&s',
     price: 299.99,
     categoryId: chairsCategory.id,
     translations: [
@@ -265,7 +272,8 @@ async function seedProducts() {
 
   // ---- Dining Table Product ----
   const diningTableDto = {
-    image: 'https://media.ezlivingfurniture.ie/wysiwyg/Blog_Media/dining_table_perfect/mila_dining_table_insta.webp',
+    image:
+      'https://media.ezlivingfurniture.ie/wysiwyg/Blog_Media/dining_table_perfect/mila_dining_table_insta.webp',
     price: 899.99,
     categoryId: tablesCategory.id,
     translations: [
@@ -285,7 +293,8 @@ async function seedProducts() {
 
   // ---- Gaming Chair Product ----
   const gamingChairDto = {
-    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8KD6aDINbGiSvZ1XawrlMOqKADn8724aFhw&s',
+    image:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8KD6aDINbGiSvZ1XawrlMOqKADn8724aFhw&s',
     price: 449.99,
     categoryId: chairsCategory.id,
     translations: [

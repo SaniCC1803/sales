@@ -81,12 +81,16 @@ export class CategoriesService {
     return this.categoryRepo.save(entity);
   }
 
-  async update(id: number, data: CreateCategoryDto, file?: Express.Multer.File) {
-    const category = await this.categoryRepo.findOne({ 
+  async update(
+    id: number,
+    data: CreateCategoryDto,
+    file?: Express.Multer.File,
+  ) {
+    const category = await this.categoryRepo.findOne({
       where: { id },
-      relations: ['translations']
+      relations: ['translations'],
     });
-    
+
     if (!category) {
       throw new Error(`Category with id ${id} not found`);
     }
@@ -100,15 +104,17 @@ export class CategoriesService {
     if (data.translations) {
       // Remove existing translations
       category.translations = [];
-      
+
       // Add new translations
-      category.translations = data.translations.map((t: any) => {
-        const translation = new CategoryTranslation();
-        translation.language = t.language;
-        translation.name = t.name;
-        translation.description = t.description ?? '';
-        return translation;
-      });
+      category.translations = data.translations.map(
+        (t: CreateCategoryTranslationDto) => {
+          const translation = new CategoryTranslation();
+          translation.language = t.language;
+          translation.name = t.name;
+          translation.description = t.description ?? '';
+          return translation;
+        },
+      );
     }
 
     return this.categoryRepo.save(category);

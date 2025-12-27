@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import type { Product } from '../types/product';
-import Breadcrumbs from '../components/Breadcrumbs';
 
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -29,13 +28,9 @@ const ProductDetailPage: React.FC = () => {
   // Build breadcrumbs array: Home > ...category... > Product
   const breadcrumbs = [];
   breadcrumbs.push({ name: 'Home', url: '/' });
-  let current = product.category;
-  const categoryCrumbs = [];
-  while (current) {
-    categoryCrumbs.unshift({ name: current.translations[0]?.name || 'Unnamed', url: `/category/${current.id}` });
-    current = current.parent as any;
+  if (product.category) {
+    breadcrumbs.push({ name: product.category.translations[0]?.name || 'Unnamed', url: `/category/${product.category.id}` });
   }
-  breadcrumbs.push(...categoryCrumbs);
   breadcrumbs.push({ name: product.translations[0]?.name || 'Product', url: null });
 
   return (

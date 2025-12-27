@@ -8,13 +8,8 @@ interface BreadcrumbsProps {
 
 // Helper to build breadcrumb path from category up to root
 function buildBreadcrumbs(category: Category): { id: number; name: string }[] {
-  const path = [];
-  let current: Category | undefined = category;
-  while (current) {
-    path.unshift({ id: current.id, name: current.translations[0]?.name || 'Unnamed' });
-    current = current.parent as Category | undefined;
-  }
-  return path;
+  // Only the current category is available, since parent object is not present
+  return [{ id: category.id, name: category.translations[0]?.name || 'Unnamed' }];
 }
 
 const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ category }) => {

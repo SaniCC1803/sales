@@ -55,7 +55,7 @@ export default function CardComponent({ item, onDelete, onEdit }: CardProps) {
     const getDisplayImage = () => {
         if ('translations' in item) {
             if ('image' in item) {
-                return getImageUrl(item.image); // Category or Product
+                return getImageUrl(item.image || ''); // Category or Product
             }
         } else if ('email' in item) {
             // User - return a default user avatar
