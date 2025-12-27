@@ -30,4 +30,11 @@ export class Application {
     eager: true,
   })
   translations!: ApplicationTranslation[];
+
+  @Column({
+    type: 'varchar',
+    array: true,
+    default: [],
+  })
+  carousel!: string[];
 }

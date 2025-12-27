@@ -52,13 +52,16 @@ export class ApplicationsController {
   )
   async create(
     @Body('translations') translations: string,
+    @Body('carousel') carousel: string,
     @UploadedFile() file: Express.Multer.File,
   ) {
     const parsedTranslations = JSON.parse(translations);
+    const parsedCarousel = carousel ? JSON.parse(carousel) : [];
     const dto: CreateApplicationDto = {
       logo: file ? `/uploads/applications/${file.filename}` : 'https://www.shutterstock.com/image-vector/image-icon-trendy-flat-style-600nw-643080895.jpg',
       languages: ['en', 'mk'], // Default languages
       translations: parsedTranslations,
+      carousel: parsedCarousel,
     };
     return await this.applicationsService.create(dto);
   }
@@ -78,12 +81,15 @@ export class ApplicationsController {
   async update(
     @Param('id') id: number,
     @Body('translations') translations: string,
+    @Body('carousel') carousel: string,
     @UploadedFile() file?: Express.Multer.File,
   ) {
     const parsedTranslations = JSON.parse(translations);
+    const parsedCarousel = carousel ? JSON.parse(carousel) : [];
     const updateData: any = {
       translations: parsedTranslations,
       languages: ['en', 'mk'], // Default languages
+      carousel: parsedCarousel,
     };
     
     if (file) {

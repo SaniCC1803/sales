@@ -33,4 +33,9 @@ export class CreateApplicationDto {
   @ValidateNested({ each: true })
   @Type(() => CreateApplicationTranslationDto)
   translations!: CreateApplicationTranslationDto[];
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  carousel?: string[];
 }

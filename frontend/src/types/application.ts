@@ -12,4 +12,5 @@ export interface Application {
   logo: string;
   languages: Language[];
   translations: ApplicationTranslation[];
+  carousel?: string[];
 }

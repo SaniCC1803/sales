@@ -44,6 +44,7 @@ type ApplicationFormValues = {
         description?: string;
     }[];
     logo: File | null;
+    carousel: string[];
 };
 
 type UserFormValues = {
@@ -169,6 +170,7 @@ export default function CreateEditDrawer({
                     };
                 }),
                 logo: null,
+                carousel: Array.isArray(editApplication.carousel) ? editApplication.carousel : [],
             };
         }
         return {
@@ -178,6 +180,7 @@ export default function CreateEditDrawer({
                 description: '',
             })),
             logo: null,
+            carousel: [],
         };
     };
 
@@ -235,7 +238,8 @@ export default function CreateEditDrawer({
             const formData = new FormData();
             formData.append('translations', JSON.stringify(applicationData.translations));
             if (applicationData.logo) formData.append('logo', applicationData.logo);
-            
+            formData.append('carousel', JSON.stringify(applicationData.carousel));
+
             try {
                 let res;
                 if (isEditMode && editApplication) {
@@ -507,6 +511,39 @@ export default function CreateEditDrawer({
                                                     <p className="text-destructive text-sm mt-1">{message}</p>
                                                 )}
                                             />
+                                        </div>
+                                    )}
+                                />
+                                <Separator className="my-1" />
+                                <Label>Promotional Carousel Images</Label>
+                                <Controller
+                                    name="carousel"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <div className="flex flex-col gap-2">
+                                            {field.value && field.value.length > 0 && field.value.map((url: string, idx: number) => (
+                                                <div key={idx} className="flex items-center gap-2">
+                                                    <Input
+                                                        value={url}
+                                                        onChange={e => {
+                                                            const newArr = [...field.value];
+                                                            newArr[idx] = e.target.value;
+                                                            field.onChange(newArr);
+                                                        }}
+                                                        placeholder={`Image URL #${idx + 1}`}
+                                                    />
+                                                    <Button type="button" variant="destructive" size="icon" onClick={() => {
+                                                        const newArr = field.value.filter((_: any, i: number) => i !== idx);
+                                                        field.onChange(newArr);
+                                                    }} aria-label="Remove image">✕</Button>
+                                                </div>
+                                            ))}
+                                            {(!field.value || field.value.length < 5) && (
+                                                <Button type="button" variant="outline" onClick={() => field.onChange([...(field.value || []), ""])}>
+                                                    + Add Image
+                                                </Button>
+                                            )}
+                                            <p className="text-xs text-muted-foreground">Add up to 5 horizontal promotional image URLs for the homepage carousel.</p>
                                         </div>
                                     )}
                                 />
