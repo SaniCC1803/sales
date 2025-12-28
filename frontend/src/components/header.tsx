@@ -10,6 +10,7 @@ import CloseIcon from "./icons/CloseIcon";
 import HamburgerMenu from "./icons/HamburgerMenu";
 import { ThemeSelector } from "./ThemeSelector";
 import { ThemeTabs } from "./dark-light-mode-button";
+import CategoryNav from "./CategoryNav";
 
 type HeaderProps = {
   application: Application
@@ -20,7 +21,8 @@ export default function Header({ application }: HeaderProps) {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="bg-background text-foreground sticky top-0 z-50 px-6 h-12 flex items-center justify-between relative">
+    <>
+      <header className="bg-background text-foreground sticky top-0 z-50 px-6 h-20 flex items-center justify-between relative">
       <Link to="/">
         <img
           src={application.logo}
@@ -32,10 +34,7 @@ export default function Header({ application }: HeaderProps) {
       {/* Desktop */}
       <div>
         <nav className="hidden md:flex space-x-6 items-center">
-          <Link to="/admin" className="text-foreground">
-            {t("collections")}
-          </Link>
-          <Link to="/about-us" className="text-foreground">
+          <Link to="/about-us" className="text-foreground hover:text-foreground" style={{ color: 'inherit' }}>
             {t("aboutUs")}
           </Link>
           <ThemeTabs />
@@ -75,5 +74,7 @@ export default function Header({ application }: HeaderProps) {
         </div>
       )}
     </header>
+    <CategoryNav />
+    </>
   );
 }

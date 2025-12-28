@@ -12,6 +12,7 @@ import { ErrorMessage } from "@hookform/error-message";
 import SingleImageUpload from "./SingleImageUpload";
 import { Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
 import { useState, useEffect } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import type { Category } from "@/types/category";
 import type { Product } from "@/types/product";
 import type { Application } from "@/types/application";
@@ -421,7 +422,7 @@ export default function CreateEditDrawer({
                     </Button>
                 </SheetTrigger>
             )}
-            <SheetContent className="flex flex-col h-full w-full max-w-full md:max-w-xl md:w-[500px] md:h-full fixed md:relative inset-0 md:inset-auto bg-background z-[100]">
+            <SheetContent className="flex flex-col md:max-w-md md:w-[400px] bg-background z-[100]">
                 <SheetHeader>
                     <SheetTitle>
                         {isEditMode 
@@ -429,8 +430,8 @@ export default function CreateEditDrawer({
                             : `${t("create")} ${isApplicationMode ? t("application") : isProductMode ? t("product") : isUserMode ? t("user") : t("category")}`}
                     </SheetTitle>
                 </SheetHeader>
-                <div className="flex-1 overflow-y-auto pr-2 scrollable-form">
-                    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+                <div className="flex-1 overflow-y-auto scrollable-form">
+                    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 px-1">
                         {isApplicationMode ? (
                             <>
                                 {/* Application Form */}
@@ -753,27 +754,38 @@ export default function CreateEditDrawer({
                                             message: t("passwordMinLength")
                                         }
                                     }}
-                                    render={({ field }) => (
-                                        <div className="w-full">
-                                            <Input 
-                                                {...field} 
-                                                type="password"
-                                                placeholder={isEditMode ? t("newPassword") : t("password")} 
-                                            />
-                                            <ErrorMessage
-                                                errors={errors}
-                                                name="password"
-                                                render={({ message }) => (
-                                                    <p className="text-destructive text-sm mt-1">{message}</p>
+                                    render={({ field }) => {
+                                        const [showPassword, setShowPassword] = useState(false);
+                                        return (
+                                            <div className="w-full relative">
+                                                <Input 
+                                                    {...field} 
+                                                    type={showPassword ? "text" : "password"}
+                                                    placeholder={isEditMode ? t("newPassword") : t("password")} 
+                                                />
+                                                <button
+                                                    type="button"
+                                                    className="absolute right-1 top-1/2 -translate-y-1/2 p-0.5 text-muted-foreground focus:outline-none h-6 w-6 flex items-center justify-center"
+                                                    tabIndex={-1}
+                                                    onClick={() => setShowPassword(v => !v)}
+                                                >
+                                                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                                </button>
+                                                <ErrorMessage
+                                                    errors={errors}
+                                                    name="password"
+                                                    render={({ message }) => (
+                                                        <p className="text-destructive text-sm mt-1">{message}</p>
+                                                    )}
+                                                />
+                                                {isEditMode && (
+                                                    <p className="text-muted-foreground text-xs mt-1">
+                                                        {t("leaveBlankToKeepCurrent")}
+                                                    </p>
                                                 )}
-                                            />
-                                            {isEditMode && (
-                                                <p className="text-muted-foreground text-xs mt-1">
-                                                    {t("leaveBlankToKeepCurrent")}
-                                                </p>
-                                            )}
-                                        </div>
-                                    )}
+                                            </div>
+                                        );
+                                    }}
                                 />
                                 
                                 <Separator className="my-1" />
