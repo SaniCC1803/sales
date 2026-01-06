@@ -38,4 +38,12 @@ export class CreateApplicationDto {
   @IsString({ each: true })
   @IsOptional()
   carousel?: string[];
+
+  @IsOptional()
+  @IsString()
+  contactEmail?: string;
+
+  @IsOptional()
+  @IsString()
+  websiteUrl?: string;
 }

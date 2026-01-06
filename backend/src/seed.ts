@@ -1,3 +1,35 @@
+// Utility to clear all tables before seeding
+async function clearDatabase(dataSource: DataSource) {
+  // Delete child tables first to avoid FK errors
+  await dataSource
+    .getRepository(ProductTranslation)
+    .createQueryBuilder()
+    .delete()
+    .execute();
+  await dataSource
+    .getRepository(Product)
+    .createQueryBuilder()
+    .delete()
+    .execute();
+  await dataSource
+    .getRepository(CategoryTranslation)
+    .createQueryBuilder()
+    .delete()
+    .execute();
+  await dataSource
+    .getRepository(Category)
+    .createQueryBuilder()
+    .delete()
+    .execute();
+  await dataSource
+    .getRepository(Application)
+    .createQueryBuilder()
+    .delete()
+    .execute();
+  // Uncomment these lines if you want to clear users as well
+  // await dataSource.getRepository(User).createQueryBuilder().delete().execute();
+  console.log('All tables cleared ✅');
+}
 import { DataSource } from 'typeorm';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
@@ -5,9 +37,9 @@ import { CategoriesService } from './categories/categories.service';
 import { CreateCategoryDto } from './categories/categories.dto';
 import { Category } from './categories/category.entity';
 import { CategoryTranslation } from './categories/category-translations.entity';
-import { User, Role } from './users/user.entity';
-import { CreateUserDto } from './users/users.dto';
-import { UsersService } from './users/users.service';
+// import { User, Role } from './users/user.entity';
+// import { CreateUserDto } from './users/users.dto';
+// import { UsersService } from './users/users.service';
 import { Application } from './applications/application.entity';
 import { CreateApplicationDto } from './applications/applications.dto';
 import { ApplicationsService } from './applications/applications.service';
@@ -16,35 +48,35 @@ import { ProductTranslation } from './products/product-translations.entity';
 import { ProductsService } from './products/products.service';
 import { Language } from './shared-types';
 
-async function seedUsers() {
-  const app = await NestFactory.createApplicationContext(AppModule);
-  const dataSource = app.get(DataSource);
+// async function seedUsers() {
+//   const app = await NestFactory.createApplicationContext(AppModule);
+//   const dataSource = app.get(DataSource);
 
-  const userRepo = dataSource.getRepository(User);
-  const userService = app.get(UsersService);
+//   const userRepo = dataSource.getRepository(User);
+//   const userService = app.get(UsersService);
 
-  // --- CLEAR EXISTING DATA ---
-  await userRepo.createQueryBuilder().delete().execute();
-  console.log('Database cleared ✅');
+//   // --- CLEAR EXISTING DATA ---
+//   await userRepo.createQueryBuilder().delete().execute();
+//   console.log('Database cleared ✅');
 
-  // ---- Users Category ----
-  const userDto1: CreateUserDto = {
-    email: 'a.gj.sani@gmail.com',
-    password: 'sani$123',
-    role: Role.SUPERADMIN,
-  };
-  await userService.create(userDto1);
+//   // ---- Users Category ----
+//   const userDto1: CreateUserDto = {
+//     email: 'a.gj.sani@gmail.com',
+//     password: 'sani$123',
+//     role: Role.SUPERADMIN,
+//   };
+//   await userService.create(userDto1);
 
-  const userDto2: CreateUserDto = {
-    email: 'sani@codechem.com',
-    password: 'sani$123',
-    role: Role.USER,
-  };
-  await userService.create(userDto2);
+//   const userDto2: CreateUserDto = {
+//     email: 'sani@codechem.com',
+//     password: 'sani$123',
+//     role: Role.USER,
+//   };
+//   await userService.create(userDto2);
 
-  console.log('Users seeded ✅');
-  await app.close();
-}
+//   console.log('Users seeded ✅');
+//   await app.close();
+// }
 
 async function seedApplication() {
   const app = await NestFactory.createApplicationContext(AppModule);
@@ -79,6 +111,8 @@ async function seedApplication() {
       'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=800&q=80',
     ],
+    contactEmail: 'contact@furniture-app.com',
+    websiteUrl: 'http://localhost:5173',
   };
 
   await applicationService.create(applicationDto);
@@ -236,12 +270,29 @@ async function seedProducts() {
   // Get some categories to link products to
 
   // Find subcategories for seeding
-  const officeChairsCategory = await categoryRepo.findOne({ where: { translations: { name: 'Office Chairs' } }, relations: ['translations'] });
-  const homeChairsCategory = await categoryRepo.findOne({ where: { translations: { name: 'Home Chairs' } }, relations: ['translations'] });
-  const diningTablesCategory = await categoryRepo.findOne({ where: { translations: { name: 'Dining Tables' } }, relations: ['translations'] });
-  const coffeeTablesCategory = await categoryRepo.findOne({ where: { translations: { name: 'Coffee Tables' } }, relations: ['translations'] });
+  const officeChairsCategory = await categoryRepo.findOne({
+    where: { translations: { name: 'Office Chairs' } },
+    relations: ['translations'],
+  });
+  const homeChairsCategory = await categoryRepo.findOne({
+    where: { translations: { name: 'Home Chairs' } },
+    relations: ['translations'],
+  });
+  const diningTablesCategory = await categoryRepo.findOne({
+    where: { translations: { name: 'Dining Tables' } },
+    relations: ['translations'],
+  });
+  const coffeeTablesCategory = await categoryRepo.findOne({
+    where: { translations: { name: 'Coffee Tables' } },
+    relations: ['translations'],
+  });
 
-  if (!officeChairsCategory || !homeChairsCategory || !diningTablesCategory || !coffeeTablesCategory) {
+  if (
+    !officeChairsCategory ||
+    !homeChairsCategory ||
+    !diningTablesCategory ||
+    !coffeeTablesCategory
+  ) {
     console.error('Subcategories not found. Please seed categories first.');
     await app.close();
     return;
@@ -359,7 +410,14 @@ async function seedProducts() {
 
 async function seedAll() {
   try {
-    await seedUsers();
+    // Create app context just for clearing
+    const app = await NestFactory.createApplicationContext(AppModule);
+    const dataSource = app.get(DataSource);
+    await clearDatabase(dataSource);
+    await app.close();
+
+    // Now run the actual seeders
+    // await seedUsers();
     await seedApplication();
     await seedCategories();
     await seedProducts();

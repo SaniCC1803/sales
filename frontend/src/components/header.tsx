@@ -11,6 +11,8 @@ import HamburgerMenu from "./icons/HamburgerMenu";
 import { ThemeSelector } from "./ThemeSelector";
 import { ThemeTabs } from "./dark-light-mode-button";
 import CategoryNav from "./CategoryNav";
+import UserDropdown from "./ui/UserDropdown";
+import { useLocation } from "react-router-dom";
 
 type HeaderProps = {
   application: Application
@@ -19,6 +21,18 @@ type HeaderProps = {
 export default function Header({ application }: HeaderProps) {
   const { language } = useLanguage();
   const [open, setOpen] = useState(false);
+  const location = useLocation();
+  // Get user email from JWT (if present)
+  let userEmail = "Unknown";
+  try {
+    const token = localStorage.getItem("userToken");
+    if (token) {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      userEmail = payload.email || "Unknown";
+    }
+  } catch (e) {
+    console.error(e);
+  }
 
   return (
     <>
@@ -33,13 +47,23 @@ export default function Header({ application }: HeaderProps) {
 
       {/* Desktop */}
       <div>
-        <nav className="hidden md:flex space-x-6 items-center">
+        <nav className="hidden md:flex space-x-3 items-center">
           <Link to="/about-us" className="text-foreground hover:text-foreground" style={{ color: 'inherit' }}>
             {t("aboutUs")}
           </Link>
           <ThemeTabs />
           {/* ThemeSelector as dropdown with icon */}
           <ThemeSelector dropdown />
+          {/* Show UserDropdown only on /admin route */}
+          {location.pathname === "/admin" && (
+            <UserDropdown
+              email={userEmail}
+              onLogout={() => {
+                localStorage.removeItem("userToken");
+                window.location.href = "/";
+              }}
+            />
+          )}
         </nav>
       </div>
 

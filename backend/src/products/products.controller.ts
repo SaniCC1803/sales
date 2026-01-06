@@ -8,10 +8,11 @@ import {
   Body,
   UseInterceptors,
   UploadedFile,
-  ValidationPipe,
-  UsePipes,
+  UploadedFiles,
+  UseGuards,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { ProductsService } from '../products/products.service';
@@ -24,11 +25,12 @@ export class ProductsController {
   @Get() async getAll() {
     return await this.productsService.findAll();
   }
-  
+
   @Get(':id') getOne(@Param('id') id: number) {
     return this.productsService.findOne(id);
   }
-  
+
+  @UseGuards(JwtAuthGuard)
   @Post()
   @UseInterceptors(
     FileInterceptor('image', {
@@ -62,14 +64,21 @@ export class ProductsController {
       translations: JSON.parse(translations),
       price: parseFloat(price),
       categoryId: parsedCategoryId,
-      images: file ? [`/uploads/products/${file.filename}`] : (images ? JSON.parse(images) : ['https://www.shutterstock.com/image-vector/image-icon-trendy-flat-style-600nw-643080895.jpg']),
+      images: file
+        ? [`/uploads/products/${file.filename}`]
+        : images
+          ? JSON.parse(images)
+          : [
+              'https://www.shutterstock.com/image-vector/image-icon-trendy-flat-style-600nw-643080895.jpg',
+            ],
     };
     return await this.productsService.create(dto, file);
   }
-  
+
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
   @UseInterceptors(
-    FileInterceptor('image', {
+    FilesInterceptor('images', 10, {
       storage: diskStorage({
         destination: './uploads/products',
         filename: (req, file, cb) => {
@@ -89,18 +98,31 @@ export class ProductsController {
     @Body('price') price: string,
     @Body('categoryId') categoryId: string,
     @Body('images') images: string,
-    @UploadedFile() file?: Express.Multer.File,
+    @UploadedFiles() files?: Array<Express.Multer.File>,
   ) {
+    // Parse URLs from images field
+    let urlImages: string[] = [];
+    try {
+      urlImages = images ? JSON.parse(images) : [];
+    } catch (e) {
+      urlImages = [];
+    }
+    // Add uploaded file paths
+    const fileImages = Array.isArray(files)
+      ? files.map((f) => `/uploads/products/${f.filename}`)
+      : [];
     const dto: CreateProductDto = {
       translations: JSON.parse(translations),
       price: parseFloat(price),
       categoryId: parseInt(categoryId),
-      images: file ? [`/uploads/products/${file.filename}`] : (images ? JSON.parse(images) : []),
+      images: [...urlImages, ...fileImages],
     };
-    return this.productsService.update(id, dto, file);
+    return this.productsService.update(id, dto, files);
   }
-  
-  @Delete(':id') delete(@Param('id') id: number) {
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  delete(@Param('id') id: number) {
     return this.productsService.remove(id);
   }
 }

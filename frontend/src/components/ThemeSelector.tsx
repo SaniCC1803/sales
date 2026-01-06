@@ -1,5 +1,5 @@
 import { changeTheme, colors } from "../lib/utils";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Palette } from "lucide-react";
 
 type ThemeSelectorProps = {
@@ -9,6 +9,23 @@ type ThemeSelectorProps = {
 
 export function ThemeSelector({ dropdown, onSelect }: ThemeSelectorProps) {
   const [open, setOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+    if (open) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [open]);
 
   if (!dropdown) {
     return (
@@ -26,7 +43,7 @@ export function ThemeSelector({ dropdown, onSelect }: ThemeSelectorProps) {
   }
 
   return (
-    <div className="relative">
+    <div className="relative" ref={dropdownRef}>
       <button
         className="flex items-center justify-center h-10 w-10 rounded-full border border-input bg-background hover:bg-muted transition-colors"
         onClick={() => setOpen((v) => !v)}

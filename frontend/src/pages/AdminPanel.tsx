@@ -13,6 +13,7 @@ import type { Category } from "@/types/category";
 import type { Product } from "@/types/product";
 import type { User } from "@/types/user";
 import { useEffect, useState } from "react";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 import { useTranslation } from "react-i18next";
 import { Edit3, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -42,14 +43,14 @@ export default function Page() {
   const { t } = useTranslation();
 
   const fetchCategories = () => {
-    fetch("http://localhost:3000/categories")
+    fetchWithAuth("http://localhost:3000/categories")
       .then((res) => res.json())
       .then(setCategories)
       .catch(() => setError("Failed to load categories"));
   };
 
   const fetchProducts = () => {
-    fetch("http://localhost:3000/products")
+    fetchWithAuth("http://localhost:3000/products")
       .then((res) => res.json())
       .then(setProducts)
       .catch(() => setError("Failed to load products"));
@@ -58,7 +59,7 @@ export default function Page() {
   const fetchApplication = () => {
     // Fetch current user's application - you may need to adjust this endpoint
     // based on your authentication system
-    fetch("http://localhost:3000/applications/current")
+    fetchWithAuth("http://localhost:3000/applications/current")
       .then((res) => {
         if (res.ok) {
           return res.json();
@@ -79,7 +80,7 @@ export default function Page() {
   };
 
   const fetchUsers = () => {
-    fetch("http://localhost:3000/users")
+    fetchWithAuth("http://localhost:3000/users")
       .then((res) => res.json())
       .then(setUsers)
       .catch(() => setError("Failed to load users"));
@@ -132,8 +133,8 @@ export default function Page() {
       } else if (deleteModal.type === 'user') {
         endpoint = 'users';
       }
-      
-      const res = await fetch(`http://localhost:3000/${endpoint}/${deleteModal.id}`, {
+
+      const res = await fetchWithAuth(`http://localhost:3000/${endpoint}/${deleteModal.id}`, {
         method: 'DELETE',
       });
 
@@ -214,23 +215,26 @@ export default function Page() {
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1 md:hidden" />
           <Separator orientation="vertical" className="mr-2 h-4 md:hidden" />
-          <div className="w-full flex justify-between">
+          <div className="w-full flex justify-between items-center">
             <h1 className="text-xl font-semibold capitalize">{activeSection === "applications" ? t("application") : activeSection === "users" ? t("user") : t(activeSection)}</h1>
-            <CreateEditDrawer
-              onCategoryCreated={fetchCategories}
-              onProductCreated={fetchProducts}
-              onApplicationCreated={fetchApplication}
-              onUserCreated={fetchUsers}
-              editCategory={editingCategory}
-              editProduct={editingProduct}
-              editApplication={editingApplication ? application : null}
-              editUser={editingUser}
-              onEditComplete={handleEditComplete}
-              onProductEditComplete={handleProductEditComplete}
-              onApplicationEditComplete={handleApplicationEditComplete}
-              onUserEditComplete={handleUserEditComplete}
-              activeSection={activeSection}
-            />
+            <div className="flex items-center gap-4">
+              <CreateEditDrawer
+                onCategoryCreated={fetchCategories}
+                onProductCreated={fetchProducts}
+                onApplicationCreated={fetchApplication}
+                onUserCreated={fetchUsers}
+                editCategory={editingCategory}
+                editProduct={editingProduct}
+                editApplication={editingApplication ? application : null}
+                editUser={editingUser}
+                onEditComplete={handleEditComplete}
+                onProductEditComplete={handleProductEditComplete}
+                onApplicationEditComplete={handleApplicationEditComplete}
+                onUserEditComplete={handleUserEditComplete}
+                activeSection={activeSection}
+              />
+              {/* Removed UserDropdown from here; now only in main header */}
+            </div>
           </div>
         </header>
 
@@ -247,35 +251,35 @@ export default function Page() {
                       {t("edit")}
                     </Button>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {application.logo && (
                       <div className="lg:col-span-1">
                         <label className="text-sm font-bold text-primary mb-3 block uppercase tracking-wide">{t("logo")}</label>
                         <div className="bg-muted/30 border border-border rounded-lg p-6 flex items-center justify-center">
-                          <img 
+                          <img
                             src={application.logo.startsWith('http') ? application.logo : `http://localhost:3000${application.logo}`}
-                            alt="Application Logo" 
+                            alt="Application Logo"
                             className="max-w-full max-h-48 object-contain rounded-lg"
                           />
                         </div>
                       </div>
                     )}
-                    
+
                     <div className={`${application.logo ? 'lg:col-span-2' : 'lg:col-span-3'} space-y-6`}>
                       <div>
                         <label className="text-sm font-bold text-primary mb-3 block uppercase tracking-wide">{t("name")}</label>
                         <p className="text-2xl font-bold text-foreground">
-                          {application.translations.find(t => t.language === 'en')?.name || 
-                           application.translations[0]?.name || 'Unnamed Application'}
+                          {application.translations.find(t => t.language === 'en')?.name ||
+                            application.translations[0]?.name || 'Unnamed Application'}
                         </p>
                       </div>
-                      
+
                       <div>
                         <label className="text-sm font-bold text-primary mb-3 block uppercase tracking-wide">{t("description")}</label>
                         <p className="text-lg text-muted-foreground leading-relaxed font-medium">
-                          {application.translations.find(t => t.language === 'en')?.description || 
-                           application.translations[0]?.description || 'No description provided'}
+                          {application.translations.find(t => t.language === 'en')?.description ||
+                            application.translations[0]?.description || 'No description provided'}
                         </p>
                       </div>
                     </div>
@@ -305,25 +309,44 @@ export default function Page() {
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {activeSection === "categories"
-                ? categories.map((cat) => (
-                  <CardComponent
-                    key={cat.id}
-                    item={cat}
-                    onDelete={handleDeleteCategory}
-                    onEdit={handleEdit}
-                  />
-                ))
-                : products.map((product) => (
-                  <CardComponent
-                    key={product.id}
-                    item={product}
-                    onDelete={handleDeleteProduct}
-                    onEdit={handleEdit}
-                  />
-                ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {activeSection === "categories"
+                  ? categories.map((cat) => (
+                    <CardComponent
+                      key={cat.id}
+                      item={cat}
+                      onDelete={handleDeleteCategory}
+                      onEdit={handleEdit}
+                    />
+                  ))
+                  : products.map((product) => (
+                    <CardComponent
+                      key={product.id}
+                      item={product}
+                      onDelete={handleDeleteProduct}
+                      onEdit={handleEdit}
+                    />
+                  ))}
+              </div>
+              {activeSection === "categories" && (
+                <>
+                  <h2 className="text-xl font-semibold mt-8 mb-4">Subcategories</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    {categories
+                      .flatMap(cat => cat.subcategories || [])
+                      .map(sub => (
+                        <CardComponent
+                          key={sub.id}
+                          item={sub}
+                          onDelete={handleDeleteCategory}
+                          onEdit={handleEdit}
+                        />
+                      ))}
+                  </div>
+                </>
+              )}
+            </>
           )}
         </section>
       </SidebarInset>

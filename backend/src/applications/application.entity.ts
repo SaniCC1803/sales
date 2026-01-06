@@ -1,9 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToMany,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { ApplicationTranslation } from './application-translations.entity';
 import { Language } from '../shared-types';
 
@@ -30,6 +25,12 @@ export class Application {
     eager: true,
   })
   translations!: ApplicationTranslation[];
+
+  @Column({ nullable: true })
+  contactEmail?: string;
+
+  @Column({ nullable: true })
+  websiteUrl?: string;
 
   @Column({
     type: 'varchar',

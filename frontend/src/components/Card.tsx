@@ -51,6 +51,19 @@ export default function CardComponent({ item, onDelete, onEdit }: CardProps) {
         return '';
     };
 
+    // Only for admin panel: show isConfirmed checkbox for users
+    const renderIsConfirmedCheckbox = () => {
+        if (isUser && isAdmin) {
+            return (
+                <div className="flex items-center justify-center mt-2">
+                    <input type="checkbox" checked={item.isConfirmed} readOnly className="mr-2" />
+                    <span className="text-xs text-muted-foreground">Confirmed</span>
+                </div>
+            );
+        }
+        return null;
+    };
+
     // Helper function to get image for any item type
     const getDisplayImage = () => {
         if ('translations' in item) {
@@ -102,7 +115,18 @@ export default function CardComponent({ item, onDelete, onEdit }: CardProps) {
                 )}
                 <CardTitle className={isUser ? 'text-center' : ''}>{getDisplayName()}</CardTitle>
                 <CardDescription className={isUser ? 'text-center' : ''}>{getDisplayDescription()}</CardDescription>
+                {/* Subcategories display for Category */}
+                {'subcategories' in item && Array.isArray(item.subcategories) && item.subcategories.length > 0 && (
+                    <div className="mt-2 text-sm text-muted-foreground">
+                        <span className="font-semibold">Subcategories:</span> {item.subcategories.map((sub) => {
+                            // Try to get the subcategory name in the current language
+                            const name = sub.translations?.find((t) => t.language === language)?.name || sub.translations?.[0]?.name || 'Unnamed';
+                            return name;
+                        }).join(', ')}
+                    </div>
+                )}
                 <div className="flex flex-col flex-1">
+                    {renderIsConfirmedCheckbox()}
                     <div className="flex-1" />
                     {'price' in item && (
                         <div className="mb-2">

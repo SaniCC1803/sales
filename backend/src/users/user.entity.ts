@@ -22,4 +22,12 @@ export class User {
     default: Role.USER,
   })
   role!: Role;
+  @Column({ default: false })
+  isConfirmed!: boolean;
+
+  @Column({ nullable: true })
+  confirmationToken?: string;
+
+  @Column({ nullable: true })
+  refreshToken?: string;
 }

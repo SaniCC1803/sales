@@ -5,7 +5,6 @@ import { useLanguage } from "@/context/LanguageContext";
 
 export default function CategoryNav() {
   const location = useLocation();
-  if (location.pathname.startsWith('/admin') || location.pathname.startsWith('/about-us')) return null;
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const { language } = useLanguage();
@@ -19,6 +18,7 @@ export default function CategoryNav() {
 
   if (loading) return null;
   if (!categories.length) return null;
+  if (location.pathname.startsWith('/admin') || location.pathname.startsWith('/about-us')) return null;
 
   // Flatten all categories and subcategories into a single array for rendering with dividers
   const navItems = categories.flatMap((cat) => [

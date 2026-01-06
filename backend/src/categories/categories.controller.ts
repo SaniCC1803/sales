@@ -8,7 +8,9 @@ import {
   Body,
   UseInterceptors,
   UploadedFile,
+  UseGuards,
 } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import * as path from 'path';
 import { Request } from 'express';
 import { CategoriesService } from './categories.service';
@@ -46,17 +48,20 @@ export class CategoriesController {
     return this.categoriesService.findOne(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   @UseInterceptors(FileInterceptor('image', { storage: categoryStorage() }))
   create(
     @UploadedFile() file: Express.Multer.File,
     @Body('translations') translationsJson: string,
+    @Body('parentId') parentId?: string,
   ) {
     try {
       const translationsRaw: unknown = JSON.parse(translationsJson);
       const translations = translationsRaw as CreateCategoryDto['translations'];
       const categoryData: CreateCategoryDto = {
         translations,
+        parentId: parentId ? Number(parentId) : undefined,
       };
 
       return this.categoriesService.create(categoryData, file);
@@ -66,6 +71,7 @@ export class CategoriesController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
   @UseInterceptors(FileInterceptor('image', { storage: categoryStorage() }))
   update(
@@ -88,6 +94,7 @@ export class CategoriesController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   delete(@Param('id') id: number) {
     return this.categoriesService.remove(id);

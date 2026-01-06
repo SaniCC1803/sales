@@ -16,35 +16,39 @@ export class ProductsService {
   ) {}
 
   async findAll() {
-    const products = await this.productRepo.find({ 
-      relations: ['category', 'translations'] 
+    const products = await this.productRepo.find({
+      relations: ['category', 'translations'],
     });
     return products;
   }
-  
+
   findOne(id: number) {
-    return this.productRepo.findOne({ 
-      where: { id }, 
-      relations: ['category', 'translations'] 
+    return this.productRepo.findOne({
+      where: { id },
+      relations: ['category', 'translations'],
     });
   }
-  
+
   async create(dto: CreateProductDto, file?: Express.Multer.File) {
     // First, validate that the category exists
-    const category = await this.categoryRepo.findOne({ where: { id: dto.categoryId } });
+    const category = await this.categoryRepo.findOne({
+      where: { id: dto.categoryId },
+    });
     if (!category) {
       throw new Error(`Category not found. Please select a valid category.`);
     }
 
     const entity = new Product();
-    
+
     if (file) {
       entity.images = [`/uploads/products/${file.filename}`];
     } else if (dto.images && dto.images.length > 0) {
       entity.images = dto.images;
     } else {
       // Provide default image if neither file nor URL is provided
-      entity.images = ['https://www.shutterstock.com/image-vector/image-icon-trendy-flat-style-600nw-643080895.jpg'];
+      entity.images = [
+        'https://www.shutterstock.com/image-vector/image-icon-trendy-flat-style-600nw-643080895.jpg',
+      ];
     }
 
     entity.price = dto.price;
@@ -62,28 +66,33 @@ export class ProductsService {
 
     return this.productRepo.save(entity);
   }
-  
-  async update(id: number, dto: CreateProductDto, file?: Express.Multer.File) {
-    const product = await this.productRepo.findOne({ 
+
+  async update(id: number, dto: CreateProductDto, files?: Express.Multer.File[]) {
+    const product = await this.productRepo.findOne({
       where: { id },
-      relations: ['translations']
+      relations: ['translations'],
     });
-    
+
     if (!product) {
       throw new Error(`Product with id ${id} not found`);
     }
 
     // Validate category exists
-    const category = await this.categoryRepo.findOne({ where: { id: dto.categoryId } });
+    const category = await this.categoryRepo.findOne({
+      where: { id: dto.categoryId },
+    });
     if (!category) {
       throw new Error(`Category not found. Please select a valid category.`);
     }
 
-    // Update images if file is provided, or if DTO has images
-    if (file) {
-      product.images = [`/uploads/products/${file.filename}`];
-    } else if (dto.images && dto.images.length > 0) {
-      product.images = dto.images;
+    // Combine DTO image URLs and uploaded file paths, removing duplicates
+    const fileImages = Array.isArray(files)
+      ? files.map(f => `/uploads/products/${f.filename}`)
+      : [];
+    if ((dto.images && dto.images.length > 0) || fileImages.length > 0) {
+      const allImages = [...(dto.images || []), ...fileImages];
+      // Remove duplicates
+      product.images = Array.from(new Set(allImages));
     }
 
     // Update price and category
@@ -94,7 +103,7 @@ export class ProductsService {
     if (dto.translations) {
       // Remove existing translations
       product.translations = [];
-      
+
       // Add new translations
       product.translations = dto.translations.map((t: any) => {
         const translation = new ProductTranslation();
@@ -107,7 +116,7 @@ export class ProductsService {
 
     return this.productRepo.save(product);
   }
-  
+
   remove(id: number) {
     return this.productRepo.delete(id);
   }

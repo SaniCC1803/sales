@@ -10,6 +10,8 @@ import { useTranslation } from "react-i18next";
 import { Label } from "./ui/label";
 import { ErrorMessage } from "@hookform/error-message";
 import SingleImageUpload from "./SingleImageUpload";
+import MultiImageDropzone from "./MultiImageDropzone";
+// import MultiImageDropzoneWithPreview from './MultiImageDropzoneWithPreview';
 import { Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
 import { useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
@@ -17,6 +19,7 @@ import type { Category } from "@/types/category";
 import type { Product } from "@/types/product";
 import type { Application } from "@/types/application";
 import type { User } from "@/types/user";
+import { fetchWithAuth } from '@/lib/fetchWithAuth';
 
 type CategoryFormValues = {
     translations: {
@@ -25,6 +28,7 @@ type CategoryFormValues = {
         description?: string;
     }[];
     image: File | null;
+    parentId?: number | null;
 };
 
 type ProductFormValues = {
@@ -35,7 +39,7 @@ type ProductFormValues = {
     }[];
     price: string;
     categoryId: number;
-    image: File | null;
+    images: string[];
 };
 
 type ApplicationFormValues = {
@@ -94,15 +98,15 @@ export default function CreateEditDrawer({
     const isApplicationMode = activeSection === 'applications';
     const isUserMode = activeSection === 'users';
 
-    // Fetch categories for product creation
+    // Fetch categories for product creation and for parent selection in category form
     useEffect(() => {
-        if (isProductMode) {
+        if (isProductMode || activeSection === 'categories') {
             fetch('http://localhost:3000/categories')
                 .then(res => res.json())
                 .then(setCategories)
                 .catch(console.error);
         }
-    }, [isProductMode]);
+    }, [isProductMode, activeSection]);
 
     // Helper function to get default values for categories
     const getCategoryDefaultValues = () => {
@@ -116,7 +120,8 @@ export default function CreateEditDrawer({
                         description: existingTranslation?.description || '',
                     };
                 }),
-                image: null, // File will be handled separately for edit
+                image: null,
+                parentId: editCategory.parentId ?? null,
             };
         }
         return {
@@ -126,6 +131,7 @@ export default function CreateEditDrawer({
                 description: '',
             })),
             image: null,
+            parentId: null,
         };
     };
 
@@ -143,7 +149,7 @@ export default function CreateEditDrawer({
                 }),
                 price: editProduct.price.toString(),
                 categoryId: editProduct.category?.id || editProduct.categoryId || 0,
-                image: null,
+                images: Array.isArray(editProduct.images) ? editProduct.images : [], // Start with existing image URLs for edit
             };
         }
         return {
@@ -154,7 +160,7 @@ export default function CreateEditDrawer({
             })),
             price: '',
             categoryId: 0,
-            image: null,
+            images: [],
         };
     };
 
@@ -207,30 +213,22 @@ export default function CreateEditDrawer({
 
     // Reset form when editCategory, editProduct, editApplication, or editUser changes
     useEffect(() => {
-        if (isUserMode) {
+        if (isUserMode && editUser) {
             reset(getUserDefaultValues());
-            if (editUser) {
-                setIsOpen(true);
-            }
-        } else if (isApplicationMode) {
+            setIsOpen(true);
+        } else if (isApplicationMode && editApplication) {
             reset(getApplicationDefaultValues());
-            if (editApplication) {
-                setIsOpen(true);
-            }
-        } else if (isProductMode) {
+            setIsOpen(true);
+        } else if (isProductMode && editProduct) {
             reset(getProductDefaultValues());
-            if (editProduct) {
-                setIsOpen(true);
-            }
-        } else {
+            setIsOpen(true);
+        } else if (editCategory && activeSection === 'categories') {
             reset(getCategoryDefaultValues());
-            if (editCategory) {
-                console.log('Edit category data:', editCategory);
-                console.log('Image URL:', editCategory.image);
-                setIsOpen(true);
-            }
+            setIsOpen(true);
+        } else {
+            setIsOpen(false);
         }
-    }, [editCategory, editProduct, editApplication, editUser, isProductMode, isApplicationMode, isUserMode]);
+    }, [editCategory, editProduct, editApplication, editUser, activeSection, isProductMode, isApplicationMode, isUserMode]);
 
     const onSubmit = async (data: CategoryFormValues | ProductFormValues | ApplicationFormValues | UserFormValues) => {
         if (isApplicationMode) {
@@ -244,12 +242,12 @@ export default function CreateEditDrawer({
             try {
                 let res;
                 if (isEditMode && editApplication) {
-                    res = await fetch(`http://localhost:3000/applications/${editApplication.id}`, {
+                    res = await fetchWithAuth(`http://localhost:3000/applications/${editApplication.id}`, {
                         method: 'PUT',
                         body: formData,
                     });
                 } else {
-                    res = await fetch('http://localhost:3000/applications', {
+                    res = await fetchWithAuth('http://localhost:3000/applications', {
                         method: 'POST',
                         body: formData,
                     });
@@ -273,12 +271,12 @@ export default function CreateEditDrawer({
         } else if (isUserMode) {
             // Handle user submission
             const userData = data as UserFormValues;
-            
+
             try {
                 let res;
                 if (isEditMode && editUser) {
                     // Update existing user
-                    res = await fetch(`http://localhost:3000/users/${editUser.id}`, {
+                    res = await fetchWithAuth(`http://localhost:3000/users/${editUser.id}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
@@ -291,7 +289,7 @@ export default function CreateEditDrawer({
                     });
                 } else {
                     // Create new user
-                    res = await fetch('http://localhost:3000/users', {
+                    res = await fetchWithAuth('http://localhost:3000/users', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -322,21 +320,32 @@ export default function CreateEditDrawer({
         } else if (isProductMode) {
             // Handle product submission
             const productData = data as ProductFormValues;
+
             const formData = new FormData();
             formData.append('translations', JSON.stringify(productData.translations));
             formData.append('price', productData.price.toString());
             formData.append('categoryId', productData.categoryId.toString());
-            if (productData.image) formData.append('image', productData.image);
-            
+
+            // Separate URLs and Files
+            const imageUrls = (productData.images || []).filter(img => typeof img === 'string');
+            const imageFiles = (productData.images || []).filter(img => typeof img === 'object' && img !== null && 'type' in img);
+
+            // Send URLs as a single JSON string
+            formData.append('images', JSON.stringify(imageUrls));
+            // Send new files as FormData files (images[])
+            imageFiles.forEach((file, idx) => {
+                formData.append('images', file);
+            });
+
             try {
                 let res;
                 if (isEditMode && editProduct) {
-                    res = await fetch(`http://localhost:3000/products/${editProduct.id}`, {
+                    res = await fetchWithAuth(`http://localhost:3000/products/${editProduct.id}`, {
                         method: 'PUT',
                         body: formData,
                     });
                 } else {
-                    res = await fetch('http://localhost:3000/products', {
+                    res = await fetchWithAuth('http://localhost:3000/products', {
                         method: 'POST',
                         body: formData,
                     });
@@ -346,10 +355,25 @@ export default function CreateEditDrawer({
                     console.error(`Error ${isEditMode ? 'updating' : 'creating'} product`);
                 } else {
                     console.log(`Product ${isEditMode ? 'updated' : 'created'}!`);
-                    reset();
                     if (isEditMode) {
+                        // For edit, reset to updated product values
+                        try {
+                            const updatedProduct = await res.json();
+                            if (updatedProduct && Array.isArray(updatedProduct.images)) {
+                                reset({
+                                    ...productData,
+                                    images: updatedProduct.images // Only URLs, no File objects
+                                });
+                            } else {
+                                reset();
+                            }
+                        } catch (e) {
+                            reset();
+                        }
                         onProductEditComplete?.();
                     } else {
+                        // For create, always reset to empty fields
+                        reset(getProductDefaultValues());
                         onProductCreated?.();
                     }
                     setIsOpen(false);
@@ -363,19 +387,20 @@ export default function CreateEditDrawer({
             const formData = new FormData();
             formData.append('translations', JSON.stringify(categoryData.translations));
             if (categoryData.image) formData.append('image', categoryData.image);
+            if (categoryData.parentId) formData.append('parentId', String(categoryData.parentId));
             console.log("Form Data to be submitted:", categoryData);
 
             try {
                 let res;
                 if (isEditMode && editCategory) {
                     // Update existing category
-                    res = await fetch(`http://localhost:3000/categories/${editCategory.id}`, {
+                    res = await fetchWithAuth(`http://localhost:3000/categories/${editCategory.id}`, {
                         method: 'PUT',
                         body: formData,
                     });
                 } else {
                     // Create new category
-                    res = await fetch('http://localhost:3000/categories', {
+                    res = await fetchWithAuth('http://localhost:3000/categories', {
                         method: 'POST',
                         body: formData,
                     });
@@ -385,10 +410,11 @@ export default function CreateEditDrawer({
                     console.error(`Error ${isEditMode ? 'updating' : 'creating'} category`);
                 } else {
                     console.log(`Category ${isEditMode ? 'updated' : 'created'}!`);
-                    reset();
                     if (isEditMode) {
+                        reset(getCategoryDefaultValues());
                         onEditComplete?.();
                     } else {
+                        reset(getCategoryDefaultValues());
                         onCategoryCreated?.();
                     }
                     setIsOpen(false);
@@ -425,8 +451,8 @@ export default function CreateEditDrawer({
             <SheetContent className="flex flex-col md:max-w-md md:w-[400px] bg-background z-[100]">
                 <SheetHeader>
                     <SheetTitle>
-                        {isEditMode 
-                            ? `${t("edit")} ${isApplicationMode ? t("application") : isProductMode ? t("product") : isUserMode ? t("user") : t("category")}` 
+                        {isEditMode
+                            ? `${t("edit")} ${isApplicationMode ? t("application") : isProductMode ? t("product") : isUserMode ? t("user") : t("category")}`
                             : `${t("create")} ${isApplicationMode ? t("application") : isProductMode ? t("product") : isUserMode ? t("user") : t("category")}`}
                     </SheetTitle>
                 </SheetHeader>
@@ -498,9 +524,9 @@ export default function CreateEditDrawer({
                                         <div>
                                             <SingleImageUpload
                                                 value={field.value}
-                                                existingImageUrl={editApplication?.logo ? 
-                                                  (editApplication.logo.startsWith('http') ? editApplication.logo : `http://localhost:3000${editApplication.logo}`) 
-                                                  : undefined
+                                                existingImageUrl={editApplication?.logo ?
+                                                    (editApplication.logo.startsWith('http') ? editApplication.logo : `http://localhost:3000${editApplication.logo}`)
+                                                    : undefined
                                                 }
                                                 onChange={field.onChange}
                                                 onBlur={field.onBlur}
@@ -539,8 +565,8 @@ export default function CreateEditDrawer({
                                                     }} aria-label="Remove image">✕</Button>
                                                 </div>
                                             ))}
-                                            {(!field.value || field.value.length < 5) && (
-                                                <Button type="button" variant="outline" onClick={() => field.onChange([...(field.value || []), ""])}>
+                                            {(!Array.isArray(field.value) || field.value.length < 5) && (
+                                                <Button type="button" variant="outline" onClick={() => field.onChange([...(Array.isArray(field.value) ? field.value : []), ""])}>
                                                     + Add Image
                                                 </Button>
                                             )}
@@ -606,12 +632,12 @@ export default function CreateEditDrawer({
                                     );
                                 })}
                                 <Separator className="my-1" />
-                                
+
                                 <Label>{t("price")}</Label>
                                 <Controller
                                     name="price"
                                     control={control}
-                                    rules={{ 
+                                    rules={{
                                         required: t("priceRequired"),
                                         pattern: {
                                             value: /^\d+(\.\d{1,2})?$/,
@@ -627,11 +653,11 @@ export default function CreateEditDrawer({
                                     }}
                                     render={({ field }) => (
                                         <div className="w-full">
-                                            <Input 
-                                                {...field} 
+                                            <Input
+                                                {...field}
                                                 type="text"
                                                 inputMode="decimal"
-                                                placeholder={t("price")} 
+                                                placeholder={t("price")}
                                                 onChange={(e) => {
                                                     const value = e.target.value;
                                                     // Only allow numbers and decimal point
@@ -650,18 +676,18 @@ export default function CreateEditDrawer({
                                         </div>
                                     )}
                                 />
-                                
+
                                 <Label>{t("category")}</Label>
                                 <Controller
                                     name="categoryId"
                                     control={control}
-                                    rules={{ 
+                                    rules={{
                                         required: t("categoryRequired"),
                                         validate: (value) => value !== 0 || t("categoryRequired")
                                     }}
                                     render={({ field }) => (
                                         <div className="w-full">
-                                            <select 
+                                            <select
                                                 {...field}
                                                 className="w-full px-3 py-2 border border-input bg-background rounded-md"
                                                 onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
@@ -669,8 +695,8 @@ export default function CreateEditDrawer({
                                                 <option value={0}>{t("selectCategory")}</option>
                                                 {categories.map(cat => (
                                                     <option key={cat.id} value={cat.id}>
-                                                        {cat.translations.find(t => t.language === 'en')?.name || 
-                                                         cat.translations[0]?.name}
+                                                        {cat.translations.find(t => t.language === 'en')?.name ||
+                                                            cat.translations[0]?.name}
                                                     </option>
                                                 ))}
                                             </select>
@@ -684,30 +710,41 @@ export default function CreateEditDrawer({
                                         </div>
                                     )}
                                 />
-                                
+
                                 <Separator className="my-1" />
-                                <Label>{t("image")}</Label>
+                                <Label>{t("images")}</Label>
+                                {/* Carousel for existing images (URLs) */}
                                 <Controller
-                                    name="image"
+                                    name="images"
                                     control={control}
-                                    rules={{ required: !isEditMode ? t("imageRequired") : false }}
-                                    render={({ field }) => (
-                                        <div>
-                                            <SingleImageUpload
-                                                value={field.value}
-                                                existingImageUrl={isEditMode ? editProduct?.image : undefined}
-                                                onChange={field.onChange}
-                                                onBlur={field.onBlur}
-                                            />
-                                            <ErrorMessage
-                                                errors={errors}
-                                                name="image"
-                                                render={({ message }) => (
-                                                    <p className="text-destructive text-sm mt-1">{message}</p>
+                                    render={({ field }) => {
+                                        const existingImages = Array.isArray(field.value) ? field.value.filter(f => typeof f === 'string') : [];
+                                        const newFiles = Array.isArray(field.value) ? field.value.filter(f => typeof f === 'object' && f !== null && 'type' in f) : [];
+                                        return (
+                                            <>
+                                                {existingImages.length > 0 && (
+                                                    <div className="flex gap-2 overflow-x-auto mb-2">
+                                                        {existingImages.map((url, idx) => (
+                                                            <div key={idx} className="relative">
+                                                                <img
+                                                                    src={url.startsWith('http') ? url : `http://localhost:3000${url}`}
+                                                                    alt={`product-img-${idx}`}
+                                                                    className="w-20 h-20 object-cover rounded"
+                                                                />
+                                                                <Button type="button" variant="destructive" size="icon" className="absolute top-0 right-0" onClick={() => {
+                                                                    const newArr = [...field.value];
+                                                                    newArr.splice(newArr.indexOf(url), 1);
+                                                                    field.onChange(newArr);
+                                                                }}>✕</Button>
+                                                            </div>
+                                                        ))}
+                                                    </div>
                                                 )}
-                                            />
-                                        </div>
-                                    )}
+                                                {/* MultiImageDropzone for new files */}
+                                                <MultiImageDropzone value={newFiles} onChange={files => field.onChange([...existingImages, ...files])} />
+                                            </>
+                                        );
+                                    }}
                                 />
                             </>
                         ) : isUserMode ? (
@@ -717,7 +754,7 @@ export default function CreateEditDrawer({
                                 <Controller
                                     name="email"
                                     control={control}
-                                    rules={{ 
+                                    rules={{
                                         required: t("emailRequired"),
                                         pattern: {
                                             value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
@@ -726,10 +763,10 @@ export default function CreateEditDrawer({
                                     }}
                                     render={({ field }) => (
                                         <div className="w-full">
-                                            <Input 
-                                                {...field} 
+                                            <Input
+                                                {...field}
                                                 type="email"
-                                                placeholder={t("email")} 
+                                                placeholder={t("email")}
                                             />
                                             <ErrorMessage
                                                 errors={errors}
@@ -741,13 +778,13 @@ export default function CreateEditDrawer({
                                         </div>
                                     )}
                                 />
-                                
+
                                 <Separator className="my-1" />
                                 <Label>{isEditMode ? t("newPassword") : t("password")}</Label>
                                 <Controller
                                     name="password"
                                     control={control}
-                                    rules={{ 
+                                    rules={{
                                         required: !isEditMode ? t("passwordRequired") : false,
                                         minLength: {
                                             value: 6,
@@ -758,10 +795,10 @@ export default function CreateEditDrawer({
                                         const [showPassword, setShowPassword] = useState(false);
                                         return (
                                             <div className="w-full relative">
-                                                <Input 
-                                                    {...field} 
+                                                <Input
+                                                    {...field}
                                                     type={showPassword ? "text" : "password"}
-                                                    placeholder={isEditMode ? t("newPassword") : t("password")} 
+                                                    placeholder={isEditMode ? t("newPassword") : t("password")}
                                                 />
                                                 <button
                                                     type="button"
@@ -787,7 +824,7 @@ export default function CreateEditDrawer({
                                         );
                                     }}
                                 />
-                                
+
                                 <Separator className="my-1" />
                                 <Label>{t("role")}</Label>
                                 <Controller
@@ -796,8 +833,8 @@ export default function CreateEditDrawer({
                                     rules={{ required: t("roleRequired") }}
                                     render={({ field }) => (
                                         <div className="w-full">
-                                            <select 
-                                                {...field} 
+                                            <select
+                                                {...field}
                                                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                             >
                                                 <option value="">{t("selectRole")}</option>
@@ -848,6 +885,40 @@ export default function CreateEditDrawer({
                                         </div>
                                     );
                                 })}
+                                <Separator className="my-1" />
+                                <Label>Category</Label>
+                                <Controller
+                                    name="parentId"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <div className="w-full mb-2">
+                                            <select
+                                                value={field.value ?? ''}
+                                                onChange={e => {
+                                                    const val = e.target.value;
+                                                    field.onChange(val === '' ? null : Number(val));
+                                                }}
+                                                className="w-full px-3 py-2 border border-input bg-background rounded-md"
+                                            >
+                                                <option value="">Select a Category</option>
+                                                {categories
+                                                    .filter(cat => !editCategory || cat.id !== editCategory.id)
+                                                    .map(cat => (
+                                                        <option key={cat.id} value={cat.id}>
+                                                            {cat.translations.find(t => t.language === 'en')?.name || cat.translations[0]?.name}
+                                                        </option>
+                                                    ))}
+                                            </select>
+                                            <ErrorMessage
+                                                errors={errors}
+                                                name="parentId"
+                                                render={({ message }) => (
+                                                    <p className="text-destructive text-sm mt-1">{message}</p>
+                                                )}
+                                            />
+                                        </div>
+                                    )}
+                                />
                                 <Separator className="my-1" />
                                 <Label>{t("description")}</Label>
                                 {languages.map((lang) => {

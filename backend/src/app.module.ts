@@ -5,6 +5,7 @@ import { ApplicationsModule } from './applications/applications.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ProductsModule } from './products/products.module';
 import { User } from './users/user.entity';
+import { AuthModule } from './auth/auth.module';
 import { Application } from './applications/application.entity';
 import { Category } from './categories/category.entity';
 import { Product } from './products/product.entity';
@@ -36,6 +37,7 @@ import { ProductTranslation } from './products/product-translations.entity';
     ApplicationsModule,
     CategoriesModule,
     ProductsModule,
+    AuthModule,
   ],
 })
 export class AppModule {}
