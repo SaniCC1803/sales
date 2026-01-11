@@ -23,9 +23,10 @@ export class CreateProductDto {
   @IsPositive()
   price!: number;
 
+  @IsOptional()
   @IsNumber()
   @Min(1, { message: 'Please select a valid category' })
-  categoryId!: number;
+  categoryId?: number;
 
   @IsArray()
   @ArrayMinSize(1)

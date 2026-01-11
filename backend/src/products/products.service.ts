@@ -29,27 +29,26 @@ export class ProductsService {
     });
   }
 
-  async create(dto: CreateProductDto, file?: Express.Multer.File) {
-    // First, validate that the category exists
-    const category = await this.categoryRepo.findOne({
-      where: { id: dto.categoryId },
-    });
-    if (!category) {
-      throw new Error(`Category not found. Please select a valid category.`);
+  async create(dto: CreateProductDto) {
+    // Validate category if provided
+    let category = null;
+    if (dto.categoryId) {
+      category = await this.categoryRepo.findOne({
+        where: { id: dto.categoryId },
+      });
+      if (!category) {
+        throw new Error(`Category not found. Please select a valid category.`);
+      }
     }
 
     const entity = new Product();
 
-    if (file) {
-      entity.images = [`/uploads/products/${file.filename}`];
-    } else if (dto.images && dto.images.length > 0) {
-      entity.images = dto.images;
-    } else {
-      // Provide default image if neither file nor URL is provided
-      entity.images = [
-        'https://www.shutterstock.com/image-vector/image-icon-trendy-flat-style-600nw-643080895.jpg',
-      ];
-    }
+    // Use the images from DTO which already includes both URLs and uploaded file paths
+    entity.images = dto.images && dto.images.length > 0 
+      ? dto.images 
+      : [
+          'https://www.shutterstock.com/image-vector/image-icon-trendy-flat-style-600nw-643080895.jpg',
+        ];
 
     entity.price = dto.price;
     entity.category = category;
@@ -77,12 +76,15 @@ export class ProductsService {
       throw new Error(`Product with id ${id} not found`);
     }
 
-    // Validate category exists
-    const category = await this.categoryRepo.findOne({
-      where: { id: dto.categoryId },
-    });
-    if (!category) {
-      throw new Error(`Category not found. Please select a valid category.`);
+    // Validate category if provided
+    let category = null;
+    if (dto.categoryId) {
+      category = await this.categoryRepo.findOne({
+        where: { id: dto.categoryId },
+      });
+      if (!category) {
+        throw new Error(`Category not found. Please select a valid category.`);
+      }
     }
 
     // Combine DTO image URLs and uploaded file paths, removing duplicates

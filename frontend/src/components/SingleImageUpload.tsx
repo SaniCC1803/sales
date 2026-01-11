@@ -16,7 +16,6 @@ const SingleImageUpload = ({ value, existingImageUrl, onChange, onBlur }: Single
   const [file, setFile] = useState<File | null>(value ?? null);
   const [filePreview, setFilePreview] = useState<string | undefined>();
 
-  // Update local state when `value` or `existingImageUrl` changes from outside
   useEffect(() => {
     setFile(value ?? null);
     if (value) {
@@ -28,8 +27,10 @@ const SingleImageUpload = ({ value, existingImageUrl, onChange, onBlur }: Single
       };
       reader.readAsDataURL(value);
     } else if (existingImageUrl) {
-      const fullUrl = `http://localhost:3000${existingImageUrl}`;
-      console.log('Setting existing image URL:', fullUrl);
+      // Handle both full URLs and relative paths
+      const fullUrl = existingImageUrl.startsWith('http') 
+        ? existingImageUrl 
+        : `http://localhost:3000${existingImageUrl}`;
       setFilePreview(fullUrl);
     } else {
       setFilePreview(undefined);
@@ -62,8 +63,6 @@ const SingleImageUpload = ({ value, existingImageUrl, onChange, onBlur }: Single
     onChange?.(null);
     onBlur?.();
   };
-
-  console.log('SingleImageUpload render:', { file, filePreview, existingImageUrl });
 
   return (
     <div className="space-y-2">

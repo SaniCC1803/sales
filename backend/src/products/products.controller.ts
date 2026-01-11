@@ -33,7 +33,7 @@ export class ProductsController {
   @UseGuards(JwtAuthGuard)
   @Post()
   @UseInterceptors(
-    FileInterceptor('image', {
+    FilesInterceptor('images', 20, {
       storage: diskStorage({
         destination: './uploads/products',
         filename: (req, file, cb) => {
@@ -50,35 +50,56 @@ export class ProductsController {
   async create(
     @Body('translations') translations: string,
     @Body('price') price: string,
-    @Body('categoryId') categoryId: string,
-    @Body('images') images: string,
-    @UploadedFile() file?: Express.Multer.File,
+    @Body('categoryId') categoryId?: string,
+    @Body('images') images?: string,
+    @UploadedFiles() files?: Array<Express.Multer.File>,
   ) {
-    // Validate that categoryId is provided and is a valid number
-    const parsedCategoryId = parseInt(categoryId);
-    if (!categoryId || isNaN(parsedCategoryId) || parsedCategoryId <= 0) {
+    // Parse categoryId if provided
+    const parsedCategoryId =
+      categoryId && categoryId !== 'undefined' && categoryId !== ''
+        ? parseInt(categoryId)
+        : undefined;
+
+    if (
+      categoryId &&
+      categoryId !== 'undefined' &&
+      categoryId !== '' &&
+      (isNaN(parsedCategoryId!) || parsedCategoryId! <= 0)
+    ) {
       throw new Error('Please select a valid category');
     }
+
+    // Parse URLs from images field
+    let urlImages: string[] = [];
+    try {
+      urlImages = images ? JSON.parse(images) : [];
+    } catch (e) {
+      urlImages = [];
+    }
+
+    // Add uploaded file paths
+    const fileImages = Array.isArray(files)
+      ? files.map((f) => `/uploads/products/${f.filename}`)
+      : [];
 
     const dto: CreateProductDto = {
       translations: JSON.parse(translations),
       price: parseFloat(price),
       categoryId: parsedCategoryId,
-      images: file
-        ? [`/uploads/products/${file.filename}`]
-        : images
-          ? JSON.parse(images)
+      images:
+        [...urlImages, ...fileImages].length > 0
+          ? [...urlImages, ...fileImages]
           : [
               'https://www.shutterstock.com/image-vector/image-icon-trendy-flat-style-600nw-643080895.jpg',
             ],
     };
-    return await this.productsService.create(dto, file);
+    return await this.productsService.create(dto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Put(':id')
   @UseInterceptors(
-    FilesInterceptor('images', 10, {
+    FilesInterceptor('images', 20, {
       storage: diskStorage({
         destination: './uploads/products',
         filename: (req, file, cb) => {
@@ -114,7 +135,7 @@ export class ProductsController {
     const dto: CreateProductDto = {
       translations: JSON.parse(translations),
       price: parseFloat(price),
-      categoryId: parseInt(categoryId),
+      categoryId: categoryId ? parseInt(categoryId) : undefined,
       images: [...urlImages, ...fileImages],
     };
     return this.productsService.update(id, dto, files);

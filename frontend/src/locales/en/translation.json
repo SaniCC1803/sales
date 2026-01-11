@@ -1,5 +1,6 @@
 {
   "create": "Create",
+  "close": "Close",
   "edit": "Edit",
   "delete": "Delete",
   "save": "Save",
@@ -12,6 +13,7 @@
   "createApplication": "Create Application",
   "products": "Products",
   "product": "Product",
+  "carouselImages": "Carousel Images",
   "name": "Name",
   "nameRequired": "Name is required",
   "description": "Description",

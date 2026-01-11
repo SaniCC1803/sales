@@ -4,10 +4,9 @@ import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import type { Category } from "@/types/category";
 import type { Product } from "@/types/product";
 import type { User } from "@/types/user";
-import { Edit3, Section, Trash2, User as UserIcon } from "lucide-react";
+import { Edit3, Trash2, User as UserIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Label } from "./ui/label";
 import { Checkbox } from "./ui/checkbox";
 import { Separator } from "./ui/separator";
 
@@ -48,7 +47,7 @@ export default function CardComponent({ item, onDelete, onEdit }: CardProps) {
         if (isUser(item)) return (
             <>
                 {item.email}
-                <Checkbox checked={item.isConfirmed} className="mr-2 pointer-events-none" />
+                <Checkbox checked={item.isConfirmed} className="mt-2 pointer-events-none" />
             </>
         );
         return "Unnamed";
@@ -96,7 +95,7 @@ export default function CardComponent({ item, onDelete, onEdit }: CardProps) {
             ) : (
                 <img
                     src={getDisplayImage()}
-                    alt={getDisplayName()}
+                    alt={item.id.toString()}
                     className="w-full h-40 object-cover cursor-pointer"
                     onClick={handleView}
                 />

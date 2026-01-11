@@ -120,7 +120,20 @@ export class CategoriesService {
     return this.categoryRepo.save(category);
   }
 
-  remove(id: number) {
+  async remove(id: number) {
+    // First, set category to null for all products that reference this category
+    await this.productRepo.update(
+      { category: { id } },
+      { category: null }
+    );
+
+    // Set parentId to null for all subcategories that have this category as their parent
+    await this.categoryRepo.update(
+      { parent: { id } },
+      { parent: null }
+    );
+
+    // Now safely delete the category
     return this.categoryRepo.delete(id);
   }
 }

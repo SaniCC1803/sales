@@ -1,5 +1,6 @@
 {
   "create": "Креирај",
+  "close": "Затвори",
   "edit": "Уреди",
   "delete": "Избриши",
   "save": "Зачувај",
@@ -12,6 +13,7 @@
   "createApplication": "Креирај Апликација",
   "products": "Продукти",
   "product": "Продукт",
+  "carouselImages": "Насловни слики",
   "name": "Име",
   "nameRequired": "Името е задолжително",
   "description": "Опис",

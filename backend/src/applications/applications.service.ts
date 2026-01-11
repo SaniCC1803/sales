@@ -45,6 +45,9 @@ export class ApplicationsService {
     if (data.languages) {
       existingApp.languages = data.languages;
     }
+    if (data.carousel) {
+      existingApp.carousel = data.carousel;
+    }
 
     // Handle translations separately
     if (data.translations) {

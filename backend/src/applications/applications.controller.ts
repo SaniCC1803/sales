@@ -8,10 +8,11 @@ import {
   Body,
   UseInterceptors,
   UploadedFile,
+  UploadedFiles,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor, AnyFilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { ApplicationsService } from './applications.service';
@@ -42,12 +43,13 @@ export class ApplicationsController {
 
   @Post()
   @UseInterceptors(
-    FileInterceptor('logo', {
+    AnyFilesInterceptor({
       storage: diskStorage({
         destination: './uploads/applications',
         filename: (req, file, cb) => {
           const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          cb(null, 'logo-' + uniqueSuffix + extname(file.originalname));
+          const prefix = file.fieldname === 'logo' ? 'logo-' : 'carousel-';
+          cb(null, prefix + uniqueSuffix + extname(file.originalname));
         },
       }),
     }),
@@ -55,27 +57,40 @@ export class ApplicationsController {
   async create(
     @Body('translations') translations: string,
     @Body('carousel') carousel: string,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFiles() files: Express.Multer.File[],
   ) {
     const parsedTranslations = JSON.parse(translations);
     const parsedCarousel = carousel ? JSON.parse(carousel) : [];
+    
+    // Find logo file
+    const logoFile = files?.find(f => f.fieldname === 'logo');
+    // Find carousel files
+    const carouselFiles = files?.filter(f => f.fieldname === 'carousel') || [];
+    
+    // Add uploaded carousel files to the carousel array
+    const carouselImages = [
+      ...parsedCarousel,
+      ...carouselFiles.map(f => `/uploads/applications/${f.filename}`)
+    ];
+    
     const dto: CreateApplicationDto = {
-      logo: file ? `/uploads/applications/${file.filename}` : 'https://www.shutterstock.com/image-vector/image-icon-trendy-flat-style-600nw-643080895.jpg',
+      logo: logoFile ? `/uploads/applications/${logoFile.filename}` : 'https://www.shutterstock.com/image-vector/image-icon-trendy-flat-style-600nw-643080895.jpg',
       languages: ['en', 'mk'], // Default languages
       translations: parsedTranslations,
-      carousel: parsedCarousel,
+      carousel: carouselImages,
     };
     return await this.applicationsService.create(dto);
   }
 
   @Put(':id')
   @UseInterceptors(
-    FileInterceptor('logo', {
+    AnyFilesInterceptor({
       storage: diskStorage({
         destination: './uploads/applications',
         filename: (req, file, cb) => {
           const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          cb(null, 'logo-' + uniqueSuffix + extname(file.originalname));
+          const prefix = file.fieldname === 'logo' ? 'logo-' : 'carousel-';
+          cb(null, prefix + uniqueSuffix + extname(file.originalname));
         },
       }),
     }),
@@ -84,18 +99,30 @@ export class ApplicationsController {
     @Param('id') id: number,
     @Body('translations') translations: string,
     @Body('carousel') carousel: string,
-    @UploadedFile() file?: Express.Multer.File,
+    @UploadedFiles() files?: Express.Multer.File[],
   ) {
     const parsedTranslations = JSON.parse(translations);
     const parsedCarousel = carousel ? JSON.parse(carousel) : [];
+    
+    // Find logo file
+    const logoFile = files?.find(f => f.fieldname === 'logo');
+    // Find carousel files
+    const carouselFiles = files?.filter(f => f.fieldname === 'carousel') || [];
+    
+    // Add uploaded carousel files to the carousel array
+    const carouselImages = [
+      ...parsedCarousel,
+      ...carouselFiles.map(f => `/uploads/applications/${f.filename}`)
+    ];
+    
     const updateData: any = {
       translations: parsedTranslations,
       languages: ['en', 'mk'], // Default languages
-      carousel: parsedCarousel,
+      carousel: carouselImages,
     };
     
-    if (file) {
-      updateData.logo = `/uploads/applications/${file.filename}`;
+    if (logoFile) {
+      updateData.logo = `/uploads/applications/${logoFile.filename}`;
     }
     
     return await this.applicationsService.update(id, updateData);

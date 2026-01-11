@@ -1,6 +1,6 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import CardComponent from "@/components/Card";
-import CreateEditDrawer from "@/components/CreateEditDrawer";
+import CreateEditDrawer from "@/components/forms/CreateEditDrawer";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -15,10 +15,19 @@ import type { User } from "@/types/user";
 import { useEffect, useState } from "react";
 import { fetchWithAuth } from "@/lib/fetchWithAuth";
 import { useTranslation } from "react-i18next";
-import { Edit3, Plus } from "lucide-react";
+import { Edit3, Plus, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import ImageGallery from "@/components/ImageGallery";
 
 export default function Page() {
+  const { t, i18n } = useTranslation();
+  const currentLanguage = i18n.language as 'en' | 'mk';
   const [activeSection, setActiveSection] = useState<"categories" | "applications" | "products" | "users">("categories");
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -29,6 +38,18 @@ export default function Page() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [editingApplication, setEditingApplication] = useState<boolean>(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  // For opening drawer in create mode
+  const [createDrawerOpen, setCreateDrawerOpen] = useState(false);
+  // Image gallery modal state
+  const [imageGallery, setImageGallery] = useState<{
+    open: boolean;
+    images: string[];
+    currentIndex: number;
+  }>({
+    open: false,
+    images: [],
+    currentIndex: 0,
+  });
   const [deleteModal, setDeleteModal] = useState<{
     open: boolean;
     type: 'category' | 'product' | 'user';
@@ -40,7 +61,6 @@ export default function Page() {
     id: 0,
     name: '',
   });
-  const { t } = useTranslation();
 
   const fetchCategories = () => {
     fetchWithAuth("http://localhost:3000/categories")
@@ -150,18 +170,19 @@ export default function Page() {
       } else {
         setError(`Failed to delete ${deleteModal.type}`);
       }
-    } catch (error) {
+    } catch {
       setError(`Failed to delete ${deleteModal.type}`);
     }
   };
 
   const handleEdit = (item: Category | Product | User) => {
+    setCreateDrawerOpen(false); // Always reset create mode
     if (activeSection === 'categories') {
-      setEditingCategory(item as Category);
+      setEditingCategory({ ...(item as Category) });
     } else if (activeSection === 'products') {
-      setEditingProduct(item as Product);
+      setEditingProduct({ ...(item as Product) });
     } else if (activeSection === 'users') {
-      setEditingUser(item as User);
+      setEditingUser({ ...(item as User) });
     }
   };
 
@@ -188,6 +209,48 @@ export default function Page() {
     setEditingApplication(false);
     fetchApplication(); // Refresh the application data
   };
+
+  const openImageGallery = (images: string[], startIndex: number) => {
+    setImageGallery({
+      open: true,
+      images,
+      currentIndex: startIndex,
+    });
+  };
+
+  const closeImageGallery = () => {
+    setImageGallery(prev => ({ ...prev, open: false }));
+  };
+
+  const navigateGallery = (direction: 'prev' | 'next') => {
+    setImageGallery(prev => ({
+      ...prev,
+      currentIndex: direction === 'next' 
+        ? (prev.currentIndex + 1) % prev.images.length
+        : (prev.currentIndex - 1 + prev.images.length) % prev.images.length
+    }));
+  };
+
+  // Keyboard navigation for gallery
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (imageGallery.open) {
+        if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          navigateGallery('prev');
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          navigateGallery('next');
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          closeImageGallery();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [imageGallery.open]);
 
   useEffect(() => {
     fetchCategories();
@@ -218,6 +281,22 @@ export default function Page() {
           <div className="w-full flex justify-between items-center">
             <h1 className="text-xl font-semibold capitalize">{activeSection === "applications" ? t("application") : activeSection === "users" ? t("user") : t(activeSection)}</h1>
             <div className="flex items-center gap-4">
+              {/* Plus button for each tab except applications (handled below) */}
+              {activeSection === "categories" && (
+                <Button variant="outline" onClick={() => { setEditingCategory(null); setCreateDrawerOpen(true); }}>
+                  <Plus className="h-4 w-4" />
+                </Button>
+              )}
+              {activeSection === "products" && (
+                <Button variant="outline" onClick={() => { setEditingProduct(null); setCreateDrawerOpen(true); }}>
+                  <Plus className="h-4 w-4" />
+                </Button>
+              )}
+              {activeSection === "users" && (
+                <Button variant="outline" onClick={() => { setEditingUser(null); setCreateDrawerOpen(true); }}>
+                  <Plus className="h-4 w-4" />
+                </Button>
+              )}
               <CreateEditDrawer
                 onCategoryCreated={fetchCategories}
                 onProductCreated={fetchProducts}
@@ -232,8 +311,17 @@ export default function Page() {
                 onApplicationEditComplete={handleApplicationEditComplete}
                 onUserEditComplete={handleUserEditComplete}
                 activeSection={activeSection}
+                open={Boolean(editingCategory || editingProduct || editingUser || editingApplication || createDrawerOpen)}
+                onOpenChange={(open) => {
+                  if (!open) {
+                    setEditingCategory(null);
+                    setEditingProduct(null);
+                    setEditingUser(null);
+                    setEditingApplication(false);
+                    setCreateDrawerOpen(false);
+                  }
+                }}
               />
-              {/* Removed UserDropdown from here; now only in main header */}
             </div>
           </div>
         </header>
@@ -270,7 +358,8 @@ export default function Page() {
                       <div>
                         <label className="text-sm font-bold text-primary mb-3 block uppercase tracking-wide">{t("name")}</label>
                         <p className="text-2xl font-bold text-foreground">
-                          {application.translations.find(t => t.language === 'en')?.name ||
+                          {application.translations.find(t => t.language === currentLanguage)?.name ||
+                            application.translations.find(t => t.language === 'en')?.name ||
                             application.translations[0]?.name || 'Unnamed Application'}
                         </p>
                       </div>
@@ -278,12 +367,36 @@ export default function Page() {
                       <div>
                         <label className="text-sm font-bold text-primary mb-3 block uppercase tracking-wide">{t("description")}</label>
                         <p className="text-lg text-muted-foreground leading-relaxed font-medium">
-                          {application.translations.find(t => t.language === 'en')?.description ||
+                          {application.translations.find(t => t.language === currentLanguage)?.description ||
+                            application.translations.find(t => t.language === 'en')?.description ||
                             application.translations[0]?.description || 'No description provided'}
                         </p>
                       </div>
                     </div>
                   </div>
+
+                  {/* Carousel Images Section */}
+                  {application.carousel && application.carousel.length > 0 && (
+                    <div className="mt-8">
+                      <label className="text-sm font-bold text-primary mb-3 block uppercase tracking-wide">{t("carouselImages")}</label>
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {application.carousel.map((img, idx) => (
+                          <div 
+                            key={idx} 
+                            className="bg-muted/30 border border-border rounded-lg p-2 cursor-pointer hover:bg-muted/50 transition-colors"
+                            onClick={() => openImageGallery(application.carousel, idx)}
+                          >
+                            <img
+                              src={img.startsWith('http') ? img : `http://localhost:3000${img}`}
+                              alt={`Carousel ${idx + 1}`}
+                              className="w-full h-32 object-cover rounded"
+                            />
+                            <p className="text-xs text-muted-foreground mt-2 text-center">Image {idx + 1}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="text-center py-16">
@@ -357,6 +470,14 @@ export default function Page() {
         onConfirm={confirmDelete}
         title={`Delete ${deleteModal.type === 'category' ? 'Category' : deleteModal.type === 'product' ? 'Product' : 'User'}`}
         itemName={deleteModal.name}
+      />
+
+      <ImageGallery
+        images={imageGallery.images}
+        isOpen={imageGallery.open}
+        initialIndex={imageGallery.currentIndex}
+        onClose={closeImageGallery}
+        title="Carousel Images"
       />
     </SidebarProvider>
   );

@@ -20,8 +20,10 @@ export class Product {
   @Column('float')
   price!: number;
 
-  @ManyToOne(() => Category, (category) => category.products)
-  category!: Category;
+  @ManyToOne(() => Category, (category) => category.products, {
+    nullable: true,
+  })
+  category?: Category | null;
 
   @OneToMany(() => ProductTranslation, (t) => t.product, {
     cascade: true,

@@ -2,12 +2,15 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import type { Product } from '../types/product';
+import ImageGallery from '@/components/ImageGallery';
 
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [galleryStartIndex, setGalleryStartIndex] = useState(0);
 
   useEffect(() => {
     setLoading(true);
@@ -24,6 +27,11 @@ const ProductDetailPage: React.FC = () => {
   if (loading) return <div className="p-8 text-center">Loading...</div>;
   if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
   if (!product) return null;
+
+  const openGallery = (startIndex: number) => {
+    setGalleryStartIndex(startIndex);
+    setGalleryOpen(true);
+  };
 
   // Build breadcrumbs array: Home > ...category... > Product
   const breadcrumbs = [];
@@ -55,10 +63,11 @@ const ProductDetailPage: React.FC = () => {
           product.images.map((img, idx) => (
             <img
               key={idx}
-              src={img}
+              src={img.startsWith('http') ? img : `http://localhost:3000${img}`}
               alt={product.translations[0]?.name}
-              className="w-full max-w-xs rounded shadow border"
+              className="w-full max-w-xs rounded shadow border cursor-pointer hover:opacity-80 transition-opacity"
               style={{ minWidth: 200, maxHeight: 220, objectFit: 'cover' }}
+              onClick={() => openGallery(idx)}
             />
           ))
         ) : (
@@ -68,6 +77,14 @@ const ProductDetailPage: React.FC = () => {
       <div className="mb-4 text-lg font-semibold">Price: {product.price}</div>
       <div className="mb-4">{product.translations[0]?.description}</div>
       <div className="text-gray-500 text-sm">Product ID: {product.id}</div>
+
+      <ImageGallery
+        images={product.images || []}
+        isOpen={galleryOpen}
+        initialIndex={galleryStartIndex}
+        onClose={() => setGalleryOpen(false)}
+        title={product.translations[0]?.name || 'Product Images'}
+      />
     </div>
   );
 };
