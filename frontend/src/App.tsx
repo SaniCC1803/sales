@@ -1,6 +1,6 @@
 import "../i18n";
 import { useEffect, useState } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "./context/LanguageContext";
 import Header from "./components/header";
 import Footer from "./components/footer";
@@ -58,7 +58,11 @@ export default function App() {
               <Routes>
                 <Route path="/" element={<HomePage application={applications[0]} />} />
                 <Route path="/about-us" element={<AboutPage />} />
-                <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
+                <Route path="/admin" element={<Navigate to="/admin/categories" replace />} />
+                <Route path="/admin/products" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
+                <Route path="/admin/categories" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
+                <Route path="/admin/applications" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
+                <Route path="/admin/users" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
                 <Route path="/category/:id" element={<CategoryViewPage />} />
                 <Route path="/product/:id" element={<ProductDetailPage />} />
               </Routes>

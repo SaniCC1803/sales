@@ -13,6 +13,7 @@ import type { Category } from "@/types/category";
 import type { Product } from "@/types/product";
 import type { User } from "@/types/user";
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { fetchWithAuth } from "@/lib/fetchWithAuth";
 import { useTranslation } from "react-i18next";
 import { Edit3, Plus, ChevronLeft, ChevronRight, X } from "lucide-react";
@@ -28,7 +29,20 @@ import ImageGallery from "@/components/ImageGallery";
 export default function Page() {
   const { t, i18n } = useTranslation();
   const currentLanguage = i18n.language as 'en' | 'mk';
-  const [activeSection, setActiveSection] = useState<"categories" | "applications" | "products" | "users">("categories");
+  const location = useLocation();
+  
+  // Determine initial active section based on route
+  const getActiveSectionFromPath = (pathname: string) => {
+    if (pathname === '/admin/products') return 'products';
+    if (pathname === '/admin/categories') return 'categories';
+    if (pathname === '/admin/applications') return 'applications';
+    if (pathname === '/admin/users') return 'users';
+    return 'categories'; // default for /admin
+  };
+
+  const [activeSection, setActiveSection] = useState<"categories" | "applications" | "products" | "users">(
+    getActiveSectionFromPath(location.pathname)
+  );
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [application, setApplication] = useState<Application | null>(null);
@@ -267,6 +281,12 @@ export default function Page() {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  // Update active section when route changes
+  useEffect(() => {
+    const newSection = getActiveSectionFromPath(location.pathname);
+    setActiveSection(newSection);
+  }, [location.pathname]);
 
   return (
     <SidebarProvider>
