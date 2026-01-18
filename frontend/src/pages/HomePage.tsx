@@ -14,6 +14,7 @@ type HomePageProps = {
 
 export default function HomePage({ application }: HomePageProps) {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [subcategories, setSubcategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const { t } = useTranslation();
@@ -27,6 +28,12 @@ export default function HomePage({ application }: HomePageProps) {
     ])
       .then(([categories, products]) => {
         setCategories(categories);
+        
+        const allSubcategories = categories.flatMap((cat: Category) => 
+          cat.subcategories || []
+        );
+        setSubcategories(allSubcategories);
+        
         setProducts(products);
       })
       .catch(console.error)
@@ -45,6 +52,13 @@ export default function HomePage({ application }: HomePageProps) {
                 <CardComponent key={cat.id} item={cat} />
               ))}
             </CardGrid>
+            {subcategories.length > 0 && (
+              <CardGrid title={t("subcategories")}>
+                {subcategories.map((subcat) => (
+                  <CardComponent key={subcat.id} item={subcat} />
+                ))}
+              </CardGrid>
+            )}
             <CardGrid title={t("products")}>
               {products.map((product) => (
                 <CardComponent key={product.id} item={product} />
