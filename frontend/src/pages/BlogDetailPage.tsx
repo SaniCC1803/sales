@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 import type { Blog } from '@/types/blog';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import { getImageUrl } from '@/lib/utils';
 
 export default function BlogDetailPage() {
+  const { t } = useTranslation();
   const [blog, setBlog] = useState<Blog | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,18 +44,12 @@ export default function BlogDetailPage() {
     return blog.translations.find((t) => t.language === language) || blog.translations[0];
   };
 
-  const getImageUrl = (path?: string) => {
-    if (!path) return '';
-    if (path.startsWith('http')) return path;
-    return `http://localhost:3000${path}`;
-  };
-
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
           <div className="loader mb-4"></div>
-          <span>Loading blog...</span>
+          <span>{t('loadingBlog', 'Loading blog...')}</span>
         </div>
       </div>
     );
@@ -63,11 +59,13 @@ export default function BlogDetailPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center text-red-500">
-          <p>Error: {error || 'Blog not found'}</p>
+          <p>
+            {t('error')}: {error || t('blogNotFound', 'Blog not found')}
+          </p>
           <Link to="/blogs">
             <Button className="mt-4">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Blogs
+              {t('backToBlogs', 'Back to Blogs')}
             </Button>
           </Link>
         </div>
@@ -82,7 +80,7 @@ export default function BlogDetailPage() {
       <Link to="/blogs">
         <Button variant="ghost" className="mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Blogs
+          {t('backToBlogs', 'Back to Blogs')}
         </Button>
       </Link>
 
@@ -99,11 +97,15 @@ export default function BlogDetailPage() {
           <h1 className="text-3xl md:text-4xl font-bold mb-4">{translation.title}</h1>
 
           <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-            <span>By {blog.author ? blog.author.email : t('unknownAuthor')}</span>
+            <span>
+              {t('by')} {blog.author ? blog.author.email : t('unknownAuthor')}
+            </span>
             <span>•</span>
             <span>{new Date(blog.publishedAt!).toLocaleDateString()}</span>
             <span>•</span>
-            <span>Last updated: {new Date(blog.updatedAt).toLocaleDateString()}</span>
+            <span>
+              {t('lastUpdated')}: {new Date(blog.updatedAt).toLocaleDateString()}
+            </span>
           </div>
         </header>
 

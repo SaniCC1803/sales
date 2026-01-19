@@ -61,8 +61,8 @@ export default function CreateEditDrawer({
   const isEditMode = !!(editCategory || editProduct || editApplication || editUser || editBlog);
 
   const title = isEditMode
-    ? `${t('edit')} ${activeSection.slice(0, -1)}`
-    : `${t('create')} ${activeSection.slice(0, -1)}`;
+    ? `${t('edit')} ${t(activeSection)}`
+    : `${t('create')} ${t(activeSection)}`;
 
   const closeDrawer = () => onOpenChange(false);
 
@@ -121,17 +121,6 @@ export default function CreateEditDrawer({
             />
           )}
         </div>
-
-        {/* {(activeSection === "users" || activeSection === "blogs") && (
-                    <SheetFooter>
-                        <Button type="submit" form={activeSection === "users" ? "user-form" : "blog-form"}>
-                            {isEditMode ? t("save") : t("create")}
-                        </Button>
-                        <SheetClose asChild>
-                            <Button variant="outline">{t("close")}</Button>
-                        </SheetClose>
-                    </SheetFooter>
-                )} */}
       </SheetContent>
     </Sheet>
   );

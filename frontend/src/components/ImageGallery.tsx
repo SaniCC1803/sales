@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -27,11 +27,14 @@ export default function ImageGallery({
     }
   }, [isOpen, initialIndex]);
 
-  const navigateGallery = (direction: 'prev' | 'next') => {
-    setCurrentIndex((prev) =>
-      direction === 'next' ? (prev + 1) % images.length : (prev - 1 + images.length) % images.length
-    );
-  };
+  const navigateGallery = useCallback(
+    (direction: 'prev' | 'next') => {
+      setCurrentIndex((prev) =>
+        direction === 'next' ? (prev + 1) % images.length : (prev - 1 + images.length) % images.length
+      );
+    },
+    [images.length]
+  );
 
   // Keyboard navigation
   useEffect(() => {
@@ -52,7 +55,7 @@ export default function ImageGallery({
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, images.length]);
+  }, [isOpen, images.length, navigateGallery, onClose]);
 
   if (!isOpen || images.length === 0) return null;
 

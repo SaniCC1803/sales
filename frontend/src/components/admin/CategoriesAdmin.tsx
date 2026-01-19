@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
 import { fetchWithAuth } from '@/lib/fetchWithAuth';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
 import CardComponent from '@/components/Card';
 import CreateEditDrawer from '@/components/forms/CreateEditDrawer';
 import ConfirmDeleteModal from '@/components/ConfirmDeleteModal';
@@ -10,9 +8,13 @@ import type { Product } from '@/types/product';
 import type { User } from '@/types/user';
 import type { Blog } from '@/types/blog';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
+import { PageHeader } from './pageParts/PageHeader';
+import { CardsWrapper } from './pageParts/CardsWrapper';
 
 export default function CategoriesAdmin() {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [categories, setCategories] = useState<Category[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
@@ -81,7 +83,6 @@ export default function CategoriesAdmin() {
     fetchCategories();
   }, []);
 
-  // Show toast when error changes
   useEffect(() => {
     if (error) {
       toast({
@@ -94,19 +95,15 @@ export default function CategoriesAdmin() {
 
   return (
     <>
-      <div className="w-full flex justify-end items-center mb-6">
-        <Button
-          variant="outline"
-          onClick={() => {
-            setEditingCategory(null);
-            setCreateDrawerOpen(true);
-          }}
-        >
-          <Plus className="h-4 w-4" />
-        </Button>
-      </div>
+      <PageHeader
+        title={t('categories')}
+        onAdd={() => {
+          setEditingCategory(null);
+          setCreateDrawerOpen(true);
+        }}
+      />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <CardsWrapper>
         {categories.map((cat) => (
           <CardComponent
             key={cat.id}
@@ -115,10 +112,10 @@ export default function CategoriesAdmin() {
             onEdit={handleEdit}
           />
         ))}
-      </div>
+      </CardsWrapper>
 
-      <h2 className="text-xl font-semibold mt-8 mb-4">Subcategories</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <PageHeader title={t('subcategories')} />
+      <CardsWrapper>
         {categories
           .flatMap((cat) => cat.subcategories || [])
           .map((sub) => (
@@ -129,7 +126,7 @@ export default function CategoriesAdmin() {
               onEdit={handleEdit}
             />
           ))}
-      </div>
+      </CardsWrapper>
 
       <CreateEditDrawer
         onCategoryCreated={fetchCategories}

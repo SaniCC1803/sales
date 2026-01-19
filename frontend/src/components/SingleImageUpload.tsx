@@ -32,7 +32,6 @@ const SingleImageUpload = ({
       };
       reader.readAsDataURL(value);
     } else if (existingImageUrl) {
-      // Handle both full URLs and relative paths
       const fullUrl = existingImageUrl.startsWith('http')
         ? existingImageUrl
         : `http://localhost:3000${existingImageUrl}`;

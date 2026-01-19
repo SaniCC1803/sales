@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
 import { fetchWithAuth } from '@/lib/fetchWithAuth';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
 import ConfirmDeleteModal from '@/components/ConfirmDeleteModal';
 import type { Blog } from '@/types/blog';
 import { useLanguage } from '@/context/LanguageContext';
@@ -11,9 +9,13 @@ import type { Category } from '@/types/category';
 import type { Product } from '@/types/product';
 import type { User } from '@/types/user';
 import { useToast } from '@/hooks/use-toast';
+import { PageHeader } from './pageParts/PageHeader';
+import { useTranslation } from 'react-i18next';
+import { CardsWrapper } from './pageParts/CardsWrapper';
 
 export default function BlogsAdmin() {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [editingBlog, setEditingBlog] = useState<Blog | null>(null);
@@ -97,19 +99,15 @@ export default function BlogsAdmin() {
 
   return (
     <>
-      <div className="w-full flex justify-end items-center mb-6">
-        <Button
-          variant="outline"
-          onClick={() => {
-            setEditingBlog(null);
-            setCreateDrawerOpen(true);
-          }}
-        >
-          <Plus className="h-4 w-4" />
-        </Button>
-      </div>
+      <PageHeader
+        title={t('blogs')}
+        onAdd={() => {
+          setEditingBlog(null);
+          setCreateDrawerOpen(true);
+        }}
+      />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 md:grid-cols-3 gap-6">
+      <CardsWrapper>
         {blogs.map((blog) => (
           <CardComponent
             key={blog.id}
@@ -118,7 +116,7 @@ export default function BlogsAdmin() {
             onEdit={handleEdit}
           />
         ))}
-      </div>
+      </CardsWrapper>
 
       <CreateEditDrawer
         onBlogCreated={fetchBlogs}

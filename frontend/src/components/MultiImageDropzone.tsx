@@ -1,6 +1,8 @@
 import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Button } from '@/components/ui/button';
+import { UploadIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 // Accepts both File (new uploads) and string (existing image URLs)
 export type MultiImageValue = (File | string)[];
@@ -13,6 +15,7 @@ interface MultiImageDropzoneProps {
 const isFile = (item: File | string): item is File => item instanceof File;
 
 const MultiImageDropzone: React.FC<MultiImageDropzoneProps> = ({ value, onChange }) => {
+  const { t } = useTranslation();
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       onChange([...value, ...acceptedFiles]);
@@ -37,13 +40,21 @@ const MultiImageDropzone: React.FC<MultiImageDropzoneProps> = ({ value, onChange
     <div className="flex flex-col gap-2">
       <div
         {...getRootProps()}
-        className={`border-2 border-dashed rounded-md p-4 text-center cursor-pointer ${isDragActive ? 'bg-accent' : 'bg-background'}`}
+        className={`border-2 border-dashed rounded-md p-6 text-center cursor-pointer flex flex-col items-center justify-center gap-2 ${isDragActive ? 'bg-accent' : 'bg-background'}`}
       >
         <input {...getInputProps()} />
+        <div className="flex size-8 items-center justify-center rounded-md bg-muted text-muted-foreground mb-2">
+          <UploadIcon size={20} />
+        </div>
         {isDragActive ? (
-          <p>Drop the images here ...</p>
+          <p className="font-medium text-sm">{t('dropImages')}</p>
         ) : (
-          <p>Drag & drop images here, or click to select files</p>
+          <>
+            <p className="font-medium text-sm">{t('uploadImages', 'Upload images')}</p>
+            <p className="text-xs text-muted-foreground">
+              {t('dragDropOrClick', 'Drag and drop or click to upload')}
+            </p>
+          </>
         )}
       </div>
       <div className="flex flex-wrap gap-2 mt-2">

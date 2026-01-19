@@ -1,16 +1,18 @@
 import type { Item } from '../Card';
 import { useEffect, useState } from 'react';
 import { fetchWithAuth } from '@/lib/fetchWithAuth';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
 import CardComponent from '@/components/Card';
 import CreateEditDrawer from '@/components/forms/CreateEditDrawer';
 import ConfirmDeleteModal from '@/components/ConfirmDeleteModal';
 import type { User } from '@/types/user';
 import { useToast } from '@/hooks/use-toast';
+import { PageHeader } from './pageParts/PageHeader';
+import { useTranslation } from 'react-i18next';
+import { CardsWrapper } from './pageParts/CardsWrapper';
 
 export default function UsersAdmin() {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -84,19 +86,15 @@ export default function UsersAdmin() {
 
   return (
     <>
-      <div className="w-full flex justify-end items-center mb-6">
-        <Button
-          variant="outline"
-          onClick={() => {
-            setEditingUser(null);
-            setCreateDrawerOpen(true);
-          }}
-        >
-          <Plus className="h-4 w-4" />
-        </Button>
-      </div>
+      <PageHeader
+        title={t('categories')}
+        onAdd={() => {
+          setEditingUser(null);
+          setCreateDrawerOpen(true);
+        }}
+      />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <CardsWrapper>
         {users.map((user) => (
           <CardComponent
             key={user.id}
@@ -105,7 +103,7 @@ export default function UsersAdmin() {
             onEdit={handleEdit}
           />
         ))}
-      </div>
+      </CardsWrapper>
 
       <CreateEditDrawer
         onUserCreated={fetchUsers}

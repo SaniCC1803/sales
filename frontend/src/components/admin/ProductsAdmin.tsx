@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react';
 import { fetchWithAuth } from '@/lib/fetchWithAuth';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
 import CardComponent from '@/components/Card';
 import CreateEditDrawer from '@/components/forms/CreateEditDrawer';
 import ConfirmDeleteModal from '@/components/ConfirmDeleteModal';
 import type { Product } from '@/types/product';
 import type { Item } from '../Card';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
+import { PageHeader } from './pageParts/PageHeader';
+import { CardsWrapper } from './pageParts/CardsWrapper';
 
 export default function ProductsAdmin() {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -88,19 +90,15 @@ export default function ProductsAdmin() {
 
   return (
     <>
-      <div className="w-full flex justify-end items-center mb-6">
-        <Button
-          variant="outline"
-          onClick={() => {
-            setEditingProduct(null);
-            setCreateDrawerOpen(true);
-          }}
-        >
-          <Plus className="h-4 w-4" />
-        </Button>
-      </div>
+      <PageHeader
+        title={t('products')}
+        onAdd={() => {
+          setEditingProduct(null);
+          setCreateDrawerOpen(true);
+        }}
+      />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <CardsWrapper>
         {products.map((product) => (
           <CardComponent
             key={product.id}
@@ -109,7 +107,7 @@ export default function ProductsAdmin() {
             onEdit={handleEdit}
           />
         ))}
-      </div>
+      </CardsWrapper>
 
       <CreateEditDrawer
         onProductCreated={fetchProducts}

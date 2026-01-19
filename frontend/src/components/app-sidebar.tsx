@@ -11,14 +11,14 @@ import {
 } from '@/components/ui/sidebar';
 import { useTranslation } from 'react-i18next';
 
+
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-  activeSection: 'categories' | 'applications' | 'products' | 'users' | 'blogs';
   onSectionChange: (
     section: 'categories' | 'applications' | 'products' | 'users' | 'blogs'
   ) => void;
 }
 
-export function AppSidebar({ activeSection, onSectionChange, ...props }: AppSidebarProps) {
+export function AppSidebar({ onSectionChange, ...props }: AppSidebarProps) {
   const { t } = useTranslation();
   const location = useLocation();
 

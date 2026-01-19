@@ -212,7 +212,7 @@ export default function ProductForm({
                 field.onChange(e.target.value === '' ? null : Number(e.target.value))
               }
             >
-              <option value="">{t('selectCategory')} (Optional)</option>
+              <option value="">{t('selectCategory')}</option>
               {categories
                 .filter((cat) => !editProduct || cat.id !== editProduct.id)
                 .map((cat) => (

@@ -13,6 +13,7 @@ import { ThemeTabs } from './dark-light-mode-button';
 import CategoryNav from './CategoryNav';
 import UserDropdown from './ui/UserDropdown';
 import { useLocation } from 'react-router-dom';
+import { getImageUrl } from '@/lib/utils';
 
 type HeaderProps = {
   application: Application;
@@ -39,7 +40,7 @@ export default function Header({ application }: HeaderProps) {
       <header className="bg-background text-foreground sticky top-0 z-50 px-6 h-20 flex items-center justify-between relative">
         <Link to="/">
           <img
-            src={application.logo}
+            src={getImageUrl(application.logo)}
             alt={`${application.translations.find((t) => t.language === language)?.name} logo`}
             className="h-8 w-auto object-contain cursor-pointer"
           />

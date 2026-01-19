@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { useLanguage } from '@/context/LanguageContext';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 import type { Blog } from '@/types/blog';
 import CardComponent from '@/components/Card';
 
@@ -9,7 +7,7 @@ export default function BlogsPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { language } = useLanguage();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -30,22 +28,12 @@ export default function BlogsPage() {
     fetchBlogs();
   }, []);
 
-  const getBlogTranslation = (blog: Blog) => {
-    return blog.translations.find((t) => t.language === language) || blog.translations[0];
-  };
-
-  const getImageUrl = (path?: string) => {
-    if (!path) return '';
-    if (path.startsWith('http')) return path;
-    return `http://localhost:3000${path}`;
-  };
-
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
           <div className="loader mb-4"></div>
-          <span>Loading blogs...</span>
+          <span>{t('loadingBlogs', 'Loading blogs...')}</span>
         </div>
       </div>
     );
@@ -55,7 +43,9 @@ export default function BlogsPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center text-red-500">
-          <p>Error: {error}</p>
+          <p>
+            {t('error')}: {error}
+          </p>
         </div>
       </div>
     );
@@ -67,7 +57,7 @@ export default function BlogsPage() {
 
       {blogs.length === 0 ? (
         <div className="text-center">
-          <p className="text-muted-foreground">No blogs found.</p>
+          <p className="text-muted-foreground">{t('noBlogsFound', 'No blogs found.')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

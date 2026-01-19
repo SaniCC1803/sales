@@ -23,6 +23,9 @@
   "descriptionRequired": "Описот е задолжителен",
   "image": "Слика",
   "imageRequired": "Сликата е задолжителна",
+  "images": "Слики",
+  "dropImages": "Оставете ги сликите овде",
+  "dragDropImages": "Повлечете и пуштете слики тука или кликнете за да изберете датотеки",
   "status": "Статус",
   "draft": "Драфт",
   "published": "Публицирана",
@@ -61,5 +64,16 @@
   "blogs": "Блогови",
   "blog": "Блог",
   "collections": "Колекции",
-  "aboutUs": "За нас"
+  "aboutUs": "За нас",
+  "loadingBlogs": "Се вчитуваат блогови..",
+  "error": "Грешка",
+  "noBlogsFound": "Не се пронајдени блогови.",
+  "loadingBlog": "Се вчитува блогот...",
+  "blogNotFound": "Блогот не е пронајден",
+  "backToBlogs": "Назад кон блоговите",
+  "by": "Од",
+  "lastUpdated": "Последно ажурирано",
+  "statusLabel": "Статус",
+  "createdLabel": "Создадено",
+  "publishedLabel": "Објавено:"
 }

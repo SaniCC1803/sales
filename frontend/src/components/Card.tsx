@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Checkbox } from './ui/checkbox';
 import { Separator } from './ui/separator';
+import { getImageUrl } from '@/lib/utils';
 
 export type Item = Category | Product | User | Blog;
 
@@ -25,19 +26,11 @@ export default function CardComponent({ item, onDelete, onEdit }: CardProps) {
   const navigate = useNavigate();
   const isAdmin = location.pathname.includes('/admin');
 
-  // ---------- Type guards ----------
   const isUser = (i: Item): i is User => 'email' in i && !('author' in i);
   const isProduct = (i: Item): i is Product => 'price' in i;
   const isCategory = (i: Item): i is Category =>
     'translations' in i && !('price' in i) && !('slug' in i);
   const isBlog = (i: Item): i is Blog => 'slug' in i && 'translations' in i && 'author' in i;
-
-  // ---------- Helpers ----------
-  const getImageUrl = (path?: string) => {
-    if (!path) return '';
-    if (path.startsWith('http')) return path;
-    return `http://localhost:3000${path}`;
-  };
 
   const getDisplayName = () => {
     if (isCategory(item) || isProduct(item)) {
@@ -145,18 +138,18 @@ export default function CardComponent({ item, onDelete, onEdit }: CardProps) {
         {isBlog(item) && (
           <div className="flex flex-col gap-1 mb-2">
             <CardDescription>
-              <span className="font-bold">Status:</span> {item.status}
+              <span className="font-bold">{t('statusLabel', 'Status:')}</span> {item.status}
             </CardDescription>
             <CardDescription>
-              <span className="font-bold">By:</span> {item.author?.email}
+              <span className="font-bold">{t('by', 'By:')}</span> {item.author?.email}
             </CardDescription>
             <CardDescription>
-              <span className="font-bold">Created:</span>{' '}
+              <span className="font-bold">{t('createdLabel', 'Created:')}</span>{' '}
               {new Date(item.createdAt).toLocaleDateString()}
             </CardDescription>
             {item.publishedAt && (
               <CardDescription>
-                <span className="font-bold">Published:</span>{' '}
+                <span className="font-bold">{t('publishedLabel', 'Published:')}</span>{' '}
                 {new Date(item.publishedAt).toLocaleDateString()}
               </CardDescription>
             )}

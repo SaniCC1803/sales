@@ -39,3 +39,8 @@ export const colors = [
   { name: 'yellow', class: 'yellow', primary: 'oklch(0.795 0.184 86.047)' },
   { name: 'violet', class: 'violet', primary: 'oklch(0.606 0.25 292.717)' },
 ];
+
+export const getImageUrl = (path: string) => {
+  if (path.startsWith('http')) return path;
+  return `http://localhost:3000${path}`;
+};

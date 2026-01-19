@@ -33,7 +33,6 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-/* eslint-disable react-refresh/only-export-components */
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
   if (!context) {
