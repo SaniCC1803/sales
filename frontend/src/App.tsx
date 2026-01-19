@@ -16,6 +16,8 @@ import { restoreTheme } from "./lib/utils";
 
 import CategoryViewPage from "./pages/CategoryViewPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
+import BlogsPage from "./pages/BlogsPage";
+import BlogDetailPage from "./pages/BlogDetailPage";
 
 export default function App() {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -58,11 +60,14 @@ export default function App() {
               <Routes>
                 <Route path="/" element={<HomePage application={applications[0]} />} />
                 <Route path="/about-us" element={<AboutPage />} />
+                <Route path="/blogs" element={<BlogsPage />} />
+                <Route path="/blog/:slug" element={<BlogDetailPage />} />
                 <Route path="/admin" element={<Navigate to="/admin/categories" replace />} />
                 <Route path="/admin/products" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
                 <Route path="/admin/categories" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
                 <Route path="/admin/applications" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
                 <Route path="/admin/users" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
+                <Route path="/admin/blogs" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
                 <Route path="/category/:id" element={<CategoryViewPage />} />
                 <Route path="/product/:id" element={<ProductDetailPage />} />
               </Routes>

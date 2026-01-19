@@ -12,8 +12,8 @@ import {
 import { useTranslation } from "react-i18next";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-  activeSection: "categories" | "applications" | "products" | "users";
-  onSectionChange: (section: "categories" | "applications" | "products" | "users") => void;
+  activeSection: "categories" | "applications" | "products" | "users" | "blogs";
+  onSectionChange: (section: "categories" | "applications" | "products" | "users" | "blogs") => void;
 }
 
 export function AppSidebar({ activeSection, onSectionChange, ...props }: AppSidebarProps) {
@@ -25,6 +25,7 @@ export function AppSidebar({ activeSection, onSectionChange, ...props }: AppSide
     { title: "application", value: "applications", path: "/admin/applications" },
     { title: "categories", value: "categories", path: "/admin/categories" },
     { title: "products", value: "products", path: "/admin/products" },
+    { title: "blogs", value: "blogs", path: "/admin/blogs" },
   ];
 
   return (
@@ -45,7 +46,7 @@ export function AppSidebar({ activeSection, onSectionChange, ...props }: AppSide
                       <Link 
                         to={item.path}
                         className="w-full text-left"
-                        onClick={() => onSectionChange(item.value as "categories" | "applications" | "products" | "users")}
+                        onClick={() => onSectionChange(item.value as "categories" | "applications" | "products" | "users" | "blogs")}
                       >
                         {t(item.title)}
                       </Link>

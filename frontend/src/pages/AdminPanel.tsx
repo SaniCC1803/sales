@@ -12,6 +12,7 @@ import CategoriesAdmin from "@/components/admin/CategoriesAdmin";
 import ProductsAdmin from "@/components/admin/ProductsAdmin";
 import ApplicationsAdmin from "@/components/admin/ApplicationsAdmin";
 import UsersAdmin from "@/components/admin/UsersAdmin";
+import BlogsAdmin from "@/components/admin/BlogsAdmin";
 import { useTranslation } from "react-i18next";
 
 export default function Page() {
@@ -23,10 +24,11 @@ export default function Page() {
     if (pathname === '/admin/categories') return 'categories';
     if (pathname === '/admin/applications') return 'applications';
     if (pathname === '/admin/users') return 'users';
+    if (pathname === '/admin/blogs') return 'blogs';
     return 'categories';
   };
 
-  const [activeSection, setActiveSection] = useState<"categories" | "applications" | "products" | "users">(
+  const [activeSection, setActiveSection] = useState<"categories" | "applications" | "products" | "users" | "blogs">(
     getActiveSectionFromPath(location.pathname)
   );
 
@@ -45,6 +47,8 @@ export default function Page() {
         return <ApplicationsAdmin />;
       case 'users':
         return <UsersAdmin />;
+      case 'blogs':
+        return <BlogsAdmin />;
       default:
         return <CategoriesAdmin />;
     }

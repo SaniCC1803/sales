@@ -8,6 +8,7 @@ import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
 import type { Category } from "@/types/category";
 import type { Product } from "@/types/product";
 import type { User } from "@/types/user";
+import type { Blog } from "@/types/blog";
 
 export default function CategoriesAdmin() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -61,9 +62,12 @@ export default function CategoriesAdmin() {
     }
   };
 
-  const handleEdit = (item: Category | Product | User) => {
+  const handleEdit = (item: Category | Product | User | Blog) => {
     setCreateDrawerOpen(false);
-    setEditingCategory({ ...item } as Category);
+    // Only allow editing if item is a Category
+    if ('translations' in item && 'subcategories' in item) {
+      setEditingCategory({ ...item } as Category);
+    }
   };
 
   const handleEditComplete = () => {
@@ -84,7 +88,7 @@ export default function CategoriesAdmin() {
       </div>
 
       {error && <div className="text-red-500 mb-4">{error}</div>}
-      
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {categories.map((cat) => (
           <CardComponent

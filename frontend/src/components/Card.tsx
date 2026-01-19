@@ -4,13 +4,15 @@ import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import type { Category } from "@/types/category";
 import type { Product } from "@/types/product";
 import type { User } from "@/types/user";
+import type { Blog } from "@/types/blog";
 import { Edit3, Trash2, User as UserIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Checkbox } from "./ui/checkbox";
 import { Separator } from "./ui/separator";
 
-type Item = Category | Product | User;
+
+type Item = Category | Product | User | Blog;
 
 type CardProps = {
     item: Item;
@@ -25,9 +27,10 @@ export default function CardComponent({ item, onDelete, onEdit }: CardProps) {
     const isAdmin = location.pathname.includes("/admin");
 
     // ---------- Type guards ----------
-    const isUser = (i: Item): i is User => "email" in i;
+    const isUser = (i: Item): i is User => "email" in i && !("author" in i);
     const isProduct = (i: Item): i is Product => "price" in i;
-    const isCategory = (i: Item): i is Category => "translations" in i && !("price" in i);
+    const isCategory = (i: Item): i is Category => "translations" in i && !("price" in i) && !("slug" in i);
+    const isBlog = (i: Item): i is Blog => "slug" in i && "translations" in i && "author" in i;
 
     // ---------- Helpers ----------
     const getImageUrl = (path?: string) => {
@@ -39,15 +42,22 @@ export default function CardComponent({ item, onDelete, onEdit }: CardProps) {
     const getDisplayName = () => {
         if (isCategory(item) || isProduct(item)) {
             return (
-                item.translations.find((t) => t.language === language)?.name ||
+                item.translations.find((t: any) => t.language === language)?.name ||
                 item.translations[0]?.name ||
                 "Unnamed"
+            );
+        }
+        if (isBlog(item)) {
+            return (
+                item.translations.find((t) => t.language === language)?.title ||
+                item.translations[0]?.title ||
+                "Untitled Blog"
             );
         }
         if (isUser(item)) return (
             <>
                 {item.email}
-                <Checkbox checked={item.isConfirmed} className="mt-2 pointer-events-none" />
+                {"isConfirmed" in item && <Checkbox checked={item.isConfirmed} className="mt-2 pointer-events-none" />}
             </>
         );
         return "Unnamed";
@@ -56,8 +66,15 @@ export default function CardComponent({ item, onDelete, onEdit }: CardProps) {
     const getDisplayDescription = () => {
         if (isCategory(item) || isProduct(item)) {
             return (
-                item.translations.find((t) => t.language === language)?.description ||
+                item.translations.find((t: any) => t.language === language)?.description ||
                 item.translations[0]?.description ||
+                ""
+            );
+        }
+        if (isBlog(item)) {
+            return (
+                item.translations.find((t) => t.language === language)?.excerpt ||
+                item.translations[0]?.excerpt ||
                 ""
             );
         }
@@ -68,13 +85,16 @@ export default function CardComponent({ item, onDelete, onEdit }: CardProps) {
     const getDisplayImage = () => {
         if (isProduct(item) && item.images?.length) return getImageUrl(item.images[0]);
         if (isCategory(item) && item.image) return getImageUrl(item.image);
+        if (isBlog(item) && item.featuredImage) return getImageUrl(item.featuredImage);
         if (isUser(item)) return "https://via.placeholder.com/300x160?text=User";
+        if (isBlog(item)) return "https://via.placeholder.com/300x160?text=Blog";
         return "https://via.placeholder.com/300x160?text=Product";
     };
 
     const handleView = () => {
         if (isProduct(item)) navigate(`/product/${item.id}`);
         else if (isCategory(item)) navigate(`/category/${item.id}`);
+        else if (isBlog(item)) navigate(`/blog/${item.slug}`);
     };
 
     return (
@@ -122,6 +142,25 @@ export default function CardComponent({ item, onDelete, onEdit }: CardProps) {
                             .join(", ")}
                     </CardDescription>
                 ) : null}
+                {/* Blog status and author */}
+                {isBlog(item) && (
+                    <div className="flex flex-col gap-1 mb-2">
+                        <CardDescription>
+                            <span className="font-bold">Status:</span> {item.status}
+                        </CardDescription>
+                        <CardDescription>
+                            <span className="font-bold">By:</span> {item.author?.email}
+                        </CardDescription>
+                        <CardDescription>
+                            <span className="font-bold">Created:</span> {new Date(item.createdAt).toLocaleDateString()}
+                        </CardDescription>
+                        {item.publishedAt && (
+                            <CardDescription>
+                                <span className="font-bold">Published:</span> {new Date(item.publishedAt).toLocaleDateString()}
+                            </CardDescription>
+                        )}
+                    </div>
+                )}
 
                 <div className="flex-1" /> {/* Push buttons to bottom */}
 

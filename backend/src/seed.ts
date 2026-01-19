@@ -2,6 +2,12 @@
 async function clearDatabase(dataSource: DataSource) {
   // Delete child tables first to avoid FK errors
   await dataSource
+    .getRepository(BlogTranslation)
+    .createQueryBuilder()
+    .delete()
+    .execute();
+  await dataSource.getRepository(Blog).createQueryBuilder().delete().execute();
+  await dataSource
     .getRepository(ProductTranslation)
     .createQueryBuilder()
     .delete()
@@ -46,6 +52,11 @@ import { ApplicationsService } from './applications/applications.service';
 import { Product } from './products/product.entity';
 import { ProductTranslation } from './products/product-translations.entity';
 import { ProductsService } from './products/products.service';
+import { Blog, BlogStatus } from './blogs/blog.entity';
+import { BlogTranslation } from './blogs/blog-translations.entity';
+import { BlogsService } from './blogs/blogs.service';
+import { User, Role } from './users/user.entity';
+import { UsersService } from './users/users.service';
 import { Language } from './shared-types';
 
 // async function seedUsers() {
@@ -408,6 +419,197 @@ async function seedProducts() {
   await app.close();
 }
 
+async function seedBlogs() {
+  const app = await NestFactory.createApplicationContext(AppModule);
+  const dataSource = app.get(DataSource);
+
+  const blogRepo = dataSource.getRepository(Blog);
+  const blogTranslationRepo = dataSource.getRepository(BlogTranslation);
+  const userRepo = dataSource.getRepository(User);
+  const blogsService = app.get(BlogsService);
+
+  // Clear existing blogs
+  await blogTranslationRepo.createQueryBuilder().delete().execute();
+  await blogRepo.createQueryBuilder().delete().execute();
+  console.log('Blog database cleared ✅');
+
+  // Get the first user to be the author (create one if none exists)
+  let author = await userRepo.findOne({ where: {} });
+  if (!author) {
+    const userService = app.get(UsersService);
+    author = await userService.create({
+      email: 'blog@example.com',
+      password: 'password123',
+      role: Role.SUPERADMIN,
+    });
+  }
+
+  // Blog 1: Welcome Post
+  await blogsService.create(
+    {
+      slug: 'welcome-to-our-blog',
+      status: BlogStatus.PUBLISHED,
+      featuredImage:
+        'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=800&q=80',
+      translations: [
+        {
+          language: Language.EN,
+          title: 'Welcome to Our Blog!',
+          content: `<h2>Hello and welcome!</h2>
+<p>We're excited to launch our new blog where we'll be sharing the latest updates about our furniture collection, design tips, and industry insights.</p>
+
+<p>Our team is passionate about creating beautiful, functional furniture that transforms your living spaces. Whether you're looking for modern office chairs, cozy home seating, or stylish tables, we've got you covered.</p>
+
+<h3>What to Expect</h3>
+<ul>
+  <li>Product spotlights and new arrivals</li>
+  <li>Interior design tips and trends</li>
+  <li>Behind-the-scenes content</li>
+  <li>Customer stories and testimonials</li>
+</ul>
+
+<p>Stay tuned for more exciting content!</p>`,
+          excerpt:
+            "Welcome to our new blog! We're excited to share furniture insights, design tips, and product updates with you.",
+        },
+        {
+          language: Language.MK,
+          title: 'Добредојдовте на нашиот блог!',
+          content: `<h2>Здраво и добредојдовте!</h2>
+<p>Возбудени сме што го лансираме нашиот нов блог каде ќе споделуваме најнови вести за нашата колекција мебел, совети за дизајн и увиди од индустријата.</p>
+
+<p>Нашиот тим е страстен за креирање убав, функционален мебел што ги трансформира вашите животни простори.</p>
+
+<h3>Што да очекувате</h3>
+<ul>
+  <li>Презентации на производи и нови пристигнувања</li>
+  <li>Совети и трендови за ентериер дизајн</li>
+  <li>Содржини од позадината</li>
+  <li>Приказни и препораки од клиенти</li>
+</ul>
+
+<p>Останете со нас за повеќе возбудлива содржина!</p>`,
+          excerpt:
+            'Добредојдовте на нашиот нов блог! Возбудени сме да споделуваме увиди за мебел и совети за дизајн.',
+        },
+      ],
+    },
+    author.id,
+  );
+
+  // Blog 2: Design Trends
+  await blogsService.create(
+    {
+      slug: 'furniture-trends-2026',
+      status: BlogStatus.PUBLISHED,
+      featuredImage:
+        'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=800&q=80',
+      translations: [
+        {
+          language: Language.EN,
+          title: "2026 Furniture Trends: What's Hot This Year",
+          content: `<h2>The Latest in Furniture Design</h2>
+<p>2026 brings exciting new trends in furniture design that blend comfort, sustainability, and style. Here are the top trends we're seeing this year:</p>
+
+<h3>1. Sustainable Materials</h3>
+<p>Eco-friendly furniture made from recycled and renewable materials is becoming increasingly popular. Look for pieces made from reclaimed wood, bamboo, and recycled plastics.</p>
+
+<h3>2. Curved and Organic Shapes</h3>
+<p>Goodbye sharp edges! This year is all about soft, flowing lines that create a sense of calm and comfort in your space.</p>
+
+<h3>3. Bold Colors</h3>
+<p>While neutral tones remain classic, we're seeing more homeowners embrace bold, statement colors like deep emerald green, rich burgundy, and vibrant blues.</p>
+
+<h3>4. Multi-functional Furniture</h3>
+<p>As homes become more compact, furniture that serves multiple purposes is essential. Think storage ottomans, extendable dining tables, and convertible sofas.</p>
+
+<p>Which trend excites you the most? Let us know!</p>`,
+          excerpt:
+            'Discover the hottest furniture trends for 2026, from sustainable materials to bold colors and multi-functional designs.',
+        },
+        {
+          language: Language.MK,
+          title: 'Трендови во мебел 2026: Што е актуелно оваа година',
+          content: `<h2>Најновото во дизајнот на мебел</h2>
+<p>2026 година донесува возбудливи нови трендови во дизајнот на мебел што ги комбинираат удобноста, одржливоста и стилот.</p>
+
+<h3>1. Одржливи материјали</h3>
+<p>Еколошки мебел изработен од рециклирани и обновливи материјали станува сè попопуларен.</p>
+
+<h3>2. Заоблени и органски форми</h3>
+<p>Збогум остри рабови! Оваа година е во знак на мекі, тековни линии што создаваат чувство на мир и удобност.</p>
+
+<h3>3. Смели бои</h3>
+<p>Додека неутралните тонови остануваат класични, гледаме повеќе домаќини што прифаќаат смели, изразити бои.</p>
+
+<h3>4. Мултифункционален мебел</h3>
+<p>Како домовите стануваат покомпактни, мебелот што служи повеќе цели е неопходен.</p>`,
+          excerpt:
+            'Откријте ги најжешките трендови во мебел за 2026, од одржливи материјали до смели бои.',
+        },
+      ],
+    },
+    author.id,
+  );
+
+  // Blog 3: Office Setup
+  await blogsService.create(
+    {
+      slug: 'create-perfect-home-office',
+      status: BlogStatus.DRAFT,
+      featuredImage:
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80',
+      translations: [
+        {
+          language: Language.EN,
+          title: 'Creating the Perfect Home Office Setup',
+          content: `<h2>Your Guide to a Productive Workspace</h2>
+<p>With remote work becoming the norm, creating a comfortable and productive home office is more important than ever. Here's how to set up the perfect workspace:</p>
+
+<h3>Choose the Right Desk</h3>
+<p>Your desk is the foundation of your home office. Look for one that's the right height and has enough surface area for your computer, documents, and other essentials.</p>
+
+<h3>Invest in a Good Chair</h3>
+<p>You'll be sitting for hours, so comfort is key. Look for ergonomic chairs with proper lumbar support and adjustable height.</p>
+
+<h3>Lighting Matters</h3>
+<p>Natural light is best, but if that's not available, invest in good task lighting to reduce eye strain.</p>
+
+<h3>Organization is Key</h3>
+<p>Keep your space organized with storage solutions like filing cabinets, desk organizers, and shelving.</p>
+
+<p>Remember, your home office should be a space that inspires productivity and creativity!</p>`,
+          excerpt:
+            'Learn how to create a comfortable and productive home office with the right furniture and setup.',
+        },
+        {
+          language: Language.MK,
+          title: 'Креирање на совршениот домашен офис',
+          content: `<h2>Ваш водич за продуктивен работен простор</h2>
+<p>Со работата од дома која станува норма, креирањето удобен и продуктивен домашен офис е поважно од кога било.</p>
+
+<h3>Изберете го правилниот биро</h3>
+<p>Вашиот биро е основата на вашиот домашен офис. Барајте таков што е со правилна висина и има доволно површина.</p>
+
+<h3>Инвестирајте во добра столица</h3>
+<p>Ќе седите часови, па удобноста е клучна. Барајте ергономски столици со соодветна поддршка.</p>
+
+<h3>Осветлувањето е важно</h3>
+<p>Природната светлина е најдобра, но ако не е достапна, инвестирајте во добро осветлување.</p>
+
+<p>Запомнете, вашиот домашен офис треба да биде простор што инспирира продуктивност!</p>`,
+          excerpt:
+            'Научете како да креирате удобен и продуктивен домашен офис со правилниот мебел.',
+        },
+      ],
+    },
+    author.id,
+  );
+
+  console.log('Blogs seeded ✅');
+  await app.close();
+}
+
 async function seedAll() {
   try {
     // Create app context just for clearing
@@ -421,6 +623,7 @@ async function seedAll() {
     await seedApplication();
     await seedCategories();
     await seedProducts();
+    await seedBlogs();
     console.log('✅ All seeds completed');
   } catch (err) {
     console.error(err);

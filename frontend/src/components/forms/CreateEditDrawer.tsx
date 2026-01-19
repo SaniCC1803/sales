@@ -4,38 +4,40 @@ import {
     SheetContent,
     SheetHeader,
     SheetTitle,
-    SheetFooter,
-    SheetClose,
 } from "@/components/ui/sheet";
 
 import CategoryForm from "./CategoryForm";
 import ProductForm from "./ProductForm";
 import ApplicationForm from "./ApplicationForm";
 import UserForm from "./UserForm";
-import { Button } from "@/components/ui/button";
+import BlogForm from "./BlogForm";
 
 import type { Category } from "@/types/category";
 import type { Product } from "@/types/product";
 import type { Application } from "@/types/application";
 import type { User } from "@/types/user";
+import type { Blog } from "@/types/blog";
 
 type Props = {
     onCategoryCreated?: () => void;
     onProductCreated?: () => void;
     onApplicationCreated?: () => void;
     onUserCreated?: () => void;
+    onBlogCreated?: () => void;
 
     editCategory?: Category | null;
     editProduct?: Product | null;
     editApplication?: Application | null;
     editUser?: User | null;
+    editBlog?: Blog | null;
 
     onEditComplete?: () => void;
     onProductEditComplete?: () => void;
     onApplicationEditComplete?: () => void;
     onUserEditComplete?: () => void;
+    onBlogEditComplete?: () => void;
 
-    activeSection: "categories" | "applications" | "products" | "users";
+    activeSection: "categories" | "applications" | "products" | "users" | "blogs";
     open: boolean;
     onOpenChange: (open: boolean) => void;
 };
@@ -45,20 +47,23 @@ export default function CreateEditDrawer({
     onProductCreated,
     onApplicationCreated,
     onUserCreated,
+    onBlogCreated,
     editCategory,
     editProduct,
     editApplication,
     editUser,
+    editBlog,
     onEditComplete,
     onProductEditComplete,
     onApplicationEditComplete,
     onUserEditComplete,
+    onBlogEditComplete,
     activeSection,
     open,
     onOpenChange,
 }: Props) {
     const { t } = useTranslation();
-    const isEditMode = !!(editCategory || editProduct || editApplication || editUser);
+    const isEditMode = !!(editCategory || editProduct || editApplication || editUser || editBlog);
 
     const title = isEditMode
         ? `${t("edit")} ${activeSection.slice(0, -1)}`
@@ -102,28 +107,36 @@ export default function CreateEditDrawer({
                     )}
 
                     {activeSection === "users" && (
-                        <>
-                            <UserForm
-                                editUser={editUser}
-                                onCreated={onUserCreated}
-                                onEditComplete={onUserEditComplete}
-                                closeDrawer={closeDrawer}
-                                formId="user-form"
-                            />
-                        </>
+                        <UserForm
+                            editUser={editUser}
+                            onCreated={onUserCreated}
+                            onEditComplete={onUserEditComplete}
+                            closeDrawer={closeDrawer}
+                            formId="user-form"
+                        />
+                    )}
+
+                    {activeSection === "blogs" && (
+                        <BlogForm
+                            editBlog={editBlog}
+                            onCreated={onBlogCreated}
+                            onEditComplete={onBlogEditComplete}
+                            closeDrawer={closeDrawer}
+                            formId="blog-form"
+                        />
                     )}
                 </div>
 
-                {activeSection === "users" && (
+                {/* {(activeSection === "users" || activeSection === "blogs") && (
                     <SheetFooter>
-                        <Button type="submit" form="user-form">
+                        <Button type="submit" form={activeSection === "users" ? "user-form" : "blog-form"}>
                             {isEditMode ? t("save") : t("create")}
                         </Button>
                         <SheetClose asChild>
                             <Button variant="outline">{t("close")}</Button>
                         </SheetClose>
                     </SheetFooter>
-                )}
+                )} */}
             </SheetContent>
         </Sheet>
     );

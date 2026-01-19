@@ -5,6 +5,7 @@ import type { Category } from "@/types/category";
 import type { CategoryFormValues } from "./CategoryForm";
 import type { Product } from "@/types/product";
 import type { ProductFormValues } from "./ProductForm";
+import type { Blog } from "@/types/blog";
 
 export function getUserDefaultValues(editUser?: User | null): UserFormValues {
   if (!editUser) {
@@ -61,7 +62,9 @@ export function getDefaultProductValues(
   if (editProduct) {
     return {
       translations: languages.map((lang) => {
-        const existing = editProduct.translations.find((t) => t.language === lang);
+        const existing = editProduct.translations.find(
+          (t) => t.language === lang
+        );
         return {
           language: lang,
           name: existing?.name || "",
@@ -85,3 +88,25 @@ export function getDefaultProductValues(
     images: [],
   };
 }
+
+export const getDefaultBlogValues = (editBlog?: Blog | null) => {
+  const enTranslation = editBlog?.translations.find((t) => t.language === "en");
+  const mkTranslation = editBlog?.translations.find((t) => t.language === "mk");
+
+  return {
+    slug: editBlog?.slug || "",
+    status: editBlog?.status || ("DRAFT" as const),
+    translations: {
+      en: {
+        title: enTranslation?.title || "",
+        content: enTranslation?.content || "",
+        excerpt: enTranslation?.excerpt || "",
+      },
+      mk: {
+        title: mkTranslation?.title || "",
+        content: mkTranslation?.content || "",
+        excerpt: mkTranslation?.excerpt || "",
+      },
+    },
+  };
+};

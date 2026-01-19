@@ -4,14 +4,17 @@ import { UsersModule } from './users/users.module';
 import { ApplicationsModule } from './applications/applications.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ProductsModule } from './products/products.module';
+import { BlogsModule } from './blogs/blogs.module';
 import { User } from './users/user.entity';
 import { AuthModule } from './auth/auth.module';
 import { Application } from './applications/application.entity';
 import { Category } from './categories/category.entity';
 import { Product } from './products/product.entity';
+import { Blog } from './blogs/blog.entity';
 import { CategoryTranslation } from './categories/category-translations.entity';
 import { ApplicationTranslation } from './applications/application-translations.entity';
 import { ProductTranslation } from './products/product-translations.entity';
+import { BlogTranslation } from './blogs/blog-translations.entity';
 
 @Module({
   imports: [
@@ -30,6 +33,8 @@ import { ProductTranslation } from './products/product-translations.entity';
         CategoryTranslation,
         Product,
         ProductTranslation,
+        Blog,
+        BlogTranslation,
       ],
       synchronize: true,
     }),
@@ -37,6 +42,7 @@ import { ProductTranslation } from './products/product-translations.entity';
     ApplicationsModule,
     CategoriesModule,
     ProductsModule,
+    BlogsModule,
     AuthModule,
   ],
 })

@@ -48,6 +48,9 @@ export default function Header({ application }: HeaderProps) {
       {/* Desktop */}
       <div>
         <nav className="hidden md:flex space-x-3 items-center">
+          <Link to="/blogs" className="text-foreground hover:text-foreground" style={{ color: 'inherit' }}>
+            {t("blogs")}
+          </Link>
           <Link to="/about-us" className="text-foreground hover:text-foreground" style={{ color: 'inherit' }}>
             {t("aboutUs")}
           </Link>
@@ -86,6 +89,9 @@ export default function Header({ application }: HeaderProps) {
           <nav className="flex flex-col p-4 space-y-2">
             <Link onClick={() => setOpen(false)} className="text-foreground" to="/admin">
               {t("collections")}
+            </Link>
+            <Link onClick={() => setOpen(false)} className="text-foreground" to="/blogs">
+              {t("blogs")}
             </Link>
             <Link onClick={() => setOpen(false)} className="text-foreground" to="/about-us">
               {t("aboutUs")}

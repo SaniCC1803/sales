@@ -61,8 +61,6 @@ export default function CategoryForm({
 
   useEffect(() => {
     if (editCategory) {
-      console.log('CategoryForm: editCategory data:', editCategory);
-      console.log('CategoryForm: editCategory.image:', editCategory.image);
       reset(getDefaultCategoryValues(editCategory, languages));
     }
   }, [editCategory, languages, reset]);
@@ -70,7 +68,6 @@ export default function CategoryForm({
   const onSubmit = async (data: CategoryFormValues) => {
     try {
       setIsSubmitting(true);
-
       const formData = new FormData();
       formData.append("translations", JSON.stringify(data.translations));
       if (data.parentId !== null) {
@@ -112,6 +109,7 @@ export default function CategoryForm({
       closeDrawer();
     } catch (err) {
       console.error(err);
+      setIsSubmitting(false);
     } finally {
       setIsSubmitting(false);
     }
