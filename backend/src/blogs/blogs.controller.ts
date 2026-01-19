@@ -75,20 +75,21 @@ export class BlogsController {
     }),
   )
   async create(
+    @Body('translations') translationsJson: string,
     @Body() dto: CreateBlogDto,
     @UploadedFile() file: Express.Multer.File,
     @Req() req: any,
   ) {
-    // Parse translations if it's a JSON string (from FormData)
-    if (typeof dto.translations === 'string') {
-      try {
-        dto.translations = JSON.parse(dto.translations as any);
-      } catch (error) {
-        throw new Error('Invalid translations format');
-      }
+    try {
+      console.log('Raw translationsJson:', translationsJson, typeof translationsJson);
+      const translations = JSON.parse(translationsJson);
+      console.log('Parsed translations:', translations, typeof translations, Array.isArray(translations));
+      (dto as any).translations = translations;
+      return this.blogsService.create(dto, req.user.userId, file);
+    } catch (error) {
+      console.error('Error parsing translations:', error);
+      throw new Error('Invalid translations format');
     }
-    
-    return this.blogsService.create(dto, req.user.userId, file);
   }
 
   @Put(':id')
@@ -114,19 +115,18 @@ export class BlogsController {
   )
   async update(
     @Param('id') id: string,
+    @Body('translations') translationsJson: string,
     @Body() dto: UpdateBlogDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    // Parse translations if it's a JSON string (from FormData)
-    if (typeof dto.translations === 'string') {
-      try {
-        dto.translations = JSON.parse(dto.translations as any);
-      } catch (error) {
-        throw new Error('Invalid translations format');
-      }
+    try {
+      const translations = JSON.parse(translationsJson);
+      (dto as any).translations = translations;
+      return this.blogsService.update(+id, dto, file);
+    } catch (error) {
+      console.error('Error parsing translations:', error);
+      throw new Error('Invalid translations format');
     }
-    
-    return this.blogsService.update(+id, dto, file);
   }
 
   @Patch(':id')

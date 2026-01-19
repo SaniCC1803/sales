@@ -22,22 +22,18 @@ interface BlogFormProps {
     formId: string;
 }
 
+interface BlogFormTranslation {
+    language: Language;
+    title: string;
+    content: string;
+    excerpt: string;
+}
+
 interface BlogFormData {
     slug: string;
     status: 'DRAFT' | 'PUBLISHED';
     featuredImage?: File;
-    translations: {
-        en: {
-            title: string;
-            content: string;
-            excerpt: string;
-        };
-        mk: {
-            title: string;
-            content: string;
-            excerpt: string;
-        };
-    };
+    translations: BlogFormTranslation[];
 }
 
 export default function BlogForm({ editBlog, onCreated, onEditComplete, closeDrawer, formId }: BlogFormProps) {
@@ -49,7 +45,7 @@ export default function BlogForm({ editBlog, onCreated, onEditComplete, closeDra
     const [currentFeaturedImage, setCurrentFeaturedImage] = useState<string | null>(null);
 
     const { control, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm<BlogFormData>({
-        defaultValues: getDefaultBlogValues(editBlog),
+        defaultValues: getDefaultBlogValues(editBlog, languages),
     });
     const watchedEnTitle = watch("translations.en.title");
 
@@ -88,21 +84,8 @@ export default function BlogForm({ editBlog, onCreated, onEditComplete, closeDra
             if (featuredImageFile) {
                 formData.append('featuredImage', featuredImageFile);
             }
-            const translations = [
-                {
-                    language: 'en',
-                    title: data.translations.en.title,
-                    content: data.translations.en.content,
-                    excerpt: data.translations.en.excerpt,
-                },
-                {
-                    language: 'mk',
-                    title: data.translations.mk.title,
-                    content: data.translations.mk.content,
-                    excerpt: data.translations.mk.excerpt,
-                },
-            ].filter(t => t.title.trim() !== '');
-            formData.append('translations', JSON.stringify(translations));
+            // Always send translations as array of objects
+            formData.append('translations', JSON.stringify(data.translations));
             let res: Response;
             if (editBlog) {
                 res = await fetchWithAuth(
@@ -119,7 +102,6 @@ export default function BlogForm({ editBlog, onCreated, onEditComplete, closeDra
                 });
             }
             if (!res.ok) {
-                // Optionally handle error UI here
                 setIsSubmitting(false);
                 return;
             }
@@ -186,20 +168,18 @@ export default function BlogForm({ editBlog, onCreated, onEditComplete, closeDra
 
             {/* Title */}
             <Label>{t("title")}</Label>
-            {languages.map((lang) => (
+            {languages.map((lang, idx) => (
                 <Controller
                     key={lang}
-                    name={`translations.${lang}.title` as const}
+                    name={`translations.${idx}.title` as const}
                     control={control}
-                    rules={{
-                        required: t("titleRequired")
-                    }}
+                    rules={{ required: t("titleRequired") }}
                     render={({ field }) => (
                         <div className="flex flex-col gap-0.5">
                             <Input {...field} placeholder={lang.toUpperCase()} />
                             <ErrorMessage
                                 errors={errors}
-                                name={`translations.${lang}.title`}
+                                name={`translations.${idx}.title`}
                                 render={({ message }) => <p className="text-destructive text-sm mt-1">{message}</p>}
                             />
                         </div>
@@ -211,20 +191,18 @@ export default function BlogForm({ editBlog, onCreated, onEditComplete, closeDra
 
             {/* Excerpt */}
             <Label>{t("excerpt")}</Label>
-            {languages.map((lang) => (
+            {languages.map((lang, idx) => (
                 <Controller
                     key={lang}
-                    name={`translations.${lang}.excerpt` as const}
+                    name={`translations.${idx}.excerpt` as const}
                     control={control}
-                    rules={{
-                        required: t("excerptRequired")
-                    }}
+                    rules={{ required: t("excerptRequired") }}
                     render={({ field }) => (
                         <div className="flex flex-col gap-0.5">
                             <Input {...field} placeholder={lang.toUpperCase()} />
                             <ErrorMessage
                                 errors={errors}
-                                name={`translations.${lang}.excerpt`}
+                                name={`translations.${idx}.excerpt`}
                                 render={({ message }) => <p className="text-destructive text-sm mt-1">{message}</p>}
                             />
                         </div>
@@ -236,20 +214,18 @@ export default function BlogForm({ editBlog, onCreated, onEditComplete, closeDra
 
             {/* Content */}
             <Label>{t("content")}</Label>
-            {languages.map((lang) => (
+            {languages.map((lang, idx) => (
                 <Controller
                     key={lang}
-                    name={`translations.${lang}.content` as const}
+                    name={`translations.${idx}.content` as const}
                     control={control}
-                    rules={{
-                        required: t("contentRequired")
-                    }}
+                    rules={{ required: t("contentRequired") }}
                     render={({ field }) => (
                         <div className="flex flex-col gap-0.5">
                             <Textarea {...field} placeholder={lang.toUpperCase()} rows={8} />
                             <ErrorMessage
                                 errors={errors}
-                                name={`translations.${lang}.content`}
+                                name={`translations.${idx}.content`}
                                 render={({ message }) => <p className="text-destructive text-sm mt-1">{message}</p>}
                             />
                         </div>

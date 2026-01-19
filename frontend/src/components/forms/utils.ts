@@ -89,24 +89,18 @@ export function getDefaultProductValues(
   };
 }
 
-export const getDefaultBlogValues = (editBlog?: Blog | null) => {
-  const enTranslation = editBlog?.translations.find((t) => t.language === "en");
-  const mkTranslation = editBlog?.translations.find((t) => t.language === "mk");
-
+export const getDefaultBlogValues = (editBlog?: Blog | null, languages: Language[] = ["en", "mk"]) => {
   return {
     slug: editBlog?.slug || "",
     status: editBlog?.status || ("DRAFT" as const),
-    translations: {
-      en: {
-        title: enTranslation?.title || "",
-        content: enTranslation?.content || "",
-        excerpt: enTranslation?.excerpt || "",
-      },
-      mk: {
-        title: mkTranslation?.title || "",
-        content: mkTranslation?.content || "",
-        excerpt: mkTranslation?.excerpt || "",
-      },
-    },
+    translations: languages.map((lang) => {
+      const found = editBlog?.translations.find((t) => t.language === lang);
+      return {
+        language: lang,
+        title: found?.title || "",
+        content: found?.content || "",
+        excerpt: found?.excerpt || "",
+      };
+    }),
   };
 };
