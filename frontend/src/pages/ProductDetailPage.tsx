@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { getImageUrl } from '@/lib/utils';
+import { apiFetch } from '@/lib/apiFetch';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '@/context/LanguageContext';
 import { useParams, Link } from "react-router-dom";
@@ -30,14 +32,16 @@ const ProductDetailPage: React.FC = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`http://localhost:3000/products/${id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch product");
-        return res.json();
-      })
-      .then(setProduct)
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
+    (async () => {
+      const { data, error } = await apiFetch<Product>(`/products/${id}`);
+      if (error) {
+        setError(error);
+        setProduct(null);
+      } else {
+        setProduct(data);
+      }
+      setLoading(false);
+    })();
   }, [id]);
 
   if (loading) {
@@ -112,7 +116,7 @@ const ProductDetailPage: React.FC = () => {
               product.images.map((img, idx) => (
                 <img
                   key={idx}
-                  src={img.startsWith("http") ? img : `http://localhost:3000${img}`}
+                  src={getImageUrl(img)}
                   alt={productName}
                   className="h-52 w-52 rounded-lg border object-cover cursor-pointer hover:opacity-80 transition"
                   onClick={() => openGallery(idx)}

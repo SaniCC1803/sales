@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { apiFetch } from '@/lib/apiFetch';
 import ProductCarousel from '@/components/ProductCarousel';
 import type { Category } from '@/types/category';
 import type { Application } from '../types/application';
@@ -22,20 +23,19 @@ export default function HomePage({ application }: HomePageProps) {
   useEffect(() => {
     setLoading(true);
 
-    Promise.all([
-      fetch('http://localhost:3000/categories').then((res) => res.json()),
-      fetch('http://localhost:3000/products').then((res) => res.json()),
-    ])
-      .then(([categories, products]) => {
-        setCategories(categories);
-
-        const allSubcategories = categories.flatMap((cat: Category) => cat.subcategories || []);
-        setSubcategories(allSubcategories);
-
-        setProducts(products);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+    (async () => {
+      const [{ data: categories, error: catError }, { data: products, error: prodError }] = await Promise.all([
+        apiFetch<Category[]>('/categories'),
+        apiFetch<Product[]>('/products'),
+      ]);
+      if (catError) setError(catError);
+      if (prodError) setError(prodError);
+      setCategories(categories || []);
+      const allSubcategories = (categories || []).flatMap((cat: Category) => cat.subcategories || []);
+      setSubcategories(allSubcategories);
+      setProducts(products || []);
+      setLoading(false);
+    })();
   }, []);
 
   return (

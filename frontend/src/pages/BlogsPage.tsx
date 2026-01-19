@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiFetch } from '@/lib/apiFetch';
 import { useTranslation } from 'react-i18next';
 import type { Blog } from '@/types/blog';
 import CardComponent from '@/components/Card';
@@ -12,12 +13,13 @@ export default function BlogsPage() {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const response = await fetch('http://localhost:3000/blogs?published=true');
-        if (!response.ok) {
-          throw new Error('Failed to fetch blogs');
+        const { data, error } = await apiFetch<Blog[]>('/blogs?published=true');
+        if (error) {
+          setError(error);
+          setBlogs([]);
+        } else {
+          setBlogs(data || []);
         }
-        const data = await response.json();
-        setBlogs(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {

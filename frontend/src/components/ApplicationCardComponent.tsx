@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { getImageUrl } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { CardDescription, CardTitle } from '@/components/ui/card';
 import { Edit3, Plus } from 'lucide-react';
@@ -20,10 +21,7 @@ export default function ApplicationCardComponent({
   const { t, i18n } = useTranslation();
   const currentLanguage = i18n.language as 'en' | 'mk';
 
-  const getImageUrl = (path: string) => {
-    if (path.startsWith('http')) return path;
-    return `http://localhost:3000${path}`;
-  };
+
 
   if (!application) {
     return (

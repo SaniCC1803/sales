@@ -49,12 +49,11 @@ export default function Page() {
 
   return (
     <SidebarProvider>
-      <AppSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
-      <SidebarInset className="bg-muted text-muted-foreground">
-        <section className="flex flex-col container mx-auto px-6 py-6 gap-6">
-          {renderActiveSection()}
-        </section>
+        <AppSidebar onSectionChange={setActiveSection} className="h-screen fixed left-0 top-24 z-30" />
+        <SidebarInset className="bg-muted text-muted-foreground min-h-screen">
+          <section className="flex flex-col container mx-auto px-6 py-6 gap-6">{renderActiveSection()}</section>
       </SidebarInset>
     </SidebarProvider>
   );
 }
+

@@ -10,7 +10,8 @@ export async function fetchWithAuth(input: RequestInfo, init?: RequestInit) {
   let response = await fetch(input, { ...init, headers });
   if (response.status === 401 && refreshToken) {
     // Try to refresh the access token
-    const refreshRes = await fetch('http://localhost:3000/auth/refresh', {
+    const baseUrl = import.meta.env.VITE_API_URL || '';
+    const refreshRes = await fetch(`${baseUrl}/auth/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken }),

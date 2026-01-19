@@ -42,5 +42,6 @@ export const colors = [
 
 export const getImageUrl = (path: string) => {
   if (path.startsWith('http')) return path;
-  return `http://localhost:3000${path}`;
+  const baseUrl = import.meta.env.VITE_API_URL || '';
+  return `${baseUrl}${path}`;
 };

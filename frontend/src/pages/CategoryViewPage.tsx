@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { apiFetch } from '@/lib/apiFetch';
 import { Link, useParams } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '@/context/LanguageContext';
@@ -32,14 +33,16 @@ const CategoryViewPage: React.FC = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`http://localhost:3000/categories/${id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch category");
-        return res.json();
-      })
-      .then(setData)
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
+    (async () => {
+      const { data, error } = await apiFetch<CategoryResponse>(`/categories/${id}`);
+      if (error) {
+        setError(error);
+        setData(null);
+      } else {
+        setData(data);
+      }
+      setLoading(false);
+    })();
   }, [id]);
 
   if (loading) {

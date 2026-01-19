@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiFetch } from '@/lib/apiFetch';
 import { useParams, Link } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTranslation } from 'react-i18next';
@@ -24,12 +25,13 @@ export default function BlogDetailPage() {
       }
 
       try {
-        const response = await fetch(`http://localhost:3000/blogs/slug/${slug}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch blog');
+        const { data, error } = await apiFetch<Blog>(`/blogs/slug/${slug}`);
+        if (error) {
+          setError(error);
+          setBlog(null);
+        } else {
+          setBlog(data);
         }
-        const data = await response.json();
-        setBlog(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
