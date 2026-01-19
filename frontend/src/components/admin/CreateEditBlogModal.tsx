@@ -1,14 +1,20 @@
-import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { fetchWithAuth } from "@/lib/fetchWithAuth";
-import type { Blog } from "@/types/blog";
-import SingleImageUpload from "@/components/SingleImageUpload";
+import { useState, useEffect } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { fetchWithAuth } from '@/lib/fetchWithAuth';
+import type { Blog } from '@/types/blog';
+import SingleImageUpload from '@/components/SingleImageUpload';
 
 interface CreateEditBlogModalProps {
   open: boolean;
@@ -35,13 +41,18 @@ interface BlogFormData {
   };
 }
 
-export default function CreateEditBlogModal({ open, onOpenChange, blog, onSuccess }: CreateEditBlogModalProps) {
+export default function CreateEditBlogModal({
+  open,
+  onOpenChange,
+  blog,
+  onSuccess,
+}: CreateEditBlogModalProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeLanguage, setActiveLanguage] = useState<'en' | 'mk'>('en');
   const [featuredImageFile, setFeaturedImageFile] = useState<File | null>(null);
   const [currentFeaturedImage, setCurrentFeaturedImage] = useState<string | null>(null);
-  
+
   const [formData, setFormData] = useState<BlogFormData>({
     slug: '',
     status: 'DRAFT',
@@ -61,10 +72,9 @@ export default function CreateEditBlogModal({ open, onOpenChange, blog, onSucces
 
   useEffect(() => {
     if (blog) {
-      // Populate form with existing blog data
-      const enTranslation = blog.translations.find(t => t.language === 'en');
-      const mkTranslation = blog.translations.find(t => t.language === 'mk');
-      
+      const enTranslation = blog.translations.find((t) => t.language === 'en');
+      const mkTranslation = blog.translations.find((t) => t.language === 'mk');
+
       setFormData({
         slug: blog.slug,
         status: blog.status,
@@ -115,7 +125,7 @@ export default function CreateEditBlogModal({ open, onOpenChange, blog, onSucces
   };
 
   const handleTitleChange = (value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       translations: {
         ...prev.translations,
@@ -136,16 +146,16 @@ export default function CreateEditBlogModal({ open, onOpenChange, blog, onSucces
 
     try {
       const formDataToSend = new FormData();
-      
+
       // Add basic fields
       formDataToSend.append('slug', formData.slug);
       formDataToSend.append('status', formData.status);
-      
+
       // Add featured image if selected
       if (featuredImageFile) {
         formDataToSend.append('featuredImage', featuredImageFile);
       }
-      
+
       // Add translations as JSON
       const translations = [
         {
@@ -160,16 +170,14 @@ export default function CreateEditBlogModal({ open, onOpenChange, blog, onSucces
           content: formData.translations.mk.content,
           excerpt: formData.translations.mk.excerpt,
         },
-      ].filter(t => t.title.trim() !== ''); // Only include languages with titles
-      
+      ].filter((t) => t.title.trim() !== ''); // Only include languages with titles
+
       formDataToSend.append('translations', JSON.stringify(translations));
 
-      const url = blog 
-        ? `http://localhost:3000/blogs/${blog.id}`
-        : 'http://localhost:3000/blogs';
-      
+      const url = blog ? `http://localhost:3000/blogs/${blog.id}` : 'http://localhost:3000/blogs';
+
       const method = blog ? 'PATCH' : 'POST';
-      
+
       const response = await fetchWithAuth(url, {
         method,
         body: formDataToSend,
@@ -197,11 +205,9 @@ export default function CreateEditBlogModal({ open, onOpenChange, blog, onSucces
         <DialogHeader>
           <DialogTitle>{blog ? 'Edit Blog' : 'Create Blog'}</DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-6">
-          {error && (
-            <div className="text-red-500 text-sm">{error}</div>
-          )}
+          {error && <div className="text-red-500 text-sm">{error}</div>}
 
           {/* Language Tabs */}
           <div className="flex space-x-2 mb-4">
@@ -228,18 +234,18 @@ export default function CreateEditBlogModal({ open, onOpenChange, blog, onSucces
               <Input
                 id="slug"
                 value={formData.slug}
-                onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
+                onChange={(e) => setFormData((prev) => ({ ...prev, slug: e.target.value }))}
                 placeholder="blog-post-slug"
                 required
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
               <Select
                 value={formData.status}
-                onValueChange={(value: 'DRAFT' | 'PUBLISHED') => 
-                  setFormData(prev => ({ ...prev, status: value }))
+                onValueChange={(value: 'DRAFT' | 'PUBLISHED') =>
+                  setFormData((prev) => ({ ...prev, status: value }))
                 }
               >
                 <SelectTrigger>
@@ -280,16 +286,18 @@ export default function CreateEditBlogModal({ open, onOpenChange, blog, onSucces
               <Textarea
                 id="excerpt"
                 value={currentTranslation.excerpt}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  translations: {
-                    ...prev.translations,
-                    [activeLanguage]: {
-                      ...prev.translations[activeLanguage],
-                      excerpt: e.target.value,
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    translations: {
+                      ...prev.translations,
+                      [activeLanguage]: {
+                        ...prev.translations[activeLanguage],
+                        excerpt: e.target.value,
+                      },
                     },
-                  },
-                }))}
+                  }))
+                }
                 rows={3}
               />
             </div>
@@ -299,16 +307,18 @@ export default function CreateEditBlogModal({ open, onOpenChange, blog, onSucces
               <Textarea
                 id="content"
                 value={currentTranslation.content}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  translations: {
-                    ...prev.translations,
-                    [activeLanguage]: {
-                      ...prev.translations[activeLanguage],
-                      content: e.target.value,
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    translations: {
+                      ...prev.translations,
+                      [activeLanguage]: {
+                        ...prev.translations[activeLanguage],
+                        content: e.target.value,
+                      },
                     },
-                  },
-                }))}
+                  }))
+                }
                 rows={10}
                 required={activeLanguage === 'en'}
               />
@@ -320,7 +330,7 @@ export default function CreateEditBlogModal({ open, onOpenChange, blog, onSucces
               Cancel
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? 'Saving...' : (blog ? 'Update Blog' : 'Create Blog')}
+              {loading ? 'Saving...' : blog ? 'Update Blog' : 'Create Blog'}
             </Button>
           </div>
         </form>

@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
-import RegisterModal from "./RegisterModal";
-import LoginModal from "./LoginModal";
+import { useState, useEffect } from 'react';
+import RegisterModal from './RegisterModal';
+import LoginModal from './LoginModal';
 
 function isAuthenticated() {
-  return !!localStorage.getItem("userToken");
+  return !!localStorage.getItem('userToken');
 }
 
 export default function ProtectedRoute({ children }: { children: JSX.Element }) {
@@ -11,9 +11,9 @@ export default function ProtectedRoute({ children }: { children: JSX.Element }) 
   const [usersExist, setUsersExist] = useState<boolean | null>(null);
 
   useEffect(() => {
-    fetch("http://localhost:3000/users")
-      .then(res => res.json())
-      .then(users => setUsersExist(users.length > 0))
+    fetch('http://localhost:3000/users')
+      .then((res) => res.json())
+      .then((users) => setUsersExist(users.length > 0))
       .catch(() => setUsersExist(true));
     setAuth(isAuthenticated());
   }, []);

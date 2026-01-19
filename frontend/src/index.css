@@ -145,7 +145,6 @@ button:focus-visible {
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
     --sidebar-background: 240 5.9% 10%;
-
   }
 
   .red {
@@ -217,7 +216,6 @@ button:focus-visible {
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.637 0.237 25.331);
-
   }
 
   .rose {
@@ -289,7 +287,6 @@ button:focus-visible {
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.645 0.246 16.439);
-
   }
 
   .orange {
@@ -361,7 +358,6 @@ button:focus-visible {
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.646 0.222 41.116);
-
   }
 
   .green {
@@ -433,7 +429,6 @@ button:focus-visible {
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.527 0.154 150.069);
-
   }
 
   .blue {
@@ -505,7 +500,6 @@ button:focus-visible {
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.488 0.243 264.376);
-
   }
 
   .yellow {
@@ -577,7 +571,6 @@ button:focus-visible {
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.554 0.135 66.442);
-
   }
 
   .violet {
@@ -649,7 +642,6 @@ button:focus-visible {
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.541 0.281 293.009);
-
   }
 }
 

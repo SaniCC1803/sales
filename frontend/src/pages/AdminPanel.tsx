@@ -1,24 +1,20 @@
-import { AppSidebar } from "@/components/app-sidebar";
-import { Separator } from "@/components/ui/separator";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { AppSidebar } from '@/components/app-sidebar';
+import { Separator } from '@/components/ui/separator';
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
-import CategoriesAdmin from "@/components/admin/CategoriesAdmin";
-import ProductsAdmin from "@/components/admin/ProductsAdmin";
-import ApplicationsAdmin from "@/components/admin/ApplicationsAdmin";
-import UsersAdmin from "@/components/admin/UsersAdmin";
-import BlogsAdmin from "@/components/admin/BlogsAdmin";
-import { useTranslation } from "react-i18next";
+import CategoriesAdmin from '@/components/admin/CategoriesAdmin';
+import ProductsAdmin from '@/components/admin/ProductsAdmin';
+import ApplicationsAdmin from '@/components/admin/ApplicationsAdmin';
+import UsersAdmin from '@/components/admin/UsersAdmin';
+import BlogsAdmin from '@/components/admin/BlogsAdmin';
+import { useTranslation } from 'react-i18next';
 
 export default function Page() {
   const location = useLocation();
   const { t } = useTranslation();
-  
+
   const getActiveSectionFromPath = (pathname: string) => {
     if (pathname === '/admin/products') return 'products';
     if (pathname === '/admin/categories') return 'categories';
@@ -28,9 +24,9 @@ export default function Page() {
     return 'categories';
   };
 
-  const [activeSection, setActiveSection] = useState<"categories" | "applications" | "products" | "users" | "blogs">(
-    getActiveSectionFromPath(location.pathname)
-  );
+  const [activeSection, setActiveSection] = useState<
+    'categories' | 'applications' | 'products' | 'users' | 'blogs'
+  >(getActiveSectionFromPath(location.pathname));
 
   useEffect(() => {
     const newSection = getActiveSectionFromPath(location.pathname);
@@ -56,10 +52,7 @@ export default function Page() {
 
   return (
     <SidebarProvider>
-      <AppSidebar
-        activeSection={activeSection}
-        onSectionChange={setActiveSection}
-      />
+      <AppSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
       <SidebarInset className="bg-muted text-muted-foreground">
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1 md:hidden" />
@@ -67,9 +60,7 @@ export default function Page() {
           <Separator orientation="vertical" className="mr-2 h-4 md:hidden" />
         </header>
 
-        <section className="container mx-auto px-6 py-12">
-          {renderActiveSection()}
-        </section>
+        <section className="container mx-auto px-6 py-12">{renderActiveSection()}</section>
       </SidebarInset>
     </SidebarProvider>
   );

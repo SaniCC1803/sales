@@ -1,9 +1,9 @@
-import type { Application } from "../types/application";
-import { useLanguage } from "@/context/LanguageContext";
+import type { Application } from '../types/application';
+import { useLanguage } from '@/context/LanguageContext';
 
 type BannerProps = {
-  application: Application
-}
+  application: Application;
+};
 
 export default function Banner({ application }: BannerProps) {
   const { language } = useLanguage();

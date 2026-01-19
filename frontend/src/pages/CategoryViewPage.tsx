@@ -20,12 +20,12 @@ const CategoryViewPage: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     fetch(`http://localhost:3000/categories/${id}`)
-      .then(res => {
+      .then((res) => {
         if (!res.ok) throw new Error('Failed to fetch category');
         return res.json();
       })
       .then(setData)
-      .catch(e => setError(e.message))
+      .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -36,12 +36,14 @@ const CategoryViewPage: React.FC = () => {
   return (
     <div className="container mx-auto px-6 py-12">
       <Breadcrumbs category={data.category} />
-      <h1 className="text-2xl font-bold mb-4">{data.category.translations[0]?.name || 'Unnamed'}</h1>
+      <h1 className="text-2xl font-bold mb-4">
+        {data.category.translations[0]?.name || 'Unnamed'}
+      </h1>
       {data.subcategories.length > 0 && (
         <>
           <h2 className="text-xl font-semibold mb-6 text-center sm:text-left">Subcategories</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-12">
-            {data.subcategories.map(sub => (
+            {data.subcategories.map((sub) => (
               <CardComponent key={sub.id} item={sub} />
             ))}
           </div>
@@ -51,14 +53,16 @@ const CategoryViewPage: React.FC = () => {
         <>
           <h2 className="text-xl font-semibold mb-6 text-center sm:text-left">Products</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {data.products.map(prod => (
+            {data.products.map((prod) => (
               <CardComponent key={prod.id} item={prod} />
             ))}
           </div>
         </>
       )}
       {data.subcategories.length === 0 && data.products.length === 0 && (
-        <div className="text-gray-500 mt-8">No subcategories or products found in this category.</div>
+        <div className="text-gray-500 mt-8">
+          No subcategories or products found in this category.
+        </div>
       )}
     </div>
   );

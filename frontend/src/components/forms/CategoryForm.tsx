@@ -1,22 +1,22 @@
-"use client";
+'use client';
 
-import { useEffect, useState, useMemo } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { useTranslation } from "react-i18next";
+import { useEffect, useState, useMemo } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
-import { Button } from "@/components/ui/button";
-import { Select as NativeSelect } from "@/components/ui/select-native";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { getDefaultCategoryValues } from "./utils";
+import { Button } from '@/components/ui/button';
+import { Select as NativeSelect } from '@/components/ui/select-native';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { getDefaultCategoryValues } from './utils';
 
-import SingleImageUpload from "@/components/SingleImageUpload";
-import type { Category } from "@/types/category";
-import { fetchWithAuth } from "@/lib/fetchWithAuth";
-import { ErrorMessage } from "@hookform/error-message";
+import SingleImageUpload from '@/components/SingleImageUpload';
+import type { Category } from '@/types/category';
+import { fetchWithAuth } from '@/lib/fetchWithAuth';
+import { ErrorMessage } from '@hookform/error-message';
 
-type Language = "en" | "mk";
+type Language = 'en' | 'mk';
 
 export type CategoryFormValues = {
   translations: {
@@ -42,18 +42,23 @@ export default function CategoryForm({
   closeDrawer,
 }: CategoryFormProps) {
   const { t } = useTranslation();
-  const languages = useMemo<Language[]>(() => ["en", "mk"], []);
+  const languages = useMemo<Language[]>(() => ['en', 'mk'], []);
   const isEditMode = !!editCategory;
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { control, handleSubmit, reset, formState: { errors } } = useForm<CategoryFormValues>({
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<CategoryFormValues>({
     defaultValues: getDefaultCategoryValues(editCategory, languages),
   });
 
   useEffect(() => {
-    fetch("http://localhost:3000/categories")
+    fetch('http://localhost:3000/categories')
       .then((res) => res.json())
       .then(setCategories)
       .catch(console.error);
@@ -69,34 +74,31 @@ export default function CategoryForm({
     try {
       setIsSubmitting(true);
       const formData = new FormData();
-      formData.append("translations", JSON.stringify(data.translations));
+      formData.append('translations', JSON.stringify(data.translations));
       if (data.parentId !== null) {
-        formData.append("parentId", data.parentId.toString());
+        formData.append('parentId', data.parentId.toString());
       }
 
       if (data.image) {
-        formData.append("image", data.image);
+        formData.append('image', data.image);
       }
 
       let res: Response;
 
       if (isEditMode && editCategory) {
-        res = await fetchWithAuth(
-          `http://localhost:3000/categories/${editCategory.id}`,
-          {
-            method: "PUT",
-            body: formData,
-          }
-        );
+        res = await fetchWithAuth(`http://localhost:3000/categories/${editCategory.id}`, {
+          method: 'PUT',
+          body: formData,
+        });
       } else {
-        res = await fetchWithAuth("http://localhost:3000/categories", {
-          method: "POST",
+        res = await fetchWithAuth('http://localhost:3000/categories', {
+          method: 'POST',
           body: formData,
         });
       }
 
       if (!res.ok) {
-        console.error("Failed to save category");
+        console.error('Failed to save category');
         return;
       }
 
@@ -118,14 +120,14 @@ export default function CategoryForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 px-1">
       {/* Name */}
-      <Label>{t("name")}</Label>
+      <Label>{t('name')}</Label>
       {languages.map((lang, idx) => (
         <Controller
           key={lang}
           name={`translations.${idx}.name` as const}
           control={control}
           rules={{
-            required: t("nameRequired")
+            required: t('nameRequired'),
           }}
           render={({ field }) => (
             <div className="flex flex-col gap-0.5">
@@ -143,41 +145,35 @@ export default function CategoryForm({
       <Separator />
 
       {/* Description */}
-      <Label>{t("description")}</Label>
+      <Label>{t('description')}</Label>
       {languages.map((lang, idx) => (
         <Controller
           key={lang}
           name={`translations.${idx}.description` as const}
           control={control}
-          render={({ field }) => (
-            <Input {...field} placeholder={lang.toUpperCase()} />
-          )}
+          render={({ field }) => <Input {...field} placeholder={lang.toUpperCase()} />}
         />
       ))}
 
       <Separator />
 
       {/* Category */}
-      <Label>{t("category")}</Label>
+      <Label>{t('category')}</Label>
       <Controller
         name="parentId"
         control={control}
         render={({ field }) => (
           <NativeSelect
             {...field}
-            value={field.value ?? ""}
-            onChange={(e) =>
-              field.onChange(
-                e.target.value === "" ? null : Number(e.target.value)
-              )
-            }
+            value={field.value ?? ''}
+            onChange={(e) => field.onChange(e.target.value === '' ? null : Number(e.target.value))}
           >
-            <option value="">{t("selectCategory")}</option>
+            <option value="">{t('selectCategory')}</option>
             {categories
               .filter((cat) => !editCategory || cat.id !== editCategory.id)
               .map((cat) => (
                 <option key={cat.id} value={cat.id}>
-                  {cat.translations.find((t) => t.language === "en")?.name ||
+                  {cat.translations.find((t) => t.language === 'en')?.name ||
                     cat.translations[0]?.name}
                 </option>
               ))}
@@ -188,11 +184,11 @@ export default function CategoryForm({
       <Separator />
 
       {/* Image */}
-      <Label>{t("image")}</Label>
+      <Label>{t('image')}</Label>
       <Controller
         name="image"
         control={control}
-        rules={!isEditMode ? { required: t("imageRequired") } : {}}
+        rules={!isEditMode ? { required: t('imageRequired') } : {}}
         render={({ field }) => (
           <div className="flex flex-col gap-0.5">
             <SingleImageUpload
@@ -203,9 +199,7 @@ export default function CategoryForm({
             <ErrorMessage
               errors={errors}
               name="image"
-              render={({ message }) => (
-                <p className="text-destructive text-sm mt-1">{message}</p>
-              )}
+              render={({ message }) => <p className="text-destructive text-sm mt-1">{message}</p>}
             />
           </div>
         )}
@@ -213,7 +207,7 @@ export default function CategoryForm({
 
       <div className="pt-4">
         <Button type="submit" disabled={isSubmitting} className="w-full">
-          {isEditMode ? t("save") : t("create")}
+          {isEditMode ? t('save') : t('create')}
         </Button>
       </div>
     </form>

@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
-import { fetchWithAuth } from "@/lib/fetchWithAuth";
-import ApplicationCardComponent from "@/components/ApplicationCardComponent";
-import CreateEditDrawer from "@/components/forms/CreateEditDrawer";
-import ImageGallery from "@/components/ImageGallery";
-import type { Application } from "@/types/application";
+import { useEffect, useState } from 'react';
+import { fetchWithAuth } from '@/lib/fetchWithAuth';
+import ApplicationCardComponent from '@/components/ApplicationCardComponent';
+import CreateEditDrawer from '@/components/forms/CreateEditDrawer';
+import ImageGallery from '@/components/ImageGallery';
+import type { Application } from '@/types/application';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ApplicationsAdmin() {
+  const { toast } = useToast();
   const [application, setApplication] = useState<Application | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [editingApplication, setEditingApplication] = useState<boolean>(false);
@@ -21,11 +23,11 @@ export default function ApplicationsAdmin() {
   });
 
   const fetchApplication = () => {
-    fetchWithAuth("http://localhost:3000/applications/current")
+    fetchWithAuth('http://localhost:3000/applications/current')
       .then((res) => res.json())
       .then(setApplication)
       .catch(() => {
-        setError("Failed to load application");
+        setError('Failed to load application');
         setApplication(null);
       });
   };
@@ -53,17 +55,25 @@ export default function ApplicationsAdmin() {
   };
 
   const closeImageGallery = () => {
-    setImageGallery(prev => ({ ...prev, open: false }));
+    setImageGallery((prev) => ({ ...prev, open: false }));
   };
 
   useEffect(() => {
     fetchApplication();
   }, []);
 
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: 'Error',
+        description: error,
+        variant: 'destructive',
+      });
+    }
+  }, [error, toast]);
+
   return (
     <>
-      {error && <div className="text-red-500 mb-4">{error}</div>}
-      
       <div className="w-full">
         <ApplicationCardComponent
           application={application}

@@ -1,4 +1,3 @@
-
 import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Button } from '@/components/ui/button';
@@ -14,9 +13,12 @@ interface MultiImageDropzoneProps {
 const isFile = (item: File | string): item is File => item instanceof File;
 
 const MultiImageDropzone: React.FC<MultiImageDropzoneProps> = ({ value, onChange }) => {
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    onChange([...value, ...acceptedFiles]);
-  }, [value, onChange]);
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      onChange([...value, ...acceptedFiles]);
+    },
+    [value, onChange]
+  );
 
   const removeImage = (idx: number) => {
     const newImages = value.filter((_, i) => i !== idx);
@@ -26,14 +28,17 @@ const MultiImageDropzone: React.FC<MultiImageDropzoneProps> = ({ value, onChange
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      'image/*': []
+      'image/*': [],
     },
-    multiple: true
+    multiple: true,
   });
 
   return (
     <div className="flex flex-col gap-2">
-      <div {...getRootProps()} className={`border-2 border-dashed rounded-md p-4 text-center cursor-pointer ${isDragActive ? 'bg-accent' : 'bg-background'}`}> 
+      <div
+        {...getRootProps()}
+        className={`border-2 border-dashed rounded-md p-4 text-center cursor-pointer ${isDragActive ? 'bg-accent' : 'bg-background'}`}
+      >
         <input {...getInputProps()} />
         {isDragActive ? (
           <p>Drop the images here ...</p>
@@ -49,7 +54,13 @@ const MultiImageDropzone: React.FC<MultiImageDropzoneProps> = ({ value, onChange
               alt={`preview-${idx}`}
               className="w-20 h-20 object-cover rounded"
             />
-            <Button type="button" variant="destructive" size="icon" className="absolute top-0 right-0" onClick={() => removeImage(idx)}>
+            <Button
+              type="button"
+              variant="destructive"
+              size="icon"
+              className="absolute top-0 right-0"
+              onClick={() => removeImage(idx)}
+            >
               ✕
             </Button>
           </div>

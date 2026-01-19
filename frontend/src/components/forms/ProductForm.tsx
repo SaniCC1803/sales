@@ -1,22 +1,22 @@
-"use client";
-import { useEffect, useMemo, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { useTranslation } from "react-i18next";
+'use client';
+import { useEffect, useMemo, useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Select as NativeSelect } from "@/components/ui/select-native";
-import { getDefaultProductValues } from "./utils";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { Select as NativeSelect } from '@/components/ui/select-native';
+import { getDefaultProductValues } from './utils';
 
-import MultiImageDropzone from "@/components/MultiImageDropzone";
-import type { Product } from "@/types/product";
-import type { Category } from "@/types/category";
-import { fetchWithAuth } from "@/lib/fetchWithAuth";
-import { ErrorMessage } from "@hookform/error-message";
+import MultiImageDropzone from '@/components/MultiImageDropzone';
+import type { Product } from '@/types/product';
+import type { Category } from '@/types/category';
+import { fetchWithAuth } from '@/lib/fetchWithAuth';
+import { ErrorMessage } from '@hookform/error-message';
 
-type Language = "en" | "mk";
+type Language = 'en' | 'mk';
 
 export type ProductFormValues = {
   translations: {
@@ -43,18 +43,23 @@ export default function ProductForm({
   closeDrawer,
 }: ProductFormProps) {
   const { t } = useTranslation();
-  const languages = useMemo<Language[]>(() => ["en", "mk"], []);
+  const languages = useMemo<Language[]>(() => ['en', 'mk'], []);
   const isEditMode = !!editProduct;
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { control, handleSubmit, reset, formState: { errors } } = useForm<ProductFormValues>({
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<ProductFormValues>({
     defaultValues: getDefaultProductValues(editProduct, languages),
   });
 
   useEffect(() => {
-    fetch("http://localhost:3000/categories")
+    fetch('http://localhost:3000/categories')
       .then((res) => res.json())
       .then(setCategories)
       .catch(console.error);
@@ -71,34 +76,34 @@ export default function ProductForm({
       setIsSubmitting(true);
 
       const formData = new FormData();
-      formData.append("translations", JSON.stringify(data.translations));
-      formData.append("price", data.price.toString());
+      formData.append('translations', JSON.stringify(data.translations));
+      formData.append('price', data.price.toString());
       if (data.categoryId && data.categoryId > 0) {
-        formData.append("categoryId", data.categoryId.toString());
+        formData.append('categoryId', data.categoryId.toString());
       }
 
-      const existingUrls = data.images.filter((i): i is string => typeof i === "string");
+      const existingUrls = data.images.filter((i): i is string => typeof i === 'string');
       const newFiles = data.images.filter((i): i is File => i instanceof File);
 
-      formData.append("images", JSON.stringify(existingUrls));
-      newFiles.forEach((file) => formData.append("images", file));
+      formData.append('images', JSON.stringify(existingUrls));
+      newFiles.forEach((file) => formData.append('images', file));
 
       let res: Response;
 
       if (isEditMode && editProduct) {
         res = await fetchWithAuth(`http://localhost:3000/products/${editProduct.id}`, {
-          method: "PUT",
+          method: 'PUT',
           body: formData,
         });
       } else {
-        res = await fetchWithAuth("http://localhost:3000/products", {
-          method: "POST",
+        res = await fetchWithAuth('http://localhost:3000/products', {
+          method: 'POST',
           body: formData,
         });
       }
 
       if (!res.ok) {
-        console.error("Failed to save product");
+        console.error('Failed to save product');
         return;
       }
 
@@ -117,18 +122,15 @@ export default function ProductForm({
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-4 px-1"
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 px-1">
       {/* Name */}
-      <Label>{t("name")}</Label>
+      <Label>{t('name')}</Label>
       {languages.map((lang, idx) => (
         <Controller
           key={lang}
           name={`translations.${idx}.name` as const}
           control={control}
-          rules={{ required: t("nameRequired") as string }}
+          rules={{ required: t('nameRequired') as string }}
           render={({ field }) => (
             <div className="flex flex-col gap-0.5">
               <Input {...field} placeholder={lang.toUpperCase()} />
@@ -145,32 +147,30 @@ export default function ProductForm({
       <Separator />
 
       {/* Description */}
-      <Label>{t("description")}</Label>
+      <Label>{t('description')}</Label>
       {languages.map((lang, idx) => (
         <Controller
           key={lang}
           name={`translations.${idx}.description` as const}
           control={control}
-          render={({ field }) => (
-            <Input {...field} placeholder={lang.toUpperCase()} />
-          )}
+          render={({ field }) => <Input {...field} placeholder={lang.toUpperCase()} />}
         />
       ))}
 
       <Separator />
 
       {/* Price */}
-      <Label>{t("price")}</Label>
+      <Label>{t('price')}</Label>
       <Controller
         name="price"
         control={control}
         rules={{
-          required: t("priceRequired") as string,
+          required: t('priceRequired') as string,
           pattern: {
             value: /^\d+(\.\d{1,2})?$/,
-            message: t("priceInvalid") as string || "Please enter a valid price (numbers only)"
+            message: (t('priceInvalid') as string) || 'Please enter a valid price (numbers only)',
           },
-          validate: (v) => parseFloat(v) > 0 || (t("priceMinimum") as string),
+          validate: (v) => parseFloat(v) > 0 || (t('priceMinimum') as string),
         }}
         render={({ field }) => (
           <div className="flex flex-col gap-0.5">
@@ -180,7 +180,7 @@ export default function ProductForm({
               step="0.01"
               min="0"
               inputMode="decimal"
-              placeholder={t("price")}
+              placeholder={t('price')}
               onChange={(e) => {
                 // Allow only numbers and decimal point
                 const value = e.target.value.replace(/[^0-9.]/g, '');
@@ -199,7 +199,7 @@ export default function ProductForm({
       <Separator />
 
       {/* Category */}
-      <Label>{t("category")}</Label>
+      <Label>{t('category')}</Label>
       <Controller
         name="categoryId"
         control={control}
@@ -207,19 +207,17 @@ export default function ProductForm({
           <div className="flex flex-col gap-0.5">
             <NativeSelect
               {...field}
-              value={field.value && field.value > 0 ? field.value.toString() : ""}
+              value={field.value && field.value > 0 ? field.value.toString() : ''}
               onChange={(e) =>
-                field.onChange(
-                  e.target.value === "" ? null : Number(e.target.value)
-                )
+                field.onChange(e.target.value === '' ? null : Number(e.target.value))
               }
             >
-              <option value="">{t("selectCategory")} (Optional)</option>
+              <option value="">{t('selectCategory')} (Optional)</option>
               {categories
                 .filter((cat) => !editProduct || cat.id !== editProduct.id)
                 .map((cat) => (
                   <option key={cat.id} value={cat.id}>
-                    {cat.translations.find((t) => t.language === "en")?.name ||
+                    {cat.translations.find((t) => t.language === 'en')?.name ||
                       cat.translations[0]?.name}
                   </option>
                 ))}
@@ -235,12 +233,12 @@ export default function ProductForm({
       <Separator />
 
       {/* Images */}
-      <Label>{t("images")}</Label>
+      <Label>{t('images')}</Label>
       <Controller
         name="images"
         control={control}
         render={({ field }) => {
-          const existingUrls = (field.value || []).filter((i) => typeof i === "string");
+          const existingUrls = (field.value || []).filter((i) => typeof i === 'string');
           const newFiles = (field.value || []).filter((i) => i instanceof File);
 
           return (
@@ -250,7 +248,7 @@ export default function ProductForm({
                   {existingUrls.map((url, idx) => (
                     <div key={idx} className="relative">
                       <img
-                        src={url.startsWith("http") ? url : `http://localhost:3000${url}`}
+                        src={url.startsWith('http') ? url : `http://localhost:3000${url}`}
                         className="w-20 h-20 object-cover rounded"
                       />
                       <Button
@@ -281,7 +279,7 @@ export default function ProductForm({
 
       <div className="pt-4">
         <Button type="submit" disabled={isSubmitting} className="w-full">
-          {isEditMode ? t("save") : t("create")}
+          {isEditMode ? t('save') : t('create')}
         </Button>
       </div>
     </form>

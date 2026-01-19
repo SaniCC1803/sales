@@ -5,9 +5,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Trash2 } from 'lucide-react';
 
 interface ConfirmDeleteProps {
   open: boolean;
@@ -37,12 +37,11 @@ export default function ConfirmDeleteModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Trash2 className="h-5 w-5 text-destructive" />
-            {title || "Delete Item"}
+            {title || 'Delete Item'}
           </DialogTitle>
           <DialogDescription>
-            {description || 
-              `Are you sure you want to delete ${itemName ? `"${itemName}"` : 'this item'}? This action cannot be undone.`
-            }
+            {description ||
+              `Are you sure you want to delete ${itemName ? `"${itemName}"` : 'this item'}? This action cannot be undone.`}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>

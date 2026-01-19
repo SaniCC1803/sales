@@ -39,12 +39,12 @@ export default function BlogDetailPage() {
   }, [slug]);
 
   const getBlogTranslation = (blog: Blog) => {
-    return blog.translations.find(t => t.language === language) || blog.translations[0];
+    return blog.translations.find((t) => t.language === language) || blog.translations[0];
   };
 
   const getImageUrl = (path?: string) => {
-    if (!path) return "";
-    if (path.startsWith("http")) return path;
+    if (!path) return '';
+    if (path.startsWith('http')) return path;
     return `http://localhost:3000${path}`;
   };
 
@@ -97,7 +97,7 @@ export default function BlogDetailPage() {
 
         <header className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">{translation.title}</h1>
-          
+
           <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
             <span>By {blog.author.email}</span>
             <span>•</span>
@@ -113,7 +113,7 @@ export default function BlogDetailPage() {
           </div>
         )}
 
-        <div 
+        <div
           className="prose prose-lg max-w-none dark:prose-invert"
           dangerouslySetInnerHTML={{ __html: translation.content }}
         />

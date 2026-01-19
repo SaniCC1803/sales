@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 type ProductCarouselProps = {
   images: string[];
@@ -35,7 +35,17 @@ export default function ProductCarousel({ images }: ProductCarouselProps) {
           onClick={() => setIndex((prev) => (prev - 1 + images.length) % images.length)}
           aria-label="Previous slide"
         >
-          <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+          <svg
+            width="24"
+            height="24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
         </button>
       )}
       {/* Right Arrow */}
@@ -45,7 +55,17 @@ export default function ProductCarousel({ images }: ProductCarouselProps) {
           onClick={() => setIndex((prev) => (prev + 1) % images.length)}
           aria-label="Next slide"
         >
-          <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+          <svg
+            width="24"
+            height="24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
         </button>
       )}
       {/* Dots removed as requested */}

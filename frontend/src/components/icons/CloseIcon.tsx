@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 const CloseIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -10,11 +10,7 @@ const CloseIcon = (props: React.SVGProps<SVGSVGElement>) => (
     className="h-6 w-6"
     {...props}
   >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M6 18L18 6M6 6l12 12"
-    />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
   </svg>
 );
 

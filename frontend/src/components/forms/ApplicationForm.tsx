@@ -1,25 +1,25 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { useTranslation } from "react-i18next";
+import { useEffect, useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 
-import SingleImageUpload from "@/components/SingleImageUpload";
-import MultiImageDropzone from "@/components/MultiImageDropzone";
-import type { Application } from "@/types/application";
-import { fetchWithAuth } from "@/lib/fetchWithAuth";
+import SingleImageUpload from '@/components/SingleImageUpload';
+import MultiImageDropzone from '@/components/MultiImageDropzone';
+import type { Application } from '@/types/application';
+import { fetchWithAuth } from '@/lib/fetchWithAuth';
 
 // ================== TYPES ==================
 
-type Language = "en" | "mk";
+type Language = 'en' | 'mk';
 
 // Move languages array outside component to avoid recreation on every render
-const LANGUAGES: Language[] = ["en", "mk"];
+const LANGUAGES: Language[] = ['en', 'mk'];
 
 export type ApplicationFormValues = {
   translations: {
@@ -72,38 +72,35 @@ export default function ApplicationForm({
       setIsSubmitting(true);
 
       const formData = new FormData();
-      formData.append("translations", JSON.stringify(data.translations));
+      formData.append('translations', JSON.stringify(data.translations));
 
       // Handle carousel images (both URLs and files)
-      const existingUrls = data.carousel.filter((i): i is string => typeof i === "string");
+      const existingUrls = data.carousel.filter((i): i is string => typeof i === 'string');
       const newFiles = data.carousel.filter((i): i is File => i instanceof File);
 
-      formData.append("carousel", JSON.stringify(existingUrls));
-      newFiles.forEach((file) => formData.append("carousel", file));
+      formData.append('carousel', JSON.stringify(existingUrls));
+      newFiles.forEach((file) => formData.append('carousel', file));
 
       if (data.logo) {
-        formData.append("logo", data.logo);
+        formData.append('logo', data.logo);
       }
 
       let res: Response;
 
       if (isEditMode && editApplication) {
-        res = await fetchWithAuth(
-          `http://localhost:3000/applications/${editApplication.id}`,
-          {
-            method: "PUT",
-            body: formData,
-          }
-        );
+        res = await fetchWithAuth(`http://localhost:3000/applications/${editApplication.id}`, {
+          method: 'PUT',
+          body: formData,
+        });
       } else {
-        res = await fetchWithAuth("http://localhost:3000/applications", {
-          method: "POST",
+        res = await fetchWithAuth('http://localhost:3000/applications', {
+          method: 'POST',
           body: formData,
         });
       }
 
       if (!res.ok) {
-        console.error("Failed to save application");
+        console.error('Failed to save application');
         return;
       }
 
@@ -126,38 +123,34 @@ export default function ApplicationForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 px-1">
       {/* ---------- NAME ---------- */}
-      <Label>{t("name")}</Label>
+      <Label>{t('name')}</Label>
       {LANGUAGES.map((lang, idx) => (
         <Controller
           key={lang}
           name={`translations.${idx}.name` as const}
           control={control}
-          rules={{ required: t("nameRequired") as string }}
-          render={({ field }) => (
-            <Input {...field} placeholder={lang.toUpperCase()} />
-          )}
+          rules={{ required: t('nameRequired') as string }}
+          render={({ field }) => <Input {...field} placeholder={lang.toUpperCase()} />}
         />
       ))}
 
       <Separator />
 
       {/* ---------- DESCRIPTION ---------- */}
-      <Label>{t("description")}</Label>
+      <Label>{t('description')}</Label>
       {LANGUAGES.map((lang, idx) => (
         <Controller
           key={lang}
           name={`translations.${idx}.description` as const}
           control={control}
-          render={({ field }) => (
-            <Input {...field} placeholder={lang.toUpperCase()} />
-          )}
+          render={({ field }) => <Input {...field} placeholder={lang.toUpperCase()} />}
         />
       ))}
 
       <Separator />
 
       {/* ---------- LOGO ---------- */}
-      <Label>{t("logo")}</Label>
+      <Label>{t('logo')}</Label>
       <Controller
         name="logo"
         control={control}
@@ -173,12 +166,12 @@ export default function ApplicationForm({
       <Separator />
 
       {/* ---------- CAROUSEL ---------- */}
-      <Label>{t("carouselImages")}</Label>
+      <Label>{t('carouselImages')}</Label>
       <Controller
         name="carousel"
         control={control}
         render={({ field }) => {
-          const existingUrls = (field.value || []).filter((i) => typeof i === "string");
+          const existingUrls = (field.value || []).filter((i) => typeof i === 'string');
           const newFiles = (field.value || []).filter((i) => i instanceof File);
 
           return (
@@ -188,7 +181,7 @@ export default function ApplicationForm({
                   {existingUrls.map((url, idx) => (
                     <div key={idx} className="relative">
                       <img
-                        src={url.startsWith("http") ? url : `http://localhost:3000${url}`}
+                        src={url.startsWith('http') ? url : `http://localhost:3000${url}`}
                         className="w-20 h-20 object-cover rounded"
                       />
                       <Button
@@ -219,7 +212,7 @@ export default function ApplicationForm({
 
       <div className="pt-4">
         <Button type="submit" disabled={isSubmitting} className="w-full">
-          {isEditMode ? t("save") : t("create")}
+          {isEditMode ? t('save') : t('create')}
         </Button>
       </div>
     </form>
@@ -228,33 +221,27 @@ export default function ApplicationForm({
 
 // ================== HELPERS ==================
 
-function getDefaultValues(
-  editApplication: Application | null | undefined
-): ApplicationFormValues {
+function getDefaultValues(editApplication: Application | null | undefined): ApplicationFormValues {
   if (editApplication) {
     return {
       translations: LANGUAGES.map((lang) => {
-        const existing = editApplication.translations.find(
-          (t) => t.language === lang
-        );
+        const existing = editApplication.translations.find((t) => t.language === lang);
         return {
           language: lang,
-          name: existing?.name || "",
-          description: existing?.description || "",
+          name: existing?.name || '',
+          description: existing?.description || '',
         };
       }),
       logo: null,
-      carousel: Array.isArray(editApplication.carousel)
-        ? editApplication.carousel
-        : [],
+      carousel: Array.isArray(editApplication.carousel) ? editApplication.carousel : [],
     };
   }
 
   return {
     translations: LANGUAGES.map((lang) => ({
       language: lang,
-      name: "",
-      description: "",
+      name: '',
+      description: '',
     })),
     logo: null,
     carousel: [],

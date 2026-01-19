@@ -1,4 +1,4 @@
-export type Language = "en" | "mk";
+export type Language = 'en' | 'mk';
 
 export interface ApplicationTranslation {
   language: Language;

@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
-import ProductCarousel from "@/components/ProductCarousel";
-import type { Category } from "@/types/category";
-import type { Application } from "../types/application";
-import type { Product } from "@/types/product";
-import { useTranslation } from "react-i18next";
-import CardComponent from "@/components/Card";
-import CardGrid from "@/components/CardGrid";
-import { Loader } from "lucide-react";
+import { useEffect, useState } from 'react';
+import ProductCarousel from '@/components/ProductCarousel';
+import type { Category } from '@/types/category';
+import type { Application } from '../types/application';
+import type { Product } from '@/types/product';
+import { useTranslation } from 'react-i18next';
+import CardComponent from '@/components/Card';
+import CardGrid from '@/components/CardGrid';
+import { Loader } from 'lucide-react';
 
 type HomePageProps = {
   application: Application;
@@ -23,17 +23,15 @@ export default function HomePage({ application }: HomePageProps) {
     setLoading(true);
 
     Promise.all([
-      fetch("http://localhost:3000/categories").then((res) => res.json()),
-      fetch("http://localhost:3000/products").then((res) => res.json())
+      fetch('http://localhost:3000/categories').then((res) => res.json()),
+      fetch('http://localhost:3000/products').then((res) => res.json()),
     ])
       .then(([categories, products]) => {
         setCategories(categories);
-        
-        const allSubcategories = categories.flatMap((cat: Category) => 
-          cat.subcategories || []
-        );
+
+        const allSubcategories = categories.flatMap((cat: Category) => cat.subcategories || []);
         setSubcategories(allSubcategories);
-        
+
         setProducts(products);
       })
       .catch(console.error)
@@ -43,30 +41,30 @@ export default function HomePage({ application }: HomePageProps) {
   return (
     <>
       {loading && <Loader />}
-      {!loading &&
+      {!loading && (
         <>
           <ProductCarousel images={application.carousel || []} />
           <section className="container px-6 py-12 flex flex-col gap-10">
-            <CardGrid title={t("categories")}>
+            <CardGrid title={t('categories')}>
               {categories.map((cat) => (
                 <CardComponent key={cat.id} item={cat} />
               ))}
             </CardGrid>
             {subcategories.length > 0 && (
-              <CardGrid title={t("subcategories")}>
+              <CardGrid title={t('subcategories')}>
                 {subcategories.map((subcat) => (
                   <CardComponent key={subcat.id} item={subcat} />
                 ))}
               </CardGrid>
             )}
-            <CardGrid title={t("products")}>
+            <CardGrid title={t('products')}>
               {products.map((product) => (
                 <CardComponent key={product.id} item={product} />
               ))}
             </CardGrid>
           </section>
         </>
-      }
+      )}
     </>
   );
 }

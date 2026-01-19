@@ -1,24 +1,24 @@
-import type { User } from "@/types/user";
-import type { UserFormValues } from "./UserForm";
-import type { Language } from "@/types/application";
-import type { Category } from "@/types/category";
-import type { CategoryFormValues } from "./CategoryForm";
-import type { Product } from "@/types/product";
-import type { ProductFormValues } from "./ProductForm";
-import type { Blog } from "@/types/blog";
+import type { User } from '@/types/user';
+import type { UserFormValues } from './UserForm';
+import type { Language } from '@/types/application';
+import type { Category } from '@/types/category';
+import type { CategoryFormValues } from './CategoryForm';
+import type { Product } from '@/types/product';
+import type { ProductFormValues } from './ProductForm';
+import type { Blog } from '@/types/blog';
 
 export function getUserDefaultValues(editUser?: User | null): UserFormValues {
   if (!editUser) {
     return {
-      email: "",
-      password: "",
-      role: "USER",
+      email: '',
+      password: '',
+      role: 'USER',
     };
   }
 
   return {
     email: editUser.email,
-    password: "",
+    password: '',
     role: editUser.role,
   };
 }
@@ -30,13 +30,11 @@ export function getDefaultCategoryValues(
   if (editCategory) {
     return {
       translations: languages.map((lang) => {
-        const existing = editCategory.translations.find(
-          (t) => t.language === lang
-        );
+        const existing = editCategory.translations.find((t) => t.language === lang);
         return {
           language: lang,
-          name: existing?.name || "",
-          description: existing?.description || "",
+          name: existing?.name || '',
+          description: existing?.description || '',
         };
       }),
       parentId: editCategory.parentId ?? null,
@@ -47,8 +45,8 @@ export function getDefaultCategoryValues(
   return {
     translations: languages.map((lang) => ({
       language: lang,
-      name: "",
-      description: "",
+      name: '',
+      description: '',
     })),
     parentId: null,
     image: null,
@@ -62,13 +60,11 @@ export function getDefaultProductValues(
   if (editProduct) {
     return {
       translations: languages.map((lang) => {
-        const existing = editProduct.translations.find(
-          (t) => t.language === lang
-        );
+        const existing = editProduct.translations.find((t) => t.language === lang);
         return {
           language: lang,
-          name: existing?.name || "",
-          description: existing?.description || "",
+          name: existing?.name || '',
+          description: existing?.description || '',
         };
       }),
       price: editProduct.price.toString(),
@@ -80,26 +76,29 @@ export function getDefaultProductValues(
   return {
     translations: languages.map((lang) => ({
       language: lang,
-      name: "",
-      description: "",
+      name: '',
+      description: '',
     })),
-    price: "",
+    price: '',
     categoryId: null,
     images: [],
   };
 }
 
-export const getDefaultBlogValues = (editBlog?: Blog | null, languages: Language[] = ["en", "mk"]) => {
+export const getDefaultBlogValues = (
+  editBlog?: Blog | null,
+  languages: Language[] = ['en', 'mk']
+) => {
   return {
-    slug: editBlog?.slug || "",
-    status: editBlog?.status || ("DRAFT" as const),
+    slug: editBlog?.slug || '',
+    status: editBlog?.status || ('DRAFT' as const),
     translations: languages.map((lang) => {
       const found = editBlog?.translations.find((t) => t.language === lang);
       return {
         language: lang,
-        title: found?.title || "",
-        content: found?.content || "",
-        excerpt: found?.excerpt || "",
+        title: found?.title || '',
+        content: found?.content || '',
+        excerpt: found?.excerpt || '',
       };
     }),
   };

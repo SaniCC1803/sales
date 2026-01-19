@@ -12,7 +12,12 @@ type SingleImageUploadProps = {
   onBlur?: () => void;
 };
 
-const SingleImageUpload = ({ value, existingImageUrl, onChange, onBlur }: SingleImageUploadProps) => {
+const SingleImageUpload = ({
+  value,
+  existingImageUrl,
+  onChange,
+  onBlur,
+}: SingleImageUploadProps) => {
   const [file, setFile] = useState<File | null>(value ?? null);
   const [filePreview, setFilePreview] = useState<string | undefined>();
 
@@ -28,8 +33,8 @@ const SingleImageUpload = ({ value, existingImageUrl, onChange, onBlur }: Single
       reader.readAsDataURL(value);
     } else if (existingImageUrl) {
       // Handle both full URLs and relative paths
-      const fullUrl = existingImageUrl.startsWith('http') 
-        ? existingImageUrl 
+      const fullUrl = existingImageUrl.startsWith('http')
+        ? existingImageUrl
         : `http://localhost:3000${existingImageUrl}`;
       setFilePreview(fullUrl);
     } else {
@@ -85,12 +90,10 @@ const SingleImageUpload = ({ value, existingImageUrl, onChange, onBlur }: Single
               </Button>
             </div>
           </div>
-          <p className="text-xs text-muted-foreground truncate">
-            {file?.name || 'Current image'}
-          </p>
+          <p className="text-xs text-muted-foreground truncate">{file?.name || 'Current image'}</p>
         </div>
       )}
-      
+
       <Dropzone
         accept={{ 'image/*': ['.png', '.jpg', '.jpeg'] }}
         onDrop={handleDrop}
@@ -99,9 +102,7 @@ const SingleImageUpload = ({ value, existingImageUrl, onChange, onBlur }: Single
         className="min-h-[60px]"
       >
         <DropzoneEmptyState />
-        <DropzoneContent>
-          {/* Dropzone content for file selection */}
-        </DropzoneContent>
+        <DropzoneContent>{/* Dropzone content for file selection */}</DropzoneContent>
       </Dropzone>
     </div>
   );

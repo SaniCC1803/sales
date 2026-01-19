@@ -1,6 +1,6 @@
-import { changeTheme, colors } from "../lib/utils";
-import { useState, useRef, useEffect } from "react";
-import { Palette } from "lucide-react";
+import { changeTheme, colors } from '../lib/utils';
+import { useState, useRef, useEffect } from 'react';
+import { Palette } from 'lucide-react';
 
 type ThemeSelectorProps = {
   dropdown?: boolean;
@@ -18,12 +18,12 @@ export function ThemeSelector({ dropdown, onSelect }: ThemeSelectorProps) {
       }
     }
     if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
     } else {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     }
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [open]);
 
@@ -52,7 +52,15 @@ export function ThemeSelector({ dropdown, onSelect }: ThemeSelectorProps) {
         style={{ fontSize: 24 }}
       >
         {/* Palette icon with emoji fallback */}
-        <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28 }}>
+        <span
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 28,
+            height: 28,
+          }}
+        >
           <Palette className="h-6 w-6 text-foreground mx-auto" />
           <span style={{ position: 'absolute', left: -9999 }}>🎨</span>
         </span>

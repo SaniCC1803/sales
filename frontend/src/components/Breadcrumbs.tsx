@@ -18,7 +18,9 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ category }) => {
     <nav className="text-sm mb-4 text-left" aria-label="Breadcrumb">
       <ol className="list-none p-0 flex flex-wrap items-center">
         <li>
-          <Link to="/" className="text-foreground hover:underline">Home</Link>
+          <Link to="/" className="text-foreground hover:underline">
+            Home
+          </Link>
         </li>
         {breadcrumbs.map((crumb, idx) => (
           <li key={crumb.id} className="flex items-center">
@@ -26,13 +28,15 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ category }) => {
             {idx === breadcrumbs.length - 1 ? (
               <span className="text-muted-foreground">{crumb.name}</span>
             ) : (
-              <Link to={`/category/${crumb.id}`} className="text-foreground hover:underline">{crumb.name}</Link>
+              <Link to={`/category/${crumb.id}`} className="text-foreground hover:underline">
+                {crumb.name}
+              </Link>
             )}
           </li>
         ))}
       </ol>
     </nav>
   );
-}
+};
 
 export default Breadcrumbs;

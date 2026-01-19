@@ -38,8 +38,8 @@ export class Blog {
   @Column({ nullable: true })
   publishedAt?: Date;
 
-  @ManyToOne(() => User, { eager: true })
-  author!: User;
+  @ManyToOne(() => User, { eager: true, onDelete: 'SET NULL', nullable: true })
+  author?: User;
 
   @OneToMany(() => BlogTranslation, (translation) => translation.blog, {
     cascade: true,

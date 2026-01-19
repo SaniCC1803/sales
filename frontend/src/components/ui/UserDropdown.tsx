@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { LogOut, User2 } from "lucide-react";
+import { useState, useEffect, useRef } from 'react';
+import { LogOut, User2 } from 'lucide-react';
 
 export default function UserDropdown({ email, onLogout }: { email: string; onLogout: () => void }) {
   const [open, setOpen] = useState(false);
@@ -12,12 +12,12 @@ export default function UserDropdown({ email, onLogout }: { email: string; onLog
       }
     }
     if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
     } else {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     }
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [open]);
 
@@ -30,7 +30,15 @@ export default function UserDropdown({ email, onLogout }: { email: string; onLog
         type="button"
         style={{ fontSize: 24 }}
       >
-        <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28 }}>
+        <span
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 28,
+            height: 28,
+          }}
+        >
           <User2 className="h-6 w-6 text-foreground mx-auto" />
         </span>
       </button>

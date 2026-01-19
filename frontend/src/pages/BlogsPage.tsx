@@ -31,12 +31,12 @@ export default function BlogsPage() {
   }, []);
 
   const getBlogTranslation = (blog: Blog) => {
-    return blog.translations.find(t => t.language === language) || blog.translations[0];
+    return blog.translations.find((t) => t.language === language) || blog.translations[0];
   };
 
   const getImageUrl = (path?: string) => {
-    if (!path) return "";
-    if (path.startsWith("http")) return path;
+    if (!path) return '';
+    if (path.startsWith('http')) return path;
     return `http://localhost:3000${path}`;
   };
 
@@ -64,7 +64,7 @@ export default function BlogsPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8 text-center">{t('blogs')}</h1>
-      
+
       {blogs.length === 0 ? (
         <div className="text-center">
           <p className="text-muted-foreground">No blogs found.</p>
@@ -72,10 +72,7 @@ export default function BlogsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {blogs.map((blog) => (
-            <CardComponent
-              key={blog.id}
-              item={blog}
-            />
+            <CardComponent key={blog.id} item={blog} />
           ))}
         </div>
       )}

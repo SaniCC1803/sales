@@ -3,11 +3,11 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuCheckboxItem,
-} from "@/components/ui/dropdown-menu";
-import { useLanguage } from "@/context/LanguageContext";
-import { Button } from "./ui/button";
-import { useTranslation } from "react-i18next";
-import { Label } from "./ui/label";
+} from '@/components/ui/dropdown-menu';
+import { useLanguage } from '@/context/LanguageContext';
+import { Button } from './ui/button';
+import { useTranslation } from 'react-i18next';
+import { Label } from './ui/label';
 
 type FooterProps = {
   availableLanguages: string[];
@@ -19,14 +19,12 @@ export default function Footer({ availableLanguages }: FooterProps) {
 
   const changeLanguage = (lang: string) => {
     i18n.changeLanguage(lang);
-    setLanguage(lang as "en" | "mk");
+    setLanguage(lang as 'en' | 'mk');
   };
 
   return (
     <footer className="bg-background text-foreground h-12 px-6 py-2 flex justify-between items-center">
-      <Label>
-        &copy; {new Date().getFullYear()} Ecom. All rights reserved.
-      </Label>
+      <Label>&copy; {new Date().getFullYear()} Ecom. All rights reserved.</Label>
 
       {availableLanguages.length > 0 && (
         <DropdownMenu>
@@ -47,7 +45,7 @@ export default function Footer({ availableLanguages }: FooterProps) {
               </DropdownMenuCheckboxItem>
             ))}
           </DropdownMenuContent>
-        </DropdownMenu> 
+        </DropdownMenu>
       )}
     </footer>
   );

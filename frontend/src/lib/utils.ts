@@ -1,8 +1,8 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 export const changeTheme = (colorName: string) => {
@@ -22,7 +22,7 @@ export const changeTheme = (colorName: string) => {
 export const restoreTheme = () => {
   const savedTheme = localStorage.getItem('selected-color-theme');
   if (savedTheme) {
-    const themeExists = colors.find(c => c.name === savedTheme);
+    const themeExists = colors.find((c) => c.name === savedTheme);
     if (themeExists) {
       changeTheme(savedTheme);
     }

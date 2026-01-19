@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import type { Product } from '../types/product';
@@ -15,12 +14,12 @@ const ProductDetailPage: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     fetch(`http://localhost:3000/products/${id}`)
-      .then(res => {
+      .then((res) => {
         if (!res.ok) throw new Error('Failed to fetch product');
         return res.json();
       })
       .then(setProduct)
-      .catch(e => setError(e.message))
+      .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -37,7 +36,10 @@ const ProductDetailPage: React.FC = () => {
   const breadcrumbs = [];
   breadcrumbs.push({ name: 'Home', url: '/' });
   if (product.category) {
-    breadcrumbs.push({ name: product.category.translations[0]?.name || 'Unnamed', url: `/category/${product.category.id}` });
+    breadcrumbs.push({
+      name: product.category.translations[0]?.name || 'Unnamed',
+      url: `/category/${product.category.id}`,
+    });
   }
   breadcrumbs.push({ name: product.translations[0]?.name || 'Product', url: null });
 
@@ -49,7 +51,9 @@ const ProductDetailPage: React.FC = () => {
             <li key={idx} className="flex items-center">
               {idx !== 0 && <span className="mx-2 text-muted-foreground">/</span>}
               {crumb.url && idx !== breadcrumbs.length - 1 ? (
-                <a href={crumb.url} className="text-foreground hover:underline">{crumb.name}</a>
+                <a href={crumb.url} className="text-foreground hover:underline">
+                  {crumb.name}
+                </a>
               ) : (
                 <span className="text-muted-foreground">{crumb.name}</span>
               )}

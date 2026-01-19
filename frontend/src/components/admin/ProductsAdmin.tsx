@@ -1,15 +1,16 @@
-import { useEffect, useState } from "react";
-import { fetchWithAuth } from "@/lib/fetchWithAuth";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import CardComponent from "@/components/Card";
-import CreateEditDrawer from "@/components/forms/CreateEditDrawer";
-import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
-import type { Product } from "@/types/product";
-import type { Category } from "@/types/category";
-import type { User } from "@/types/user";
+import { useEffect, useState } from 'react';
+import { fetchWithAuth } from '@/lib/fetchWithAuth';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
+import CardComponent from '@/components/Card';
+import CreateEditDrawer from '@/components/forms/CreateEditDrawer';
+import ConfirmDeleteModal from '@/components/ConfirmDeleteModal';
+import type { Product } from '@/types/product';
+import type { Item } from '../Card';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ProductsAdmin() {
+  const { toast } = useToast();
   const [products, setProducts] = useState<Product[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -25,15 +26,16 @@ export default function ProductsAdmin() {
   });
 
   const fetchProducts = () => {
-    fetchWithAuth("http://localhost:3000/products")
+    fetchWithAuth('http://localhost:3000/products')
       .then((res) => res.json())
       .then(setProducts)
-      .catch(() => setError("Failed to load products"));
+      .catch(() => setError('Failed to load products'));
   };
 
   const handleDeleteProduct = (id: number) => {
-    const product = products.find(p => p.id === id);
-    const productName = product?.translations.find(t => t.language === 'en')?.name ||
+    const product = products.find((p) => p.id === id);
+    const productName =
+      product?.translations.find((t) => t.language === 'en')?.name ||
       product?.translations[0]?.name ||
       'Unknown Product';
     setDeleteModal({
@@ -60,7 +62,7 @@ export default function ProductsAdmin() {
     }
   };
 
-  const handleEdit = (item: Category | Product | User) => {
+  const handleEdit = (item: Item) => {
     setCreateDrawerOpen(false);
     setEditingProduct({ ...item } as Product);
   };
@@ -74,16 +76,30 @@ export default function ProductsAdmin() {
     fetchProducts();
   }, []);
 
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: 'Error',
+        description: error,
+        variant: 'destructive',
+      });
+    }
+  }, [error, toast]);
+
   return (
     <>
       <div className="w-full flex justify-end items-center mb-6">
-        <Button variant="outline" onClick={() => { setEditingProduct(null); setCreateDrawerOpen(true); }}>
+        <Button
+          variant="outline"
+          onClick={() => {
+            setEditingProduct(null);
+            setCreateDrawerOpen(true);
+          }}
+        >
           <Plus className="h-4 w-4" />
         </Button>
       </div>
 
-      {error && <div className="text-red-500 mb-4">{error}</div>}
-      
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {products.map((product) => (
           <CardComponent
