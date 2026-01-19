@@ -3,10 +3,6 @@ import 'dotenv/config';
 import * as crypto from 'crypto';
 import nodemailer from 'nodemailer';
 
-console.log('SMTP_HOST:', process.env.SMTP_HOST);
-console.log('SMTP_PORT:', process.env.SMTP_PORT);
-console.log('SMTP_USER:', process.env.SMTP_USER);
-console.log('SMTP_PASS:', process.env.SMTP_PASS);
 export function generateConfirmationToken(): string {
   return crypto.randomBytes(32).toString('hex');
 }
@@ -17,7 +13,6 @@ export async function sendConfirmationEmail(
   appName: string,
   fromEmail?: string,
 ) {
-  console.log('FROM', fromEmail);
   const confirmUrl = `http://localhost:3000/auth/confirm?token=${token}`;
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
@@ -26,7 +21,7 @@ export async function sendConfirmationEmail(
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
     },
-    secure: false, // true for port 465, false for 587
+    secure: false,
   });
 
   const from = fromEmail
@@ -40,5 +35,4 @@ export async function sendConfirmationEmail(
     text: `A user has been created for the application "${appName}".\n\nTo activate your account, please confirm your email by clicking the following link: ${confirmUrl}`,
     html: `<p>A user has been created for the application <b>${appName}</b>.</p><p>To activate your account, please <a href="${confirmUrl}">confirm your email</a>.</p>`,
   });
-  console.log(`Confirmation email sent to ${email}: ${confirmUrl}`);
 }

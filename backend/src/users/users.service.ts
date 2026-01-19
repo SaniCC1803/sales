@@ -47,7 +47,7 @@ export class UsersService {
         contactEmail = apps[0].contactEmail;
       }
     } catch {
-      console.log('Error');
+      console.error('Error');
     }
     await sendConfirmationEmail(
       saved.email,

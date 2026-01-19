@@ -47,7 +47,7 @@ export default function BlogForm({ editBlog, onCreated, onEditComplete, closeDra
     const { control, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm<BlogFormData>({
         defaultValues: getDefaultBlogValues(editBlog, languages),
     });
-    const watchedEnTitle = watch("translations.en.title");
+    const watchedEnTitle = watch("translations.0.title");
 
     useEffect(() => {
         if (editBlog) {

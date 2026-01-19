@@ -16,8 +16,6 @@ export default function RegisterModal({ onRegistered }: { onRegistered: () => vo
     setLoading(true);
     setError("");
     try {
-      const token = localStorage.getItem("userToken");
-      console.log("RegisterModal: token in localStorage before register", token);
       const res = await fetchWithAuth("http://localhost:3000/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -27,7 +25,7 @@ export default function RegisterModal({ onRegistered }: { onRegistered: () => vo
       setSuccess(true);
       onRegistered();
     } catch (err) {
-      setError(err.message || "Registration failed");
+      setError(err instanceof Error ? err.message : "Registration failed");
     } finally {
       setLoading(false);
     }

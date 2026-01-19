@@ -24,27 +24,6 @@ export class UsersController {
     return await this.usersService.findAll();
   }
 
-  @Get('current')
-  async getCurrent() {
-    try {
-      const users = await this.usersService.findAll();
-      if (users.length > 0) {
-        return users[0];
-      }
-      return {
-        id: 1,
-        email: 'admin@example.com',
-        role: 'SUPERADMIN',
-      };
-    } catch {
-      return {
-        id: 1,
-        email: 'admin@example.com',
-        role: 'SUPERADMIN',
-      };
-    }
-  }
-
   @Get(':id')
   getOne(@Param('id') id: number) {
     return this.usersService.findOne(id);

@@ -49,7 +49,6 @@ export class CategoriesService {
 
   async create(dto: CreateCategoryDto, file?: Express.Multer.File) {
     const entity = new Category();
-    console.log('dto', dto, file);
     if (file) {
       entity.image = `/uploads/categories/${file.filename}`;
     } else {

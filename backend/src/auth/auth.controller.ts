@@ -12,7 +12,6 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() body: { email: string; password: string }) {
-    console.log('Login attempt:', body.email, body.password);
     return this.authService.validateUser(body.email, body.password);
   }
 
@@ -33,7 +32,7 @@ export class AuthController {
         return res.redirect(apps[0].websiteUrl);
       }
     } catch (e) {
-      console.log('Could not redirect to application website:', e);
+      console.error('Could not redirect to application website:', e);
     }
 
     return res.send('Email confirmed! You can now log in.');

@@ -24,11 +24,6 @@ export class ApplicationsController {
     return await this.applicationsService.findAll();
   }
 
-  @Get('current')
-  async getCurrent() {
-    const applications = await this.applicationsService.findAll();
-    return applications.length > 0 ? applications[0] : null;
-  }
 
   @Get(':id')
   getOne(@Param('id') id: number) {
