@@ -99,7 +99,7 @@ export default function BlogDetailPage() {
           <h1 className="text-3xl md:text-4xl font-bold mb-4">{translation.title}</h1>
 
           <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-            <span>By {blog.author.email}</span>
+            <span>By {blog.author ? blog.author.email : t('unknownAuthor')}</span>
             <span>•</span>
             <span>{new Date(blog.publishedAt!).toLocaleDateString()}</span>
             <span>•</span>

@@ -94,7 +94,13 @@ export class BlogsService {
     id: number,
     dto: UpdateBlogDto,
     file?: Express.Multer.File,
+    userId?: number,
   ): Promise<Blog> {
+    if (userId) {
+      console.log('Blog update userId:', userId);
+    } else {
+      console.log('Blog update: No userId provided');
+    }
     const blog = await this.findOne(id);
     if (!blog) {
       throw new NotFoundException('Blog not found');
@@ -123,6 +129,22 @@ export class BlogsService {
           return translation;
         },
       );
+    }
+
+    // Always set author to current user if provided
+    if (userId) {
+      const author = await this.userRepo.findOne({ where: { id: userId } });
+      if (author) {
+        blog.author = author;
+        console.log('Blog update resolved author:', author);
+      } else {
+        console.log(
+          'Blog update: userId provided but author not found:',
+          userId,
+        );
+      }
+    } else {
+      console.log('Blog update: No userId, blog.author remains:', blog.author);
     }
 
     return this.blogRepo.save(blog);

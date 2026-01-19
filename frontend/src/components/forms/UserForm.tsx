@@ -172,7 +172,9 @@ export default function UserForm({
         />
       </div>
 
-      {/* Submit button is now in SheetFooter */}
+      <Button type="submit" className="mt-4 self-end">
+        {isEditMode ? t('save') : t('create')}
+      </Button>
     </form>
   );
 }

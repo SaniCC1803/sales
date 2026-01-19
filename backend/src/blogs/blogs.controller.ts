@@ -118,13 +118,15 @@ export class BlogsController {
     @Body('translations') translationsJson: string,
     @Body() dto: UpdateBlogDto,
     @UploadedFile() file: Express.Multer.File,
+    @Req() req: Request & { user: { id: number } },
   ) {
     try {
       const translations = JSON.parse(
         translationsJson,
       ) as UpdateBlogDto['translations'];
       const updateDto: UpdateBlogDto = { ...dto, translations };
-      return this.blogsService.update(+id, updateDto, file);
+      // Pass user id to service for author update
+      return this.blogsService.update(+id, updateDto, file, req.user.id);
     } catch {
       throw new Error('Invalid translations format');
     }
@@ -155,6 +157,7 @@ export class BlogsController {
     @Param('id') id: string,
     @Body() dto: UpdateBlogDto,
     @UploadedFile() file: Express.Multer.File,
+    @Req() req: Request & { user: { id: number } },
   ) {
     // Parse translations if it's a JSON string (from FormData)
     if (typeof dto.translations === 'string') {
@@ -166,7 +169,7 @@ export class BlogsController {
         throw new Error('Invalid translations format');
       }
     }
-    return this.blogsService.update(+id, dto, file);
+    return this.blogsService.update(+id, dto, file, req.user.id);
   }
 
   @Delete(':id')
