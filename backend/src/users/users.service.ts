@@ -1,5 +1,5 @@
-// ...existing code...
 import { Injectable } from '@nestjs/common';
+import * as bcrypt from 'bcryptjs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
@@ -30,8 +30,6 @@ export class UsersService {
 
   async create(data: CreateUserDto) {
     const confirmationToken = generateConfirmationToken();
-    // Hash password before saving
-    const bcrypt = require('bcryptjs');
     const hashedPassword = await bcrypt.hash(data.password, 10);
     const entity = this.userRepo.create({
       ...data,
@@ -40,13 +38,11 @@ export class UsersService {
       confirmationToken,
     });
     const saved = await this.userRepo.save(entity);
-    // Get first application for name/branding
     let appName = 'Your Application';
     let contactEmail: string | undefined = undefined;
     try {
       const apps = await this.applicationsService.findAll();
       if (apps && apps.length > 0) {
-        // Use translation or fallback to id
         appName = apps[0].translations?.[0]?.name || `App #${apps[0].id}`;
         contactEmail = apps[0].contactEmail;
       }

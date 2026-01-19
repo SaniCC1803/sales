@@ -30,7 +30,6 @@ export class ProductsService {
   }
 
   async create(dto: CreateProductDto) {
-    // Validate category if provided
     let category = null;
     if (dto.categoryId) {
       category = await this.categoryRepo.findOne({
@@ -43,12 +42,12 @@ export class ProductsService {
 
     const entity = new Product();
 
-    // Use the images from DTO which already includes both URLs and uploaded file paths
-    entity.images = dto.images && dto.images.length > 0 
-      ? dto.images 
-      : [
-          'https://www.shutterstock.com/image-vector/image-icon-trendy-flat-style-600nw-643080895.jpg',
-        ];
+    entity.images =
+      dto.images && dto.images.length > 0
+        ? dto.images
+        : [
+            'https://www.shutterstock.com/image-vector/image-icon-trendy-flat-style-600nw-643080895.jpg',
+          ];
 
     entity.price = dto.price;
     entity.category = category;
@@ -66,7 +65,11 @@ export class ProductsService {
     return this.productRepo.save(entity);
   }
 
-  async update(id: number, dto: CreateProductDto, files?: Express.Multer.File[]) {
+  async update(
+    id: number,
+    dto: CreateProductDto,
+    files?: Express.Multer.File[],
+  ) {
     const product = await this.productRepo.findOne({
       where: { id },
       relations: ['translations'],
@@ -76,7 +79,6 @@ export class ProductsService {
       throw new Error(`Product with id ${id} not found`);
     }
 
-    // Validate category if provided
     let category = null;
     if (dto.categoryId) {
       category = await this.categoryRepo.findOne({
@@ -87,33 +89,30 @@ export class ProductsService {
       }
     }
 
-    // Combine DTO image URLs and uploaded file paths, removing duplicates
     const fileImages = Array.isArray(files)
-      ? files.map(f => `/uploads/products/${f.filename}`)
+      ? files.map((f) => `/uploads/products/${f.filename}`)
       : [];
     if ((dto.images && dto.images.length > 0) || fileImages.length > 0) {
       const allImages = [...(dto.images || []), ...fileImages];
-      // Remove duplicates
       product.images = Array.from(new Set(allImages));
     }
 
-    // Update price and category
     product.price = dto.price;
     product.category = category;
 
-    // Update translations if provided
     if (dto.translations) {
-      // Remove existing translations
       product.translations = [];
 
       // Add new translations
-      product.translations = dto.translations.map((t: any) => {
-        const translation = new ProductTranslation();
-        translation.language = t.language;
-        translation.name = t.name;
-        translation.description = t.description ?? '';
-        return translation;
-      });
+      product.translations = dto.translations.map(
+        (t: CreateProductTranslationDto) => {
+          const translation = new ProductTranslation();
+          translation.language = t.language;
+          translation.name = t.name;
+          translation.description = t.description ?? '';
+          return translation;
+        },
+      );
     }
 
     return this.productRepo.save(product);

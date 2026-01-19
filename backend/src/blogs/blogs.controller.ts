@@ -14,6 +14,7 @@ import {
   Req,
   NotFoundException,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
@@ -78,16 +79,15 @@ export class BlogsController {
     @Body('translations') translationsJson: string,
     @Body() dto: CreateBlogDto,
     @UploadedFile() file: Express.Multer.File,
-    @Req() req: any,
+    @Req() req: Request & { user: { userId: number } },
   ) {
     try {
-      console.log('Raw translationsJson:', translationsJson, typeof translationsJson);
-      const translations = JSON.parse(translationsJson);
-      console.log('Parsed translations:', translations, typeof translations, Array.isArray(translations));
-      (dto as any).translations = translations;
-      return this.blogsService.create(dto, req.user.userId, file);
-    } catch (error) {
-      console.error('Error parsing translations:', error);
+      const translations = JSON.parse(
+        translationsJson,
+      ) as CreateBlogDto['translations'];
+      const blogDto: CreateBlogDto = { ...dto, translations };
+      return this.blogsService.create(blogDto, req.user.userId, file);
+    } catch {
       throw new Error('Invalid translations format');
     }
   }
@@ -120,11 +120,12 @@ export class BlogsController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     try {
-      const translations = JSON.parse(translationsJson);
-      (dto as any).translations = translations;
-      return this.blogsService.update(+id, dto, file);
-    } catch (error) {
-      console.error('Error parsing translations:', error);
+      const translations = JSON.parse(
+        translationsJson,
+      ) as UpdateBlogDto['translations'];
+      const updateDto: UpdateBlogDto = { ...dto, translations };
+      return this.blogsService.update(+id, updateDto, file);
+    } catch {
       throw new Error('Invalid translations format');
     }
   }
@@ -158,12 +159,13 @@ export class BlogsController {
     // Parse translations if it's a JSON string (from FormData)
     if (typeof dto.translations === 'string') {
       try {
-        dto.translations = JSON.parse(dto.translations as any);
-      } catch (error) {
+        dto.translations = JSON.parse(
+          dto.translations,
+        ) as UpdateBlogDto['translations'];
+      } catch {
         throw new Error('Invalid translations format');
       }
     }
-    
     return this.blogsService.update(+id, dto, file);
   }
 

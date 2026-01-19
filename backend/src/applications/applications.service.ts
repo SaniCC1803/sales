@@ -2,7 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Application } from '../applications/application.entity';
-import { CreateApplicationDto } from './applications.dto';
+import {
+  CreateApplicationDto,
+  CreateApplicationTranslationDto,
+} from './applications.dto';
+import { ApplicationTranslation } from './application-translations.entity';
 
 @Injectable()
 export class ApplicationsService {
@@ -23,11 +27,22 @@ export class ApplicationsService {
   }
 
   async create(data: CreateApplicationDto) {
-    const entity = this.applicationRepo.create(data);
+    const entity = this.applicationRepo.create({
+      ...data,
+      translations: data.translations.map(
+        (t: CreateApplicationTranslationDto) => {
+          const translation = new ApplicationTranslation();
+          translation.language = t.language;
+          translation.name = t.name;
+          translation.description = t.description ?? '';
+          return translation;
+        },
+      ),
+    });
     return this.applicationRepo.save(entity);
   }
 
-  async update(id: number, data: any) {
+  async update(id: number, data: CreateApplicationDto) {
     // Find the existing application
     const existingApp = await this.applicationRepo.findOne({
       where: { id },
@@ -51,7 +66,15 @@ export class ApplicationsService {
 
     // Handle translations separately
     if (data.translations) {
-      existingApp.translations = data.translations;
+      existingApp.translations = data.translations.map(
+        (t: CreateApplicationTranslationDto) => {
+          const translation = new ApplicationTranslation();
+          translation.language = t.language;
+          translation.name = t.name;
+          translation.description = t.description ?? '';
+          return translation;
+        },
+      );
     }
 
     // Save the updated application (this will cascade to translations)

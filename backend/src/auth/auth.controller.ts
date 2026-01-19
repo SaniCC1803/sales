@@ -27,7 +27,6 @@ export class AuthController {
     }
     await this.usersService.confirmUser(user.id);
 
-    // Redirect to the application's website if set
     try {
       const apps = await this.usersService.applicationsService.findAll();
       if (apps && apps.length > 0 && apps[0].websiteUrl) {

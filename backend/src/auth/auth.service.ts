@@ -18,16 +18,13 @@ export class AuthService {
     if (!isMatch) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    // Issue JWT access token (short-lived)
     const payload = { id: user.id, email: user.email, role: user.role };
     const secret = process.env.JWT_SECRET || 'changeme';
     const token = jwt.sign(payload, secret, { expiresIn: '1h' });
 
-    // Issue refresh token (longer-lived)
     const refreshSecret = process.env.JWT_REFRESH_SECRET || 'refreshsecret';
     const refreshToken = jwt.sign(payload, refreshSecret, { expiresIn: '7d' });
 
-    // Store refresh token in DB
     await this.usersService.update(user.id, { refreshToken });
 
     return {
@@ -41,18 +38,17 @@ export class AuthService {
       throw new UnauthorizedException('No refresh token provided');
     }
     const refreshSecret = process.env.JWT_REFRESH_SECRET || 'refreshsecret';
-    let payload: any;
+    type JwtPayload = { email: string; id: number; role: string };
+    let payload: JwtPayload;
     try {
-      payload = jwt.verify(refreshToken, refreshSecret);
-    } catch (err) {
+      payload = jwt.verify(refreshToken, refreshSecret) as JwtPayload;
+    } catch {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
-    // Find user and check stored refresh token matches
     const user = await this.usersService.findByEmail(payload.email);
     if (!user || user.refreshToken !== refreshToken) {
       throw new UnauthorizedException('Refresh token does not match');
     }
-    // Issue new access token
     const secret = process.env.JWT_SECRET || 'changeme';
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },

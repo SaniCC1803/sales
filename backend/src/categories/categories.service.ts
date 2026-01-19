@@ -28,20 +28,17 @@ export class CategoriesService {
   }
 
   async findOne(id: number) {
-    // Get the category with translations and parent
     const category = await this.categoryRepo.findOne({
       where: { id },
       relations: ['translations', 'parent'],
     });
     if (!category) return null;
 
-    // Get subcategories (direct children)
     const subcategories = await this.categoryRepo.find({
       where: { parent: { id } },
       relations: ['translations'],
     });
 
-    // Get products for this category
     const products = await this.productRepo.find({
       where: { category: { id } },
       relations: ['translations'],
@@ -95,17 +92,13 @@ export class CategoriesService {
       throw new Error(`Category with id ${id} not found`);
     }
 
-    // Update image if file is provided
     if (file) {
       category.image = `/uploads/categories/${file.filename}`;
     }
 
-    // Update translations if provided
     if (data.translations) {
-      // Remove existing translations
       category.translations = [];
 
-      // Add new translations
       category.translations = data.translations.map(
         (t: CreateCategoryTranslationDto) => {
           const translation = new CategoryTranslation();
@@ -121,19 +114,9 @@ export class CategoriesService {
   }
 
   async remove(id: number) {
-    // First, set category to null for all products that reference this category
-    await this.productRepo.update(
-      { category: { id } },
-      { category: null }
-    );
+    await this.productRepo.update({ category: { id } }, { category: null });
+    await this.categoryRepo.update({ parent: { id } }, { parent: null });
 
-    // Set parentId to null for all subcategories that have this category as their parent
-    await this.categoryRepo.update(
-      { parent: { id } },
-      { parent: null }
-    );
-
-    // Now safely delete the category
     return this.categoryRepo.delete(id);
   }
 }

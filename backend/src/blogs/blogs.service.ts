@@ -58,7 +58,6 @@ export class BlogsService {
     authorId: number,
     file?: Express.Multer.File,
   ): Promise<Blog> {
-    // Verify author exists
     const author = await this.userRepo.findOne({ where: { id: authorId } });
     if (!author) {
       throw new NotFoundException('Author not found');
@@ -75,13 +74,10 @@ export class BlogsService {
       blog.featuredImage = dto.featuredImage;
     }
 
-    // Debug: log and type check translations
-    console.log('DTO.translations at create:', dto.translations, typeof dto.translations, Array.isArray(dto.translations));
     if (!Array.isArray(dto.translations)) {
       throw new Error('Translations is not an array at create');
     }
 
-    // Create translations
     blog.translations = dto.translations.map((t: CreateBlogTranslationDto) => {
       const translation = new BlogTranslation();
       translation.language = t.language;
@@ -104,7 +100,6 @@ export class BlogsService {
       throw new NotFoundException('Blog not found');
     }
 
-    // Update basic fields
     if (dto.slug) blog.slug = dto.slug;
     if (dto.status) blog.status = dto.status;
 
@@ -112,18 +107,12 @@ export class BlogsService {
       blog.featuredImage = `/uploads/blogs/${file.filename}`;
     }
 
-
-    // Update translations if provided
     if (dto.translations) {
-      // Debug: log and type check translations
-      console.log('DTO.translations at update:', dto.translations, typeof dto.translations, Array.isArray(dto.translations));
       if (!Array.isArray(dto.translations)) {
         throw new Error('Translations is not an array at update');
       }
-      // Remove existing translations
       await this.blogTranslationRepo.delete({ blog: { id } });
 
-      // Add new translations
       blog.translations = dto.translations.map(
         (t: CreateBlogTranslationDto) => {
           const translation = new BlogTranslation();

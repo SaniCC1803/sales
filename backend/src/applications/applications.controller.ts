@@ -7,16 +7,12 @@ import {
   Param,
   Body,
   UseInterceptors,
-  UploadedFile,
   UploadedFiles,
-  UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { FileInterceptor, FilesInterceptor, AnyFilesInterceptor } from '@nestjs/platform-express';
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { ApplicationsService } from './applications.service';
-import { Application } from './application.entity';
 import { CreateApplicationDto } from './applications.dto';
 
 @Controller('applications')
@@ -30,8 +26,6 @@ export class ApplicationsController {
 
   @Get('current')
   async getCurrent() {
-    // For now, return the first application or null
-    // In a real app, you'd get the current user from auth and find their application
     const applications = await this.applicationsService.findAll();
     return applications.length > 0 ? applications[0] : null;
   }
@@ -47,7 +41,8 @@ export class ApplicationsController {
       storage: diskStorage({
         destination: './uploads/applications',
         filename: (req, file, cb) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
           const prefix = file.fieldname === 'logo' ? 'logo-' : 'carousel-';
           cb(null, prefix + uniqueSuffix + extname(file.originalname));
         },
@@ -61,20 +56,20 @@ export class ApplicationsController {
   ) {
     const parsedTranslations = JSON.parse(translations);
     const parsedCarousel = carousel ? JSON.parse(carousel) : [];
-    
-    // Find logo file
-    const logoFile = files?.find(f => f.fieldname === 'logo');
-    // Find carousel files
-    const carouselFiles = files?.filter(f => f.fieldname === 'carousel') || [];
-    
-    // Add uploaded carousel files to the carousel array
+
+    const logoFile = files?.find((f) => f.fieldname === 'logo');
+    const carouselFiles =
+      files?.filter((f) => f.fieldname === 'carousel') || [];
+
     const carouselImages = [
       ...parsedCarousel,
-      ...carouselFiles.map(f => `/uploads/applications/${f.filename}`)
+      ...carouselFiles.map((f) => `/uploads/applications/${f.filename}`),
     ];
-    
+
     const dto: CreateApplicationDto = {
-      logo: logoFile ? `/uploads/applications/${logoFile.filename}` : 'https://www.shutterstock.com/image-vector/image-icon-trendy-flat-style-600nw-643080895.jpg',
+      logo: logoFile
+        ? `/uploads/applications/${logoFile.filename}`
+        : 'https://www.shutterstock.com/image-vector/image-icon-trendy-flat-style-600nw-643080895.jpg',
       languages: ['en', 'mk'], // Default languages
       translations: parsedTranslations,
       carousel: carouselImages,
@@ -88,7 +83,8 @@ export class ApplicationsController {
       storage: diskStorage({
         destination: './uploads/applications',
         filename: (req, file, cb) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
           const prefix = file.fieldname === 'logo' ? 'logo-' : 'carousel-';
           cb(null, prefix + uniqueSuffix + extname(file.originalname));
         },
@@ -101,30 +97,25 @@ export class ApplicationsController {
     @Body('carousel') carousel: string,
     @UploadedFiles() files?: Express.Multer.File[],
   ) {
-    const parsedTranslations = JSON.parse(translations);
-    const parsedCarousel = carousel ? JSON.parse(carousel) : [];
-    
-    // Find logo file
-    const logoFile = files?.find(f => f.fieldname === 'logo');
-    // Find carousel files
-    const carouselFiles = files?.filter(f => f.fieldname === 'carousel') || [];
-    
-    // Add uploaded carousel files to the carousel array
+    const parsedTranslations: CreateApplicationDto['translations'] =
+      JSON.parse(translations);
+    const parsedCarousel: string[] = carousel ? JSON.parse(carousel) : [];
+
+    const logoFile = files?.find((f) => f.fieldname === 'logo');
+    const carouselFiles =
+      files?.filter((f) => f.fieldname === 'carousel') || [];
+
     const carouselImages = [
       ...parsedCarousel,
-      ...carouselFiles.map(f => `/uploads/applications/${f.filename}`)
+      ...carouselFiles.map((f) => `/uploads/applications/${f.filename}`),
     ];
-    
-    const updateData: any = {
+
+    const updateData = {
       translations: parsedTranslations,
-      languages: ['en', 'mk'], // Default languages
+      languages: ['en', 'mk'],
       carousel: carouselImages,
+      logo: logoFile ? `/uploads/applications/${logoFile.filename}` : '',
     };
-    
-    if (logoFile) {
-      updateData.logo = `/uploads/applications/${logoFile.filename}`;
-    }
-    
     return await this.applicationsService.update(id, updateData);
   }
 

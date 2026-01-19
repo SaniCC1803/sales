@@ -10,13 +10,12 @@ async function bootstrap() {
     origin: ['http://localhost:5173', 'http://localhost:5174'],
     credentials: true,
   });
-  
-  // Serve static files from uploads directory
+
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     prefix: '/uploads/',
   });
-  
+
   app.use(new NoCacheMiddleware().use.bind(new NoCacheMiddleware()));
   await app.listen(3000);
 }
-bootstrap();
+void bootstrap();

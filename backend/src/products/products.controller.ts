@@ -7,12 +7,11 @@ import {
   Param,
   Body,
   UseInterceptors,
-  UploadedFile,
   UploadedFiles,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { ProductsService } from '../products/products.service';
@@ -54,7 +53,6 @@ export class ProductsController {
     @Body('images') images?: string,
     @UploadedFiles() files?: Array<Express.Multer.File>,
   ) {
-    // Parse categoryId if provided
     const parsedCategoryId =
       categoryId && categoryId !== 'undefined' && categoryId !== ''
         ? parseInt(categoryId)
@@ -69,15 +67,13 @@ export class ProductsController {
       throw new Error('Please select a valid category');
     }
 
-    // Parse URLs from images field
     let urlImages: string[] = [];
     try {
       urlImages = images ? JSON.parse(images) : [];
-    } catch (e) {
+    } catch {
       urlImages = [];
     }
 
-    // Add uploaded file paths
     const fileImages = Array.isArray(files)
       ? files.map((f) => `/uploads/products/${f.filename}`)
       : [];
@@ -121,14 +117,12 @@ export class ProductsController {
     @Body('images') images: string,
     @UploadedFiles() files?: Array<Express.Multer.File>,
   ) {
-    // Parse URLs from images field
     let urlImages: string[] = [];
     try {
       urlImages = images ? JSON.parse(images) : [];
-    } catch (e) {
+    } catch {
       urlImages = [];
     }
-    // Add uploaded file paths
     const fileImages = Array.isArray(files)
       ? files.map((f) => `/uploads/products/${f.filename}`)
       : [];

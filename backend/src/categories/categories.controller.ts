@@ -65,8 +65,7 @@ export class CategoriesController {
       };
 
       return this.categoriesService.create(categoryData, file);
-    } catch (error) {
-      console.error('Error parsing translations:', error);
+    } catch {
       throw new Error('Invalid translations format');
     }
   }
@@ -81,15 +80,15 @@ export class CategoriesController {
   ) {
     try {
       const updateData: CreateCategoryDto = { translations: [] };
-      
+
       if (translationsJson) {
         const translationsRaw: unknown = JSON.parse(translationsJson);
-        updateData.translations = translationsRaw as CreateCategoryDto['translations'];
+        updateData.translations =
+          translationsRaw as CreateCategoryDto['translations'];
       }
-      
+
       return this.categoriesService.update(id, updateData, file);
-    } catch (error) {
-      console.error('Error parsing translations:', error);
+    } catch {
       throw new Error('Invalid translations format');
     }
   }
