@@ -140,4 +140,9 @@ export class ProductsController {
   delete(@Param('id') id: number) {
     return this.productsService.remove(id);
   }
+
+  @Post(':id/view')
+  async incrementView(@Param('id') id: number) {
+    return { views: await this.productsService.incrementViews(Number(id)) };
+  }
 }

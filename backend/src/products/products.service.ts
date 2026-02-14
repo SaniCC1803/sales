@@ -121,4 +121,14 @@ export class ProductsService {
   remove(id: number) {
     return this.productRepo.delete(id);
   }
+  
+  async incrementViews(id: number) {
+    const product = await this.productRepo.findOne({ where: { id } });
+    if (!product) {
+      throw new Error(`Product with id ${id} not found`);
+    }
+    product.views = (product.views || 0) + 1;
+    await this.productRepo.save(product);
+    return product.views;
+  }
 }

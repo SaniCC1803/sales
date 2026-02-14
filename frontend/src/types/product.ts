@@ -15,4 +15,5 @@ export interface Product {
   category?: Category;
   translations: ProductTranslation[];
   createdAt: string;
+  views?: number;
 }

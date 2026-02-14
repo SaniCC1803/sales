@@ -78,5 +78,7 @@
   "lastUpdated": "Последно ажурирано",
   "statusLabel": "Статус",
   "createdLabel": "Создадено",
-  "publishedLabel": "Објавено:"
+  "publishedLabel": "Објавено:",
+  "visits": "Посети",
+  "den": "ден"
 }

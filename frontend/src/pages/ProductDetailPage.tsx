@@ -44,6 +44,12 @@ const ProductDetailPage: React.FC = () => {
     })();
   }, [id]);
 
+    // Increment product views on mount
+    useEffect(() => {
+      if (!id) return;
+      apiFetch(`/products/${id}/view`, { method: 'POST' });
+    }, [id]);
+
   if (loading) {
     return (
       <div className="container mx-auto px-6 py-12">
@@ -128,7 +134,7 @@ const ProductDetailPage: React.FC = () => {
           </div>
 
           <div className="text-lg font-semibold">
-            {t('price', 'Price')}: {product.price}
+            {t('price', 'Price')}: {product.price} {t("den")}
           </div>
 
           <p className="text-muted-foreground">

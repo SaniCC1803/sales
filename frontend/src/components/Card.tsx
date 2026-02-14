@@ -96,11 +96,7 @@ export default function CardComponent({ item, onDelete, onEdit }: CardProps) {
   return (
     <Card
       key={item.id}
-      className={`
-                overflow-hidden bg-background flex flex-col h-full 
-                ${
-                  isUser(item) ? 'min-h-[180px] text-center' : 'min-h-[320px] text-left'
-                } text-sm text-muted-foreground`}
+      className={`overflow-hidden bg-background flex flex-col h-full ${isUser(item) ? 'min-h-[180px] text-center' : 'min-h-[320px] text-left'} text-sm text-muted-foreground`}
     >
       {/* Image */}
       {isUser(item) ? (
@@ -159,10 +155,14 @@ export default function CardComponent({ item, onDelete, onEdit }: CardProps) {
         {/* Price */}
         {isProduct(item) && (
           <>
-            {/* <div className="flex-1" /> */}
             <CardDescription className="text-lg font-semibold text-primary mb-2">
-              {item.price}
+              {item.price} {t('den')}
             </CardDescription>
+            {isAdmin &&
+              <CardDescription className="text-xs text-muted-foreground mb-2">
+                {t('visits')}: {item.views ?? 0}
+              </CardDescription>
+            }
           </>
         )}
         {/* Buttons */}

@@ -79,5 +79,7 @@
   "lastUpdated": "Last updated",
   "statusLabel": "Status:",
   "createdLabel": "Created:",
-  "publishedLabel": "Published:"
+  "publishedLabel": "Published:",
+  "visits": "Visits",
+  "den": "den"
 }

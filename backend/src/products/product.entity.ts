@@ -33,4 +33,7 @@ export class Product {
 
   @CreateDateColumn()
   createdAt!: Date;
+
+  @Column({ type: 'int', default: 0 })
+  views!: number;
 }
