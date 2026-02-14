@@ -95,6 +95,13 @@ export default function ApplicationCardComponent({
                   'No description provided'}
               </p>
             </div>
+
+            <div>
+              <label className="text-sm font-bold text-primary mb-3 block uppercase tracking-wide">
+                {t('contactEmail')}
+              </label>
+              <span className="text-base text-foreground font-medium">{application.contactEmail}</span>
+            </div>
           </div>
         </div>
 

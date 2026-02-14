@@ -136,7 +136,7 @@ export default function BlogsAdmin() {
         open={deleteModal.open}
         onOpenChange={(open) => setDeleteModal({ ...deleteModal, open })}
         onConfirm={confirmDelete}
-        title="Delete Blog"
+        title={t('deleteBlog')}
         itemName={deleteModal.title}
       />
     </>

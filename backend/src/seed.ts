@@ -32,6 +32,11 @@ async function clearDatabase(dataSource: DataSource) {
     .createQueryBuilder()
     .delete()
     .execute();
+  await dataSource
+    .getRepository(ContactMessage)
+    .createQueryBuilder()
+    .delete()
+    .execute();
   // Uncomment these lines if you want to clear users as well
   // await dataSource.getRepository(User).createQueryBuilder().delete().execute();
   console.log('All tables cleared ✅');
@@ -57,6 +62,7 @@ import { BlogTranslation } from './blogs/blog-translations.entity';
 import { BlogsService } from './blogs/blogs.service';
 import { User, Role } from './users/user.entity';
 import { UsersService } from './users/users.service';
+import { ContactMessage } from './contact.entity';
 import { Language } from './shared-types';
 
 // async function seedUsers() {
@@ -122,7 +128,7 @@ async function seedApplication() {
       'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=800&q=80',
     ],
-    contactEmail: 'contact@furniture-app.com',
+    contactEmail: 'a.gj.sani@gmail.com',
     websiteUrl: 'http://localhost:5173',
   };
 
@@ -610,6 +616,87 @@ async function seedBlogs() {
   await app.close();
 }
 
+async function seedContacts() {
+  const app = await NestFactory.createApplicationContext(AppModule);
+  const dataSource = app.get(DataSource);
+
+  const contactRepo = dataSource.getRepository(ContactMessage);
+
+  // --- CLEAR EXISTING DATA ---
+  await contactRepo.createQueryBuilder().delete().execute();
+  console.log('Contact database cleared ✅');
+
+  // Random data for contacts
+  const names = [
+    'John Smith',
+    'Maria Garcia',
+    'David Johnson',
+    'Sarah Wilson',
+    'Michael Brown',
+    'Lisa Davis',
+    'Robert Miller',
+    'Jennifer Lee',
+    'William Anderson',
+    'Jessica Taylor',
+  ];
+  const emails = [
+    'john@example.com',
+    'maria@test.com',
+    'david.j@email.com',
+    'sarah.w@company.com',
+    'mike@business.com',
+    'lisa@sample.org',
+    'robert@website.net',
+    'jen@contact.com',
+    'william@demo.com',
+    'jessica@example.org',
+  ];
+  const phones = [
+    '+1-555-0123',
+    '+44-20-7946-0958',
+    '+1-555-0456',
+    '+49-30-12345678',
+    '+33-1-42-86-83-26',
+    '+1-555-0789',
+    '+81-3-1234-5678',
+    '+61-2-9876-5432',
+    '+39-06-1234-5678',
+    '+46-8-123-456-78',
+  ];
+  const messages = [
+    'Hi, I am interested in your furniture collection. Could you please send me more information about your dining sets?',
+    'Hello! I would like to know about your delivery options for large furniture items. Do you offer assembly services?',
+    'Good morning, I saw your office chairs on the website. Are they available for bulk orders? I need 20 pieces.',
+    'I am looking for a complete bedroom set. What are your current promotions and financing options?',
+    'Can you help me with interior design consultation? I need to furnish my new apartment.',
+    'Hello, I received a damaged item last week. How can I process a return or exchange?',
+    'I am interested in your custom furniture services. Do you work with specific wood types?',
+    'Hi there! I love your modern sofa collection. Do you have showrooms where I can see them in person?',
+    'Good afternoon, I need urgent delivery for a coffee table. What is your fastest shipping option?',
+    'Hello, I am a real estate agent and often recommend furniture stores to my clients. Do you have a referral program?',
+  ];
+
+  // Create 10 random contacts
+  for (let i = 0; i < 10; i++) {
+    const contact = contactRepo.create({
+      name: names[i],
+      email: Math.random() > 0.3 ? emails[i] : undefined, // 70% chance of having email
+      phone: Math.random() > 0.4 ? phones[i] : undefined, // 60% chance of having phone
+      message: Math.random() > 0.2 ? messages[i] : undefined, // 80% chance of having message
+    });
+
+    // Ensure at least email OR phone exists (as per business rule)
+    if (!contact.email && !contact.phone) {
+      contact.email = emails[i];
+    }
+
+    await contactRepo.save(contact);
+  }
+
+  console.log('Contacts seeded ✅');
+  await app.close();
+}
+
 async function seedAll() {
   try {
     // Create app context just for clearing
@@ -624,6 +711,7 @@ async function seedAll() {
     await seedCategories();
     await seedProducts();
     await seedBlogs();
+    await seedContacts();
     console.log('✅ All seeds completed');
   } catch (err) {
     console.error(err);

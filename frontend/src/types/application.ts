@@ -13,4 +13,5 @@ export interface Application {
   languages: Language[];
   translations: ApplicationTranslation[];
   carousel?: string[];
+  contactEmail: string;
 }

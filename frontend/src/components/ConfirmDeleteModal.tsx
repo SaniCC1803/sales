@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ConfirmDeleteProps {
   open: boolean;
@@ -26,6 +27,8 @@ export default function ConfirmDeleteModal({
   description,
   itemName,
 }: ConfirmDeleteProps) {
+  const { t } = useTranslation();
+  
   const handleConfirm = () => {
     onConfirm();
     onOpenChange(false);
@@ -37,23 +40,23 @@ export default function ConfirmDeleteModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Trash2 className="h-5 w-5 text-destructive" />
-            {title || 'Delete Item'}
+            {title || t('deleteItem')}
           </DialogTitle>
           <DialogDescription>
             {description ||
-              `Are you sure you want to delete ${itemName ? `"${itemName}"` : 'this item'}? This action cannot be undone.`}
+              `${t('confirmDelete')} ${itemName ? `"${itemName}"` : t('thisItem')}? ${t('actionCannotBeUndone')}`}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {t('cancel')}
           </Button>
           <Button
             variant="destructive"
             className="bg-primary text-primary-foreground"
             onClick={handleConfirm}
           >
-            Delete
+            {t('delete')}
           </Button>
         </DialogFooter>
       </DialogContent>

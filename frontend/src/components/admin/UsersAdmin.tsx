@@ -123,7 +123,7 @@ export default function UsersAdmin() {
         open={deleteModal.open}
         onOpenChange={(open) => setDeleteModal({ ...deleteModal, open })}
         onConfirm={confirmDelete}
-        title="Delete User"
+        title={t('deleteUser')}
         itemName={deleteModal.name}
       />
     </>

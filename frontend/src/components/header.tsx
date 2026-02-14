@@ -57,6 +57,13 @@ export default function Header({ application }: HeaderProps) {
               {t('blogs')}
             </Link>
             <Link
+              to="/contact"
+              className="text-foreground hover:text-foreground"
+              style={{ color: 'inherit' }}
+            >
+              {t('contactUs')}
+            </Link>
+            <Link
               to="/about-us"
               className="text-foreground hover:text-foreground"
               style={{ color: 'inherit' }}

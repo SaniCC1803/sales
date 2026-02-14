@@ -73,6 +73,7 @@ export default function ApplicationForm({
 
       const formData = new FormData();
       formData.append('translations', JSON.stringify(data.translations));
+      formData.append('contactEmail', data.contactEmail || '');
 
       // Handle carousel images (both URLs and files)
       const existingUrls = data.carousel.filter((i): i is string => typeof i === 'string');
@@ -146,6 +147,24 @@ export default function ApplicationForm({
           render={({ field }) => <Input {...field} placeholder={lang.toUpperCase()} />}
         />
       ))}
+
+      <Separator />
+
+      {/* ---------- CONTACT EMAIL ---------- */}
+      <Label>{t('contactEmail', 'Contact Email')}</Label>
+      <Controller
+        name="contactEmail"
+        control={control}
+        rules={{ required: t('emailRequired') as string }}
+        render={({ field }) => (
+          <Input
+            {...field}
+            type="email"
+            placeholder={t('contactEmail', 'Contact Email')}
+            value={field.value ?? (editApplication?.contactEmail || '')}
+          />
+        )}
+      />
 
       <Separator />
 

@@ -26,8 +26,8 @@ export class Application {
   })
   translations!: ApplicationTranslation[];
 
-  @Column({ nullable: true })
-  contactEmail?: string;
+  @Column({ nullable: false })
+  contactEmail!: string;
 
   @Column({ nullable: true })
   websiteUrl?: string;

@@ -8,6 +8,7 @@ import ProductsAdmin from '@/components/admin/ProductsAdmin';
 import ApplicationsAdmin from '@/components/admin/ApplicationsAdmin';
 import UsersAdmin from '@/components/admin/UsersAdmin';
 import BlogsAdmin from '@/components/admin/BlogsAdmin';
+import ContactsAdmin from '@/components/admin/ContactsAdmin';
 
 export default function Page() {
   const location = useLocation();
@@ -18,11 +19,12 @@ export default function Page() {
     if (pathname === '/admin/applications') return 'applications';
     if (pathname === '/admin/users') return 'users';
     if (pathname === '/admin/blogs') return 'blogs';
+    if (pathname === '/admin/contacts') return 'contacts';
     return 'categories';
   };
 
   const [activeSection, setActiveSection] = useState<
-    'categories' | 'applications' | 'products' | 'users' | 'blogs'
+    'categories' | 'applications' | 'products' | 'users' | 'blogs' | 'contacts'
   >(getActiveSectionFromPath(location.pathname));
 
   useEffect(() => {
@@ -42,6 +44,8 @@ export default function Page() {
         return <UsersAdmin />;
       case 'blogs':
         return <BlogsAdmin />;
+      case 'contacts':
+        return <ContactsAdmin />;
       default:
         return <CategoriesAdmin />;
     }

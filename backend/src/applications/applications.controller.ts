@@ -95,6 +95,7 @@ export class ApplicationsController {
     @Param('id') id: number,
     @Body('translations') translations: string,
     @Body('carousel') carousel: string,
+    @Body('contactEmail') contactEmail: string,
     @UploadedFiles() files?: Express.Multer.File[],
   ) {
     const parsedTranslations: CreateApplicationDto['translations'] =
@@ -115,6 +116,7 @@ export class ApplicationsController {
       languages: ['en', 'mk'],
       carousel: carouselImages,
       logo: logoFile ? `/uploads/applications/${logoFile.filename}` : '',
+      contactEmail: contactEmail || '',
     };
     return await this.applicationsService.update(id, updateData);
   }

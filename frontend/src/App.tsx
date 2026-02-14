@@ -7,6 +7,7 @@ import Footer from './components/footer';
 import HomePage from './pages/HomePage';
 import { ThemeProvider } from './components/theme-provider';
 import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
 import AdminPanel from './pages/AdminPanel';
 import ProtectedRoute from './components/ProtectedRoute';
 import type { Application } from './types/application';
@@ -60,6 +61,7 @@ export default function App() {
               <Routes>
                 <Route path="/" element={<HomePage application={applications[0]} />} />
                 <Route path="/about-us" element={<AboutPage />} />
+                <Route path="/contact" element={<ContactPage />} />
                 <Route path="/blogs" element={<BlogsPage />} />
                 <Route path="/blog/:slug" element={<BlogDetailPage />} />
                 <Route path="/admin" element={<Navigate to="/admin/categories" replace />} />
@@ -97,6 +99,14 @@ export default function App() {
                 />
                 <Route
                   path="/admin/blogs"
+                  element={
+                    <ProtectedRoute>
+                      <AdminPanel />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/contacts"
                   element={
                     <ProtectedRoute>
                       <AdminPanel />

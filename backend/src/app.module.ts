@@ -15,6 +15,8 @@ import { CategoryTranslation } from './categories/category-translations.entity';
 import { ApplicationTranslation } from './applications/application-translations.entity';
 import { ProductTranslation } from './products/product-translations.entity';
 import { BlogTranslation } from './blogs/blog-translations.entity';
+import { ContactMessage } from './contact.entity';
+import { ContactModule } from './contact.module';
 
 @Module({
   imports: [
@@ -35,6 +37,7 @@ import { BlogTranslation } from './blogs/blog-translations.entity';
         ProductTranslation,
         Blog,
         BlogTranslation,
+        ContactMessage,
       ],
       synchronize: true,
     }),
@@ -44,6 +47,7 @@ import { BlogTranslation } from './blogs/blog-translations.entity';
     ProductsModule,
     BlogsModule,
     AuthModule,
+    ContactModule,
   ],
 })
 export class AppModule {}

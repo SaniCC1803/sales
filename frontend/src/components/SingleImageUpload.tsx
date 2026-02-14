@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Dropzone, DropzoneContent, DropzoneEmptyState } from '@/components/ui/dropzone';
 import { Button } from '@/components/ui/button';
 import { Trash2Icon } from 'lucide-react';
+import { t } from 'i18next';
 
 type SingleImageUploadProps = {
   value?: File | null;
@@ -75,7 +76,7 @@ const SingleImageUpload = ({
           <div className="relative w-full h-[120px]">
             <img
               src={filePreview}
-              alt={file?.name || 'Current image'}
+              alt={file?.name || t("currentImage")}
               className="absolute top-0 left-0 h-full w-full object-cover rounded-md border"
             />
             <div className="absolute top-2 right-2">
@@ -89,7 +90,7 @@ const SingleImageUpload = ({
               </Button>
             </div>
           </div>
-          <p className="text-xs text-muted-foreground truncate">{file?.name || 'Current image'}</p>
+          <p className="text-xs text-muted-foreground truncate">{file?.name || t("currentImage")}</p>
         </div>
       )}
 

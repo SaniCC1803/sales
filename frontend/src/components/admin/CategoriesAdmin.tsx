@@ -146,7 +146,7 @@ export default function CategoriesAdmin() {
         open={deleteModal.open}
         onOpenChange={(open) => setDeleteModal({ ...deleteModal, open })}
         onConfirm={confirmDelete}
-        title="Delete Category"
+        title={t('deleteCategory')}
         itemName={deleteModal.name}
       />
     </>

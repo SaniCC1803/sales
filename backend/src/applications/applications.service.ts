@@ -77,6 +77,10 @@ export class ApplicationsService {
       );
     }
 
+    // Update contactEmail if provided
+    if (data.contactEmail) {
+      existingApp.contactEmail = data.contactEmail;
+    }
     // Save the updated application (this will cascade to translations)
     return await this.applicationRepo.save(existingApp);
   }

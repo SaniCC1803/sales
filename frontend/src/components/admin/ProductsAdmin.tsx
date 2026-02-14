@@ -131,7 +131,7 @@ export default function ProductsAdmin() {
         open={deleteModal.open}
         onOpenChange={(open) => setDeleteModal({ ...deleteModal, open })}
         onConfirm={confirmDelete}
-        title="Delete Product"
+        title={t('deleteProduct')}
         itemName={deleteModal.name}
       />
     </>

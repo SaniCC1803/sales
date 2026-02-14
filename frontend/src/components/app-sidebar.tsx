@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   onSectionChange: (
-    section: 'categories' | 'applications' | 'products' | 'users' | 'blogs'
+    section: 'categories' | 'applications' | 'products' | 'users' | 'blogs' | 'contacts'
   ) => void;
 }
 
@@ -28,6 +28,7 @@ export function AppSidebar({ onSectionChange, ...props }: AppSidebarProps) {
     { title: 'categories', value: 'categories', path: '/admin/categories' },
     { title: 'products', value: 'products', path: '/admin/products' },
     { title: 'blogs', value: 'blogs', path: '/admin/blogs' },
+    { title: 'contacts', value: 'contacts', path: '/admin/contacts' },
   ];
 
   return (
@@ -60,6 +61,7 @@ export function AppSidebar({ onSectionChange, ...props }: AppSidebarProps) {
                               | 'products'
                               | 'users'
                               | 'blogs'
+                              | 'contacts'
                           )
                         }
                       >
