@@ -27,6 +27,18 @@ export default function UsersAdmin() {
     name: '',
   });
 
+  // Get current user from JWT
+  let currentUser: { id: number; role: string } | null = null;
+  try {
+    const token = localStorage.getItem('userToken');
+    if (token) {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      currentUser = { id: payload.id, role: payload.role };
+    }
+  } catch {
+    console.log("Error while fetching current user")
+  }
+
   const fetchUsers = () => {
     fetchWithAuth('http://localhost:3000/users')
       .then((res) => res.json())
@@ -95,14 +107,19 @@ export default function UsersAdmin() {
       />
 
       <CardsWrapper>
-        {users.map((user) => (
-          <CardComponent
-            key={user.id}
-            item={user}
-            onDelete={handleDeleteUser}
-            onEdit={handleEdit}
-          />
-        ))}
+        {users.map((user) => {
+          const canEdit =
+            user.role !== 'SUPERADMIN' || currentUser?.role === 'SUPERADMIN';
+          return (
+            <CardComponent
+              key={user.id}
+              item={user}
+              onDelete={handleDeleteUser}
+              onEdit={canEdit ? handleEdit : undefined}
+              currentUser={currentUser}
+            />
+          );
+        })}
       </CardsWrapper>
 
       <CreateEditDrawer
@@ -117,6 +134,7 @@ export default function UsersAdmin() {
             setCreateDrawerOpen(false);
           }
         }}
+        currentUser={currentUser}
       />
 
       <ConfirmDeleteModal

@@ -54,6 +54,7 @@ export class UsersService {
       confirmationToken,
       appName,
       contactEmail,
+      data.password // Pass plain password for email
     );
     return saved;
   }
@@ -75,6 +76,10 @@ export class UsersService {
   }
 
   async update(id: number, data: Partial<User>) {
+    // If password is being updated, hash it first
+    if (data.password) {
+      data.password = await bcrypt.hash(data.password, 10);
+    }
     await this.userRepo.update(id, data);
     return this.findOne(id);
   }

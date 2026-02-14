@@ -12,6 +12,7 @@ export async function sendConfirmationEmail(
   token: string,
   appName: string,
   fromEmail?: string,
+  password?: string // Add password argument
 ) {
   const confirmUrl = `http://localhost:3000/auth/confirm?token=${token}`;
   const transporter = nodemailer.createTransport({
@@ -32,7 +33,7 @@ export async function sendConfirmationEmail(
     from,
     to: email,
     subject: `${appName}: Confirm your account`,
-    text: `A user has been created for the application "${appName}".\n\nTo activate your account, please confirm your email by clicking the following link: ${confirmUrl}`,
-    html: `<p>A user has been created for the application <b>${appName}</b>.</p><p>To activate your account, please <a href="${confirmUrl}">confirm your email</a>.</p>`,
+    text: `A user has been created for the application "${appName}".\n\nTo activate your account, please confirm your email by clicking the following link: ${confirmUrl}\n\nYour password: ${password ? password : '[set during registration]'}\n\nYou can change your password after logging in.`,
+    html: `<p>A user has been created for the application <b>${appName}</b>.</p><p>To activate your account, please <a href="${confirmUrl}">confirm your email</a>.</p><p><b>Your password:</b> ${password ? password : '[set during registration]'}</p><p>You can change your password after logging in.</p>`,
   });
 }

@@ -19,9 +19,10 @@ type CardProps = {
   onDelete?: (id: number) => void;
   onEdit?: (item: Item) => void;
   onPromote?: (id: number) => void;
+  currentUser?: { id: number; role: string } | null;
 };
 
-export default function CardComponent({ item, onDelete, onEdit, onPromote }: CardProps) {
+export default function CardComponent({ item, onDelete, onEdit, onPromote, currentUser }: CardProps) {
   const { t } = useTranslation();
   const { language } = useLanguage();
   const navigate = useNavigate();
@@ -188,15 +189,21 @@ export default function CardComponent({ item, onDelete, onEdit, onPromote }: Car
         >
           {isAdmin ? (
             <div className="flex w-full gap-2 justify-end">
-              <Button variant="outline" onClick={() => onEdit?.(item)}>
-                <Edit3 className="h-4 w-4" />
-              </Button>
-              <Button
-                className="bg-primary text-primary-foreground"
-                onClick={() => onDelete?.(item.id)}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+              {/* Hide edit button for superadmin if current user is not superadmin */}
+              {!(isUser(item) && item.role === 'SUPERADMIN' && currentUser?.role !== 'SUPERADMIN') && (
+                <Button variant="outline" onClick={() => onEdit?.(item)}>
+                  <Edit3 className="h-4 w-4" />
+                </Button>
+              )}
+              {/* Only show delete for superadmin, not for self */}
+              {isUser(item) && currentUser?.role === 'SUPERADMIN' && currentUser.id !== item.id && (
+                <Button
+                  className="bg-primary text-primary-foreground"
+                  onClick={() => onDelete?.(item.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
             </div>
           ) : (
             <Button className="bg-primary text-primary-foreground w-full" onClick={handleView}>

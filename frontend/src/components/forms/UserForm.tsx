@@ -25,6 +25,7 @@ interface UserFormProps {
   onEditComplete?: () => void;
   closeDrawer: () => void;
   formId?: string;
+  currentUser?: { id: number; role: string } | null;
 }
 
 export default function UserForm({
@@ -33,9 +34,11 @@ export default function UserForm({
   onEditComplete,
   closeDrawer,
   formId = 'user-form',
+  currentUser,
 }: UserFormProps) {
   const isEditMode = !!editUser;
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const {
     control,
@@ -53,6 +56,7 @@ export default function UserForm({
   }, [editUser, reset]);
 
   const onSubmit = async (data: UserFormValues) => {
+    setLoading(true);
     try {
       let res: Response;
 
@@ -78,8 +82,13 @@ export default function UserForm({
       closeDrawer();
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
+
+  // Only allow password edit if editing self
+  const canEditPassword = !editUser || (currentUser && editUser && currentUser.id === editUser.id);
 
   return (
     <form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 p-1">
@@ -129,6 +138,7 @@ export default function UserForm({
                   {...field}
                   type={showPassword ? 'text' : 'password'}
                   placeholder={t('password')}
+                  disabled={!canEditPassword}
                 />
                 <Button
                   type="button"
@@ -137,6 +147,7 @@ export default function UserForm({
                   className="absolute right-1 top-1/2 -translate-y-1/2 bg-transparent hover:bg-transparent focus:bg-transparent pointer-events-auto"
                   tabIndex={-1}
                   onClick={() => setShowPassword((v) => !v)}
+                  disabled={!canEditPassword}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </Button>
@@ -146,6 +157,9 @@ export default function UserForm({
                 name="password"
                 render={({ message }) => <p className="text-destructive text-sm mt-1">{message}</p>}
               />
+              {!canEditPassword && (
+                <p className="text-xs text-muted-foreground mt-1">{t('onlyEditOwnPassword')}</p>
+              )}
             </div>
           )}
         />
@@ -158,8 +172,15 @@ export default function UserForm({
           rules={{ required: t('roleRequired') }}
           render={({ field }) => (
             <>
-              <NativeSelect value={field.value} onChange={field.onChange} disabled={field.disabled}>
-                <option value="SUPERADMIN">{t('superadmin')}</option>
+              <NativeSelect
+                value={field.value}
+                onChange={field.onChange}
+                disabled={field.disabled}
+              >
+                {/* Only show SUPERADMIN if currentUser is superadmin */}
+                {currentUser?.role === 'SUPERADMIN' && (
+                  <option value="SUPERADMIN">{t('superadmin')}</option>
+                )}
                 <option value="USER">{t('user')}</option>
               </NativeSelect>
               <ErrorMessage
@@ -172,7 +193,13 @@ export default function UserForm({
         />
       </div>
 
-      <Button type="submit" className="mt-4 self-end">
+      <Button type="submit" className="mt-4 self-end" disabled={loading}>
+        {loading && (
+          <svg className="animate-spin h-4 w-4 mr-2 inline" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+          </svg>
+        )}
         {isEditMode ? t('save') : t('create')}
       </Button>
     </form>

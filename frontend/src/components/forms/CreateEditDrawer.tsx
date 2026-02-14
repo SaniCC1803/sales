@@ -35,6 +35,7 @@ type Props = {
   activeSection: 'categories' | 'applications' | 'products' | 'users' | 'blogs';
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  currentUser?: { id: number; role: string } | null;
 };
 
 export default function CreateEditDrawer({
@@ -56,6 +57,7 @@ export default function CreateEditDrawer({
   activeSection,
   open,
   onOpenChange,
+  currentUser,
 }: Props) {
   const { t } = useTranslation();
   const isEditMode = !!(editCategory || editProduct || editApplication || editUser || editBlog);
@@ -108,6 +110,7 @@ export default function CreateEditDrawer({
               onEditComplete={onUserEditComplete}
               closeDrawer={closeDrawer}
               formId="user-form"
+              currentUser={currentUser}
             />
           )}
 

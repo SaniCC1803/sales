@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 
 export default function LoginModal({ onLogin }: { onLogin: () => void }) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -18,7 +20,7 @@ export default function LoginModal({ onLogin }: { onLogin: () => void }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-      if (!res.ok) throw new Error('Login failed');
+      if (!res.ok) throw new Error(t('error') || 'Login failed');
       const data = await res.json();
       localStorage.setItem('userToken', data.token);
       if (data.refreshToken) {
@@ -26,7 +28,7 @@ export default function LoginModal({ onLogin }: { onLogin: () => void }) {
       }
       onLogin();
     } catch (err: any) {
-      setError(err.message || 'Login failed');
+      setError(err.message || t('error') || 'Login failed');
     } finally {
       setLoading(false);
     }
@@ -38,24 +40,24 @@ export default function LoginModal({ onLogin }: { onLogin: () => void }) {
         onSubmit={handleLogin}
         className="bg-background p-6 rounded shadow w-full max-w-sm flex flex-col gap-4"
       >
-        <h2 className="text-lg font-semibold mb-2">Login</h2>
+        <h2 className="text-lg font-semibold mb-2">{t('signIn')}</h2>
         <Input
           type="email"
-          placeholder="Email"
+          placeholder={t('email')}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
         <Input
           type="password"
-          placeholder="Password"
+          placeholder={t('password')}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
         {error && <div className="text-destructive text-sm">{error}</div>}
         <Button type="submit" disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
+          {loading ? t('loading') || 'Logging in...' : t('signIn')}
         </Button>
       </form>
     </div>
