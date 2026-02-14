@@ -30,7 +30,7 @@ export default function CategoriesAdmin() {
   });
 
   const fetchCategories = () => {
-    fetchWithAuth('http://localhost:3000/categories')
+    fetchWithAuth(`${import.meta.env.VITE_API_URL}/categories`)
       .then((res) => res.json())
       .then(setCategories)
       .catch(() => setError('Failed to load categories'));
@@ -52,7 +52,7 @@ export default function CategoriesAdmin() {
 
   const confirmDelete = async () => {
     try {
-      const res = await fetchWithAuth(`http://localhost:3000/categories/${deleteModal.id}`, {
+      const res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/categories/${deleteModal.id}`, {
         method: 'DELETE',
       });
 

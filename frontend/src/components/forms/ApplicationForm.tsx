@@ -89,12 +89,12 @@ export default function ApplicationForm({
       let res: Response;
 
       if (isEditMode && editApplication) {
-        res = await fetchWithAuth(`http://localhost:3000/applications/${editApplication.id}`, {
+        res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/applications/${editApplication.id}`, {
           method: 'PUT',
           body: formData,
         });
       } else {
-        res = await fetchWithAuth('http://localhost:3000/applications', {
+        res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/applications`, {
           method: 'POST',
           body: formData,
         });
@@ -200,7 +200,7 @@ export default function ApplicationForm({
                   {existingUrls.map((url, idx) => (
                     <div key={idx} className="relative">
                       <img
-                        src={url.startsWith('http') ? url : `http://localhost:3000${url}`}
+                        src={url.startsWith('http') ? url : `${import.meta.env.VITE_API_URL}${url}`}
                         className="w-20 h-20 object-cover rounded"
                       />
                       <Button

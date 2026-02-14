@@ -12,9 +12,10 @@ export async function sendConfirmationEmail(
   token: string,
   appName: string,
   fromEmail?: string,
-  password?: string // Add password argument
+  password?: string,
 ) {
-  const confirmUrl = `http://localhost:3000/auth/confirm?token=${token}`;
+  const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+  const confirmUrl = `${baseUrl}/auth/confirm?token=${token}`;
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: Number(process.env.SMTP_PORT),

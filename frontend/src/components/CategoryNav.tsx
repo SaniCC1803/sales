@@ -10,7 +10,7 @@ export default function CategoryNav() {
   const { language } = useLanguage();
 
   useEffect(() => {
-    fetch('http://localhost:3000/categories')
+    fetch(`${import.meta.env.VITE_API_URL}/categories`)
       .then((res) => res.json())
       .then(setCategories)
       .finally(() => setLoading(false));

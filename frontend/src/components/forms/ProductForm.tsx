@@ -59,7 +59,7 @@ export default function ProductForm({
   });
 
   useEffect(() => {
-    fetch('http://localhost:3000/categories')
+    fetch(`${import.meta.env.VITE_API_URL}/categories`)
       .then((res) => res.json())
       .then(setCategories)
       .catch(console.error);
@@ -91,12 +91,12 @@ export default function ProductForm({
       let res: Response;
 
       if (isEditMode && editProduct) {
-        res = await fetchWithAuth(`http://localhost:3000/products/${editProduct.id}`, {
+        res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/products/${editProduct.id}`, {
           method: 'PUT',
           body: formData,
         });
       } else {
-        res = await fetchWithAuth('http://localhost:3000/products', {
+        res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/products`, {
           method: 'POST',
           body: formData,
         });
@@ -248,7 +248,7 @@ export default function ProductForm({
                   {existingUrls.map((url, idx) => (
                     <div key={idx} className="relative">
                       <img
-                        src={url.startsWith('http') ? url : `http://localhost:3000${url}`}
+                        src={url.startsWith('http') ? url : `${import.meta.env.VITE_API_URL}${url}`}
                         className="w-20 h-20 object-cover rounded"
                       />
                       <Button

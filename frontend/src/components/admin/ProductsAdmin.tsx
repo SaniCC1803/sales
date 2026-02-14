@@ -28,7 +28,7 @@ export default function ProductsAdmin() {
   });
 
   const fetchProducts = () => {
-    fetchWithAuth('http://localhost:3000/products')
+    fetchWithAuth(`${import.meta.env.VITE_API_URL}/products`)
       .then((res) => res.json())
       .then(setProducts)
       .catch(() => setError('Failed to load products'));
@@ -49,7 +49,7 @@ export default function ProductsAdmin() {
 
   const confirmDelete = async () => {
     try {
-      const res = await fetchWithAuth(`http://localhost:3000/products/${deleteModal.id}`, {
+      const res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/products/${deleteModal.id}`, {
         method: 'DELETE',
       });
 
@@ -106,7 +106,7 @@ export default function ProductsAdmin() {
             onDelete={handleDeleteProduct}
             onEdit={handleEdit}
             onPromote={async (id) => {
-              await fetchWithAuth(`http://localhost:3000/products/${id}/promote`, { method: 'POST' });
+              await fetchWithAuth(`${import.meta.env.VITE_API_URL}/products/${id}/promote`, { method: 'POST' });
               fetchProducts();
             }}
           />

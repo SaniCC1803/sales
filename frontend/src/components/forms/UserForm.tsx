@@ -61,13 +61,13 @@ export default function UserForm({
       let res: Response;
 
       if (isEditMode) {
-        res = await fetchWithAuth(`http://localhost:3000/users/${editUser?.id}`, {
+        res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/users/${editUser?.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
         });
       } else {
-        res = await fetchWithAuth('http://localhost:3000/users', {
+        res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/users`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),

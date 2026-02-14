@@ -23,7 +23,7 @@ export default function ApplicationsAdmin() {
   });
 
   const fetchApplication = () => {
-    fetchWithAuth('http://localhost:3000/applications/current')
+    fetchWithAuth(`${import.meta.env.VITE_API_URL}/applications/current`)
       .then((res) => res.json())
       .then(setApplication)
       .catch(() => {

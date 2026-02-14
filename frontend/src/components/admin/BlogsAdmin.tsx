@@ -32,7 +32,7 @@ export default function BlogsAdmin() {
   const { language } = useLanguage();
 
   const fetchBlogs = () => {
-    fetchWithAuth('http://localhost:3000/blogs')
+    fetchWithAuth(`${import.meta.env.VITE_API_URL}/blogs`)
       .then((res) => res.json())
       .then(setBlogs)
       .catch(() => setError('Failed to load blogs'));
@@ -56,7 +56,7 @@ export default function BlogsAdmin() {
 
   const confirmDelete = async () => {
     try {
-      const res = await fetchWithAuth(`http://localhost:3000/blogs/${deleteModal.id}`, {
+      const res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/blogs/${deleteModal.id}`, {
         method: 'DELETE',
       });
 

@@ -101,12 +101,12 @@ export default function BlogForm({
       formData.append('translations', JSON.stringify(data.translations));
       let res: Response;
       if (editBlog) {
-        res = await fetchWithAuth(`http://localhost:3000/blogs/${editBlog.id}`, {
+        res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/blogs/${editBlog.id}`, {
           method: 'PATCH',
           body: formData,
         });
       } else {
-        res = await fetchWithAuth('http://localhost:3000/blogs', {
+        res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/blogs`, {
           method: 'POST',
           body: formData,
         });

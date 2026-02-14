@@ -35,7 +35,7 @@ const SingleImageUpload = ({
     } else if (existingImageUrl) {
       const fullUrl = existingImageUrl.startsWith('http')
         ? existingImageUrl
-        : `http://localhost:3000${existingImageUrl}`;
+        : `${import.meta.env.VITE_API_URL}${existingImageUrl}`;
       setFilePreview(fullUrl);
     } else {
       setFilePreview(undefined);

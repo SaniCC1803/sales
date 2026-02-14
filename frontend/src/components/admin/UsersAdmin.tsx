@@ -40,7 +40,7 @@ export default function UsersAdmin() {
   }
 
   const fetchUsers = () => {
-    fetchWithAuth('http://localhost:3000/users')
+    fetchWithAuth(`${import.meta.env.VITE_API_URL}/users`)
       .then((res) => res.json())
       .then(setUsers)
       .catch(() => setError('Failed to load users'));
@@ -57,7 +57,7 @@ export default function UsersAdmin() {
 
   const confirmDelete = async () => {
     try {
-      const res = await fetchWithAuth(`http://localhost:3000/users/${deleteModal.id}`, {
+      const res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/users/${deleteModal.id}`, {
         method: 'DELETE',
       });
 

@@ -15,7 +15,7 @@ export default function RegisterModal({ onRegistered }: { onRegistered: () => vo
     setLoading(true);
     setError('');
     try {
-      const res = await fetchWithAuth('http://localhost:3000/users', {
+      const res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, role: 'SUPERADMIN' }),

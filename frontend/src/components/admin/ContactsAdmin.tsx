@@ -22,7 +22,7 @@ export default function ContactsAdmin() {
   });
 
   const fetchContacts = () => {
-    fetchWithAuth("http://localhost:3000/contact")
+    fetchWithAuth(`${import.meta.env.VITE_API_URL}/contact`)
       .then((res) => res.json())
       .then(setContacts)
       .catch(() => setError("Failed to load contacts"));
@@ -39,7 +39,7 @@ export default function ContactsAdmin() {
 
   const confirmDelete = async () => {
     try {
-      const res = await fetchWithAuth(`http://localhost:3000/contact/${deleteModal.id}`, {
+      const res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/contact/${deleteModal.id}`, {
         method: 'DELETE',
       });
 

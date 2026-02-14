@@ -58,7 +58,7 @@ export default function CategoryForm({
   });
 
   useEffect(() => {
-    fetch('http://localhost:3000/categories')
+    fetch(`${import.meta.env.VITE_API_URL}/categories`)
       .then((res) => res.json())
       .then(setCategories)
       .catch(console.error);
@@ -86,12 +86,12 @@ export default function CategoryForm({
       let res: Response;
 
       if (isEditMode && editCategory) {
-        res = await fetchWithAuth(`http://localhost:3000/categories/${editCategory.id}`, {
+        res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/categories/${editCategory.id}`, {
           method: 'PUT',
           body: formData,
         });
       } else {
-        res = await fetchWithAuth('http://localhost:3000/categories', {
+        res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/categories`, {
           method: 'POST',
           body: formData,
         });

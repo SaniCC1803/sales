@@ -11,7 +11,7 @@ export default function ProtectedRoute({ children }: { children: JSX.Element }) 
   const [usersExist, setUsersExist] = useState<boolean | null>(null);
 
   useEffect(() => {
-    fetch('http://localhost:3000/users')
+    fetch(`${import.meta.env.VITE_API_URL}/users`)
       .then((res) => res.json())
       .then((users) => setUsersExist(users.length > 0))
       .catch(() => setUsersExist(true));

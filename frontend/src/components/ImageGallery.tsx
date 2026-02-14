@@ -76,7 +76,7 @@ export default function ImageGallery({
             src={
               images[currentIndex]?.startsWith('http')
                 ? images[currentIndex]
-                : `http://localhost:3000${images[currentIndex]}`
+                : `${import.meta.env.VITE_API_URL}${images[currentIndex]}`
             }
             alt={`Gallery image ${currentIndex + 1}`}
             className="max-w-full max-h-full object-contain rounded-lg"
@@ -119,7 +119,7 @@ export default function ImageGallery({
                 onClick={() => setCurrentIndex(idx)}
               >
                 <img
-                  src={img.startsWith('http') ? img : `http://localhost:3000${img}`}
+                  src={img.startsWith('http') ? img : `${import.meta.env.VITE_API_URL}${img}`}
                   alt={`Thumbnail ${idx + 1}`}
                   className="w-full h-full object-cover"
                 />

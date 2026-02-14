@@ -28,7 +28,7 @@ export default function App() {
     // Restore the saved color theme on app start
     restoreTheme();
 
-    fetch('http://localhost:3000/applications')
+    fetch(`${import.meta.env.VITE_API_URL}/applications`)
       .then((res) => res.json())
       .then((data) => {
         setApplications(data);
