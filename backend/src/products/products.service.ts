@@ -121,6 +121,14 @@ export class ProductsService {
   remove(id: number) {
     return this.productRepo.delete(id);
   }
+
+  async setPromoted(id: number) {
+    // Unset all promoted products
+    await this.productRepo.update({ promoted: true }, { promoted: false });
+    // Set the selected product as promoted
+    await this.productRepo.update({ id }, { promoted: true });
+    return this.productRepo.findOne({ where: { id } });
+  }
   
   async incrementViews(id: number) {
     const product = await this.productRepo.findOne({ where: { id } });

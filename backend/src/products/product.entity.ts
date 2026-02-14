@@ -36,4 +36,7 @@ export class Product {
 
   @Column({ type: 'int', default: 0 })
   views!: number;
+
+  @Column({ type: 'boolean', default: false })
+  promoted!: boolean;
 }

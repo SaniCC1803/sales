@@ -7,6 +7,7 @@ import type { Product } from '@/types/product';
 import { useTranslation } from 'react-i18next';
 import CardComponent from '@/components/Card';
 import CardGrid from '@/components/CardGrid';
+import PromotedProduct from '@/components/PromotedProduct';
 import { Loader } from 'lucide-react';
 
 type HomePageProps = {
@@ -24,12 +25,11 @@ export default function HomePage({ application }: HomePageProps) {
     setLoading(true);
 
     (async () => {
-      const [{ data: categories, error: catError }, { data: products, error: prodError }] = await Promise.all([
+      const [{ data: categories }, { data: products }] = await Promise.all([
         apiFetch<Category[]>('/categories'),
         apiFetch<Product[]>('/products'),
       ]);
-      if (catError) setError(catError);
-      if (prodError) setError(prodError);
+      // Optionally handle errors here (e.g., show a toast)
       setCategories(categories || []);
       const allSubcategories = (categories || []).flatMap((cat: Category) => cat.subcategories || []);
       setSubcategories(allSubcategories);
@@ -38,6 +38,8 @@ export default function HomePage({ application }: HomePageProps) {
     })();
   }, []);
 
+  const promotedProduct = products.find((p) => p.promoted);
+
   return (
     <>
       {loading && <Loader />}
@@ -45,6 +47,7 @@ export default function HomePage({ application }: HomePageProps) {
         <>
           <ProductCarousel images={application.carousel || []} />
           <section className="container px-6 py-12 flex flex-col gap-10">
+            {promotedProduct && <PromotedProduct product={promotedProduct} />}
             <CardGrid title={t('categories')}>
               {categories.map((cat) => (
                 <CardComponent key={cat.id} item={cat} />

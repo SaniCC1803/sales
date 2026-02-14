@@ -80,5 +80,8 @@
   "createdLabel": "Создадено",
   "publishedLabel": "Објавено:",
   "visits": "Посети",
-  "den": "ден"
+  "promote": "Промовирај",
+  "promoted": "Промовиран",
+  "den": "ден",
+  "bestSelling": "*** Најпродаван Продукт ***"
 }

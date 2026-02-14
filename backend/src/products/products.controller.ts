@@ -145,4 +145,11 @@ export class ProductsController {
   async incrementView(@Param('id') id: number) {
     return { views: await this.productsService.incrementViews(Number(id)) };
   }
+
+  // Set a product as promoted (admin only)
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/promote')
+  async promoteProduct(@Param('id') id: number) {
+    return await this.productsService.setPromoted(Number(id));
+  }
 }

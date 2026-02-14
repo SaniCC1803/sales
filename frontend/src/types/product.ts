@@ -16,4 +16,5 @@ export interface Product {
   translations: ProductTranslation[];
   createdAt: string;
   views?: number;
+  promoted?: boolean;
 }

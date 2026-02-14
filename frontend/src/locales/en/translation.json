@@ -81,5 +81,8 @@
   "createdLabel": "Created:",
   "publishedLabel": "Published:",
   "visits": "Visits",
-  "den": "den"
+  "promote": "Promote",
+  "promoted": "Promoted",
+  "den": "den",
+  "bestSelling": "*** Best Selling Product ***"
 }

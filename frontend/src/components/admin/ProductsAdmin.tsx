@@ -105,6 +105,10 @@ export default function ProductsAdmin() {
             item={product}
             onDelete={handleDeleteProduct}
             onEdit={handleEdit}
+            onPromote={async (id) => {
+              await fetchWithAuth(`http://localhost:3000/products/${id}/promote`, { method: 'POST' });
+              fetchProducts();
+            }}
           />
         ))}
       </CardsWrapper>

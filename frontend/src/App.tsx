@@ -107,7 +107,12 @@ export default function App() {
                 <Route path="/product/:id" element={<ProductDetailPage />} />
               </Routes>
             </main>
-            <Footer availableLanguages={applications[0].languages} />
+            <Footer 
+              availableLanguages={applications[0].languages}
+              appName={
+                applications[0].translations?.[0]?.name || 'Ecom'
+              }
+            />
           </div>
         </SidebarProvider>
       </LanguageProvider>
