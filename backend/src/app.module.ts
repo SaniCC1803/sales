@@ -21,9 +21,9 @@ import { ContactModule } from './contact.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
-      type: 'postgres',
+      type: 'mysql',
       host: 'localhost',
-      port: 5432,
+      port: 3306,
       username: 'sani',
       password: 'sani123',
       database: 'ecom',

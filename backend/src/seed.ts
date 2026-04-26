@@ -1,44 +1,54 @@
 // Utility to clear all tables before seeding
 async function clearDatabase(dataSource: DataSource) {
-  // Delete child tables first to avoid FK errors
-  await dataSource
-    .getRepository(BlogTranslation)
-    .createQueryBuilder()
-    .delete()
-    .execute();
-  await dataSource.getRepository(Blog).createQueryBuilder().delete().execute();
-  await dataSource
-    .getRepository(ProductTranslation)
-    .createQueryBuilder()
-    .delete()
-    .execute();
-  await dataSource
-    .getRepository(Product)
-    .createQueryBuilder()
-    .delete()
-    .execute();
-  await dataSource
-    .getRepository(CategoryTranslation)
-    .createQueryBuilder()
-    .delete()
-    .execute();
-  await dataSource
-    .getRepository(Category)
-    .createQueryBuilder()
-    .delete()
-    .execute();
-  await dataSource
-    .getRepository(Application)
-    .createQueryBuilder()
-    .delete()
-    .execute();
-  await dataSource
-    .getRepository(ContactMessage)
-    .createQueryBuilder()
-    .delete()
-    .execute();
-  // Uncomment these lines if you want to clear users as well
-  // await dataSource.getRepository(User).createQueryBuilder().delete().execute();
+  // Disable FK checks so self-referential tables (Category.parent) and any
+  // other ordering dependencies don't block a flat DELETE.
+  await dataSource.query('SET FOREIGN_KEY_CHECKS = 0');
+  try {
+    await dataSource
+      .getRepository(BlogTranslation)
+      .createQueryBuilder()
+      .delete()
+      .execute();
+    await dataSource
+      .getRepository(Blog)
+      .createQueryBuilder()
+      .delete()
+      .execute();
+    await dataSource
+      .getRepository(ProductTranslation)
+      .createQueryBuilder()
+      .delete()
+      .execute();
+    await dataSource
+      .getRepository(Product)
+      .createQueryBuilder()
+      .delete()
+      .execute();
+    await dataSource
+      .getRepository(CategoryTranslation)
+      .createQueryBuilder()
+      .delete()
+      .execute();
+    await dataSource
+      .getRepository(Category)
+      .createQueryBuilder()
+      .delete()
+      .execute();
+    await dataSource
+      .getRepository(Application)
+      .createQueryBuilder()
+      .delete()
+      .execute();
+    await dataSource
+      .getRepository(ContactMessage)
+      .createQueryBuilder()
+      .delete()
+      .execute();
+    // Uncomment these lines if you want to clear users as well
+    // await dataSource.getRepository(User).createQueryBuilder().delete().execute();
+  } finally {
+    await dataSource.query('SET FOREIGN_KEY_CHECKS = 1');
+  }
   console.log('All tables cleared ✅');
 }
 import { DataSource } from 'typeorm';
@@ -149,12 +159,18 @@ async function seedCategories() {
   const categoriesService = app.get(CategoriesService);
 
   // --- CLEAR EXISTING DATA ---
-  // Delete products and their translations first (because of foreign key constraints)
-  await productTranslationRepo.createQueryBuilder().delete().execute();
-  await productRepo.createQueryBuilder().delete().execute();
-  // Then delete category translations and categories
-  await translationRepo.createQueryBuilder().delete().execute();
-  await categoryRepo.createQueryBuilder().delete().execute();
+  // Self-referential FK on Category.parent blocks a flat DELETE in MySQL.
+  await dataSource.query('SET FOREIGN_KEY_CHECKS = 0');
+  try {
+    // Delete products and their translations first (because of foreign key constraints)
+    await productTranslationRepo.createQueryBuilder().delete().execute();
+    await productRepo.createQueryBuilder().delete().execute();
+    // Then delete category translations and categories
+    await translationRepo.createQueryBuilder().delete().execute();
+    await categoryRepo.createQueryBuilder().delete().execute();
+  } finally {
+    await dataSource.query('SET FOREIGN_KEY_CHECKS = 1');
+  }
   console.log('Database cleared ✅');
 
   // ---- Chairs Category ----

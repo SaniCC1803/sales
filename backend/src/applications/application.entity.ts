@@ -13,12 +13,8 @@ export class Application {
   })
   logo!: string;
 
-  @Column({
-    type: 'varchar',
-    array: true,
-    default: [Language.EN],
-  })
-  languages!: string[];
+  @Column({ type: 'simple-array' })
+  languages: string[] = [Language.EN];
 
   @OneToMany(() => ApplicationTranslation, (t) => t.application, {
     cascade: true,
@@ -32,10 +28,6 @@ export class Application {
   @Column({ nullable: true })
   websiteUrl?: string;
 
-  @Column({
-    type: 'varchar',
-    array: true,
-    default: [],
-  })
-  carousel!: string[];
+  @Column({ type: 'simple-array' })
+  carousel: string[] = [];
 }
