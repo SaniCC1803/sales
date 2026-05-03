@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm uninstall *)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(echo \"EXIT=$?\")",
+      "Read(//tmp/**)",
+      "Bash(npx shadcn@latest add spinner --yes)",
+      "Bash(npx shadcn@latest add aspect-ratio --yes)",
+      "PowerShell(npm install *)"
+    ]
+  }
+}
