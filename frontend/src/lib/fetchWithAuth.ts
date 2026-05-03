@@ -1,34 +1,21 @@
 // fetchWithAuth.ts
-// Wrapper for fetch that logs out and redirects on 401
+// Sends cookie-bound auth credentials, attempts a single /auth/refresh on 401, and
+// signals logout (clearing client state) on persistent failure.
 export async function fetchWithAuth(input: RequestInfo, init?: RequestInit) {
-  let token = localStorage.getItem('userToken');
-  const refreshToken = localStorage.getItem('refreshToken');
-  let headers = new Headers(init?.headers || {});
-  if (token) {
-    headers.set('Authorization', `Bearer ${token}`);
-  }
-  let response = await fetch(input, { ...init, headers });
-  if (response.status === 401 && refreshToken) {
-    // Try to refresh the access token
-    const baseUrl = import.meta.env.VITE_API_URL || '';
+  const baseUrl = import.meta.env.VITE_API_URL || '';
+  const send = () => fetch(input, { ...init, credentials: 'include' });
+
+  let response = await send();
+  if (response.status === 401) {
     const refreshRes = await fetch(`${baseUrl}/auth/refresh`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken }),
+      credentials: 'include',
     });
     if (refreshRes.ok) {
-      const data = await refreshRes.json();
-      localStorage.setItem('userToken', data.token);
-      token = data.token;
-      headers = new Headers(init?.headers || {});
-      headers.set('Authorization', `Bearer ${token}`);
-      // Retry original request
-      response = await fetch(input, { ...init, headers });
+      response = await send();
       if (response.status !== 401) return response;
     }
-    // If refresh fails, logout
-    localStorage.removeItem('userToken');
-    localStorage.removeItem('refreshToken');
+    window.dispatchEvent(new Event('auth-change'));
     window.location.href = '/';
     return Promise.reject(new Error('Unauthorized'));
   }

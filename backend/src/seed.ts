@@ -44,8 +44,11 @@ async function clearDatabase(dataSource: DataSource) {
       .createQueryBuilder()
       .delete()
       .execute();
-    // Uncomment these lines if you want to clear users as well
-    // await dataSource.getRepository(User).createQueryBuilder().delete().execute();
+    await dataSource
+      .getRepository(User)
+      .createQueryBuilder()
+      .delete()
+      .execute();
   } finally {
     await dataSource.query('SET FOREIGN_KEY_CHECKS = 1');
   }
@@ -460,10 +463,11 @@ async function seedBlogs() {
   if (!author) {
     const userService = app.get(UsersService);
     author = await userService.create({
-      email: 'blog@example.com',
-      password: 'password123',
+      email: 'a.gj.sani@gmail.com',
+      password: 'sani$123',
       role: Role.SUPERADMIN,
     });
+    await userService.confirmUser(author.id);
   }
 
   // Blog 1: Welcome Post

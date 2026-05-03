@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
 import { t } from 'i18next';
 import { Button } from './ui/button';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import CloseIcon from './icons/CloseIcon';
 import HamburgerMenu from './icons/HamburgerMenu';
 import { ThemeSelector } from './ThemeSelector';
@@ -19,21 +19,34 @@ type HeaderProps = {
   application: Application;
 };
 
+async function fetchMyEmail(): Promise<string> {
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
+      credentials: 'include',
+    });
+    if (!res.ok) return 'Unknown';
+    const data = await res.json();
+    return data.email || 'Unknown';
+  } catch (e) {
+    console.error(e);
+    return 'Unknown';
+  }
+}
+
 export default function Header({ application }: HeaderProps) {
   const { language } = useLanguage();
   const [open, setOpen] = useState(false);
   const location = useLocation();
-  // Get user email from JWT (if present)
-  let userEmail = 'Unknown';
-  try {
-    const token = localStorage.getItem('userToken');
-    if (token) {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      userEmail = payload.email || 'Unknown';
-    }
-  } catch (e) {
-    console.error(e);
-  }
+  const [userEmail, setUserEmail] = useState<string>('Unknown');
+
+  useEffect(() => {
+    const refresh = () => fetchMyEmail().then(setUserEmail);
+    refresh();
+    window.addEventListener('auth-change', refresh);
+    return () => {
+      window.removeEventListener('auth-change', refresh);
+    };
+  }, []);
 
   return (
     <>
@@ -77,8 +90,15 @@ export default function Header({ application }: HeaderProps) {
             {location.pathname.includes('/admin') && (
               <UserDropdown
                 email={userEmail}
-                onLogout={() => {
-                  localStorage.removeItem('userToken');
+                onLogout={async () => {
+                  try {
+                    await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
+                      method: 'POST',
+                      credentials: 'include',
+                    });
+                  } catch (e) {
+                    console.error('Logout request failed', e);
+                  }
                   window.location.href = '/';
                 }}
               />

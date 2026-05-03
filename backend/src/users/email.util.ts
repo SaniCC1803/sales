@@ -12,10 +12,12 @@ export async function sendConfirmationEmail(
   token: string,
   appName: string,
   fromEmail?: string,
-  password?: string,
+  requiresPasswordSetup = false,
 ) {
-  const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-  const confirmUrl = `${baseUrl}/auth/confirm?token=${token}`;
+  const baseUrl =
+    (process.env.FRONTEND_URL || 'http://localhost:5173').split(',')[0].trim();
+  const path = requiresPasswordSetup ? '/activate' : '/confirm';
+  const confirmUrl = `${baseUrl}${path}?token=${token}`;
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: Number(process.env.SMTP_PORT),
@@ -30,11 +32,15 @@ export async function sendConfirmationEmail(
     ? `${appName} <${fromEmail}>`
     : `${appName} <no-reply@yourdomain.com>`;
 
+  const action = requiresPasswordSetup
+    ? 'set your password and activate your account'
+    : 'confirm your email';
+
   await transporter.sendMail({
     from,
     to: email,
-    subject: `${appName}: Confirm your account`,
-    text: `A user has been created for the application "${appName}".\n\nTo activate your account, please confirm your email by clicking the following link: ${confirmUrl}\n\nYour password: ${password ? password : '[set during registration]'}\n\nYou can change your password after logging in.`,
-    html: `<p>A user has been created for the application <b>${appName}</b>.</p><p>To activate your account, please <a href="${confirmUrl}">confirm your email</a>.</p><p><b>Your password:</b> ${password ? password : '[set during registration]'}</p><p>You can change your password after logging in.</p>`,
+    subject: `${appName}: ${requiresPasswordSetup ? 'Activate your account' : 'Confirm your account'}`,
+    text: `An account has been created for you on "${appName}".\n\nClick the link below to ${action}:\n${confirmUrl}\n\nThis link will expire in 24 hours. If you did not request this, you can ignore this email.`,
+    html: `<p>An account has been created for you on <b>${appName}</b>.</p><p>Click the link below to ${action}:</p><p><a href="${confirmUrl}">${confirmUrl}</a></p><p>This link will expire in 24 hours. If you did not request this, you can ignore this email.</p>`,
   });
 }

@@ -13,8 +13,8 @@ export class User {
   @Column({ unique: true })
   email!: string;
 
-  @Column()
-  password!: string;
+  @Column({ nullable: true })
+  password?: string;
 
   @Column({
     type: 'enum',
@@ -27,6 +27,9 @@ export class User {
 
   @Column({ nullable: true })
   confirmationToken?: string;
+
+  @Column({ type: 'datetime', nullable: true })
+  confirmationTokenExpiresAt?: Date | null;
 
   @Column({ nullable: true })
   refreshToken?: string;

@@ -15,7 +15,7 @@ import { t } from 'i18next';
 
 export type UserFormValues = {
   email: string;
-  password: string;
+  password?: string;
   role: 'USER' | 'SUPERADMIN';
 };
 
@@ -61,16 +61,21 @@ export default function UserForm({
       let res: Response;
 
       if (isEditMode) {
+        // On edit, omit password unless the user actually typed one.
+        const payload: Partial<UserFormValues> = { ...data };
+        if (!payload.password) delete payload.password;
         res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/users/${editUser?.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data),
+          body: JSON.stringify(payload),
         });
       } else {
+        // On create (admin invite), never send a password — the user will set it via the activation email.
+        const { email, role } = data;
         res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/users`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data),
+          body: JSON.stringify({ email, role }),
         });
       }
 
@@ -122,47 +127,52 @@ export default function UserForm({
           )}
         />
 
-        {/* Password */}
-        <Label>{t('password')}</Label>
-        <Controller
-          name="password"
-          control={control}
-          rules={{
-            required: !isEditMode ? t('passwordRequired') : false,
-            minLength: { value: 6, message: t('passwordMinLength') },
-          }}
-          render={({ field }) => (
-            <div className="relative flex flex-col gap-0.5">
-              <div className="flex items-center">
-                <Input
-                  {...field}
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder={t('password')}
-                  disabled={!canEditPassword}
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-1 top-1/2 -translate-y-1/2 bg-transparent hover:bg-transparent focus:bg-transparent pointer-events-auto"
-                  tabIndex={-1}
-                  onClick={() => setShowPassword((v) => !v)}
-                  disabled={!canEditPassword}
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </Button>
-              </div>
-              <ErrorMessage
-                errors={errors}
-                name="password"
-                render={({ message }) => <p className="text-destructive text-sm mt-1">{message}</p>}
-              />
-              {!canEditPassword && (
-                <p className="text-xs text-muted-foreground mt-1">{t('onlyEditOwnPassword')}</p>
+        {/* Password — only shown when editing self. New users set their password via the invitation email. */}
+        {isEditMode && canEditPassword && (
+          <>
+            <Label>{t('password')}</Label>
+            <Controller
+              name="password"
+              control={control}
+              rules={{
+                minLength: { value: 6, message: t('passwordMinLength') },
+              }}
+              render={({ field }) => (
+                <div className="relative flex flex-col gap-0.5">
+                  <div className="flex items-center">
+                    <Input
+                      {...field}
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder={t('leaveBlankToKeep', 'Leave blank to keep current')}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-1 top-1/2 -translate-y-1/2 bg-transparent hover:bg-transparent focus:bg-transparent pointer-events-auto"
+                      tabIndex={-1}
+                      onClick={() => setShowPassword((v) => !v)}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </Button>
+                  </div>
+                  <ErrorMessage
+                    errors={errors}
+                    name="password"
+                    render={({ message }) => (
+                      <p className="text-destructive text-sm mt-1">{message}</p>
+                    )}
+                  />
+                </div>
               )}
-            </div>
-          )}
-        />
+            />
+          </>
+        )}
+        {!isEditMode && (
+          <p className="text-xs text-muted-foreground">
+            {t('inviteEmailNote', 'The user will set their password via an emailed activation link.')}
+          </p>
+        )}
 
         {/* Role */}
         <Label>{t('role')}</Label>

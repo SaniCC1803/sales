@@ -19,6 +19,8 @@ import CategoryViewPage from './pages/CategoryViewPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import BlogsPage from './pages/BlogsPage';
 import BlogDetailPage from './pages/BlogDetailPage';
+import ActivatePage from './pages/ActivatePage';
+import ConfirmPage from './pages/ConfirmPage';
 
 export default function App() {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -115,6 +117,8 @@ export default function App() {
                 />
                 <Route path="/category/:id" element={<CategoryViewPage />} />
                 <Route path="/product/:id" element={<ProductDetailPage />} />
+                <Route path="/activate" element={<ActivatePage />} />
+                <Route path="/confirm" element={<ConfirmPage />} />
               </Routes>
             </main>
             <Footer 

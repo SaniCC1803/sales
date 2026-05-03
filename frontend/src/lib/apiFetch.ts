@@ -2,7 +2,7 @@ export async function apiFetch<T = any>(path: string, options?: RequestInit): Pr
   const baseUrl = import.meta.env.VITE_API_URL || '';
   const url = path.startsWith('http') ? path : `${baseUrl}${path}`;
   try {
-    const res = await fetch(url, options);
+    const res = await fetch(url, { ...options, credentials: 'include' });
     if (!res.ok) {
       const errorText = await res.text();
       return { data: null, error: errorText || res.statusText };

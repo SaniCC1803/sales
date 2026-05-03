@@ -17,15 +17,12 @@ export default function LoginModal({ onLogin }: { onLogin: () => void }) {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
       if (!res.ok) throw new Error(t('error') || 'Login failed');
-      const data = await res.json();
-      localStorage.setItem('userToken', data.token);
-      if (data.refreshToken) {
-        localStorage.setItem('refreshToken', data.refreshToken);
-      }
+      window.dispatchEvent(new Event('auth-change'));
       onLogin();
     } catch (err: any) {
       setError(err.message || t('error') || 'Login failed');

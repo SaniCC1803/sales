@@ -2,6 +2,12 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
+import { getAccessSecret, getRefreshSecret } from './jwt-secrets';
+
+// Pre-computed valid bcrypt hash used to equalize timing when the email is unknown.
+// Computed once at module load, never matches a real password.
+const BCRYPT_COST = 12;
+const DUMMY_HASH = bcrypt.hashSync('not-a-real-password', BCRYPT_COST);
 
 @Injectable()
 export class AuthService {
@@ -9,23 +15,20 @@ export class AuthService {
 
   async validateUser(email: string, password: string) {
     const user = await this.usersService.findByEmail(email);
-    if (!user || !user.isConfirmed) {
-      throw new UnauthorizedException(
-        'Invalid credentials or email not confirmed',
-      );
-    }
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
+    const hashToCompare = user?.password ?? DUMMY_HASH;
+    const isMatch = await bcrypt.compare(password, hashToCompare);
+
+    if (!user || !user.isConfirmed || !isMatch) {
       throw new UnauthorizedException('Invalid credentials');
     }
+
     const payload = { id: user.id, email: user.email, role: user.role };
-    const secret = process.env.JWT_SECRET || 'changeme';
-    const token = jwt.sign(payload, secret, { expiresIn: '1h' });
+    const token = jwt.sign(payload, getAccessSecret(), { expiresIn: '1h' });
+    const refreshToken = jwt.sign(payload, getRefreshSecret(), { expiresIn: '7d' });
 
-    const refreshSecret = process.env.JWT_REFRESH_SECRET || 'refreshsecret';
-    const refreshToken = jwt.sign(payload, refreshSecret, { expiresIn: '7d' });
-
-    await this.usersService.update(user.id, { refreshToken });
+    await this.usersService.update(user.id, {
+      refreshToken: await bcrypt.hash(refreshToken, BCRYPT_COST),
+    });
 
     return {
       token,
@@ -33,28 +36,61 @@ export class AuthService {
       user: payload,
     };
   }
+
   async refreshToken(refreshToken: string) {
     if (!refreshToken) {
       throw new UnauthorizedException('No refresh token provided');
     }
-    const refreshSecret = process.env.JWT_REFRESH_SECRET || 'refreshsecret';
     type JwtPayload = { email: string; id: number; role: string };
     let payload: JwtPayload;
     try {
-      payload = jwt.verify(refreshToken, refreshSecret) as JwtPayload;
+      payload = jwt.verify(refreshToken, getRefreshSecret()) as JwtPayload;
     } catch {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
-    const user = await this.usersService.findByEmail(payload.email);
-    if (!user || user.refreshToken !== refreshToken) {
+    const user = await this.usersService.findByIdWithSecrets(payload.id);
+    if (!user || !user.refreshToken) {
       throw new UnauthorizedException('Refresh token does not match');
     }
-    const secret = process.env.JWT_SECRET || 'changeme';
-    const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
-      secret,
-      { expiresIn: '1h' },
-    );
-    return { token };
+    const matches = await bcrypt.compare(refreshToken, user.refreshToken);
+    if (!matches) {
+      throw new UnauthorizedException('Refresh token does not match');
+    }
+
+    // Rotate: issue a new refresh token and invalidate the old one.
+    const newPayload = { id: user.id, email: user.email, role: user.role };
+    const token = jwt.sign(newPayload, getAccessSecret(), { expiresIn: '1h' });
+    const newRefreshToken = jwt.sign(newPayload, getRefreshSecret(), {
+      expiresIn: '7d',
+    });
+    await this.usersService.update(user.id, {
+      refreshToken: await bcrypt.hash(newRefreshToken, BCRYPT_COST),
+    });
+
+    return { token, refreshToken: newRefreshToken };
+  }
+
+  async logout(userId: number) {
+    await this.usersService.update(userId, { refreshToken: undefined });
+  }
+
+  async activate(token: string, password: string) {
+    const user = await this.usersService.findByConfirmationToken(token);
+    if (!user) {
+      throw new UnauthorizedException('Invalid or expired confirmation token');
+    }
+    if (
+      user.confirmationTokenExpiresAt &&
+      user.confirmationTokenExpiresAt.getTime() < Date.now()
+    ) {
+      throw new UnauthorizedException('Confirmation token has expired');
+    }
+    const hashedPassword = await bcrypt.hash(password, BCRYPT_COST);
+    await this.usersService.updateRaw(user.id, {
+      password: hashedPassword,
+      isConfirmed: true,
+      confirmationToken: undefined,
+      confirmationTokenExpiresAt: null,
+    });
   }
 }

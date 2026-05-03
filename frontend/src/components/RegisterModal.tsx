@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { fetchWithAuth } from '@/lib/fetchWithAuth';
 
 export default function RegisterModal({ onRegistered }: { onRegistered: () => void }) {
   const [email, setEmail] = useState('');
@@ -15,7 +14,7 @@ export default function RegisterModal({ onRegistered }: { onRegistered: () => vo
     setLoading(true);
     setError('');
     try {
-      const res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/users`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/users/bootstrap`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, role: 'SUPERADMIN' }),

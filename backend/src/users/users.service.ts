@@ -21,6 +21,10 @@ export class UsersService {
     });
   }
 
+  async count() {
+    return this.userRepo.count();
+  }
+
   findOne(id: number) {
     return this.userRepo.findOne({
       where: { id },
@@ -30,12 +34,17 @@ export class UsersService {
 
   async create(data: CreateUserDto) {
     const confirmationToken = generateConfirmationToken();
-    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const confirmationTokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const requiresPasswordSetup = !data.password;
+    const hashedPassword = data.password
+      ? await bcrypt.hash(data.password, 12)
+      : undefined;
     const entity = this.userRepo.create({
       ...data,
       password: hashedPassword,
       isConfirmed: false,
       confirmationToken,
+      confirmationTokenExpiresAt,
     });
     const saved = await this.userRepo.save(entity);
     let appName = 'Your Application';
@@ -54,7 +63,7 @@ export class UsersService {
       confirmationToken,
       appName,
       contactEmail,
-      data.password // Pass plain password for email
+      requiresPasswordSetup,
     );
     return saved;
   }
@@ -67,10 +76,15 @@ export class UsersService {
     return this.userRepo.findOne({ where: { email } });
   }
 
+  async findByIdWithSecrets(id: number) {
+    return this.userRepo.findOne({ where: { id } });
+  }
+
   async confirmUser(id: number) {
     await this.userRepo.update(id, {
       isConfirmed: true,
       confirmationToken: undefined,
+      confirmationTokenExpiresAt: null,
     });
     return this.findOne(id);
   }
@@ -78,8 +92,14 @@ export class UsersService {
   async update(id: number, data: Partial<User>) {
     // If password is being updated, hash it first
     if (data.password) {
-      data.password = await bcrypt.hash(data.password, 10);
+      data.password = await bcrypt.hash(data.password, 12);
     }
+    await this.userRepo.update(id, data);
+    return this.findOne(id);
+  }
+
+  // Bypasses password hashing — caller is responsible for already-hashed values.
+  async updateRaw(id: number, data: Partial<User>) {
     await this.userRepo.update(id, data);
     return this.findOne(id);
   }
