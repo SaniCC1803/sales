@@ -27,6 +27,7 @@ export type ApplicationFormValues = {
     name: string;
     description?: string;
   }[];
+  contactEmail: string;
   logo: File | null;
   carousel: (string | File)[]; // URLs or Files;
 };
@@ -161,7 +162,6 @@ export default function ApplicationForm({
             {...field}
             type="email"
             placeholder={t('contactEmail', 'Contact Email')}
-            value={field.value ?? (editApplication?.contactEmail || '')}
           />
         )}
       />
@@ -251,6 +251,7 @@ function getDefaultValues(editApplication: Application | null | undefined): Appl
           description: existing?.description || '',
         };
       }),
+      contactEmail: editApplication.contactEmail || '',
       logo: null,
       carousel: Array.isArray(editApplication.carousel) ? editApplication.carousel : [],
     };
@@ -262,6 +263,7 @@ function getDefaultValues(editApplication: Application | null | undefined): Appl
       name: '',
       description: '',
     })),
+    contactEmail: '',
     logo: null,
     carousel: [],
   };
