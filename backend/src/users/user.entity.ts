@@ -31,6 +31,6 @@ export class User {
   @Column({ type: 'datetime', nullable: true })
   confirmationTokenExpiresAt?: Date | null;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   refreshToken?: string | null;
 }
