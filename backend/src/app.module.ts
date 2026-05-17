@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
 import { UsersModule } from './users/users.module';
 import { ApplicationsModule } from './applications/applications.module';
 import { CategoriesModule } from './categories/categories.module';
@@ -21,17 +19,7 @@ import { ContactMessage } from './contact.entity';
 import { ContactModule } from './contact.module';
 
 @Module({
-  providers: [
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
-  ],
   imports: [
-    ThrottlerModule.forRoot([
-      { name: 'default', ttl: 60_000, limit: 60 },
-      { name: 'auth', ttl: 60_000, limit: 5 },
-    ]),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: process.env.DB_HOST ?? 'localhost',
