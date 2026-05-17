@@ -195,8 +195,11 @@ export default function CardComponent({ item, onDelete, onEdit, onPromote, curre
                   <Edit3 className="h-4 w-4" />
                 </Button>
               )}
-              {/* Only show delete for superadmin, not for self */}
-              {isUser(item) && currentUser?.role === 'SUPERADMIN' && currentUser.id !== item.id && (
+              {/* Delete button: any admin can delete non-user items; for users, only
+                  a superadmin can delete (and not themselves). */}
+              {(isUser(item)
+                ? currentUser?.role === 'SUPERADMIN' && currentUser.id !== item.id
+                : true) && (
                 <Button
                   className="bg-primary text-primary-foreground"
                   onClick={() => onDelete?.(item.id)}
