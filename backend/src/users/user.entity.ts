@@ -32,5 +32,5 @@ export class User {
   confirmationTokenExpiresAt?: Date | null;
 
   @Column({ nullable: true })
-  refreshToken?: string;
+  refreshToken?: string | null;
 }

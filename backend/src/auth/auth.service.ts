@@ -71,7 +71,9 @@ export class AuthService {
   }
 
   async logout(userId: number) {
-    await this.usersService.update(userId, { refreshToken: undefined });
+    // null (not undefined) - TypeORM treats undefined as "leave the column alone",
+    // which would result in an empty update payload and a crash.
+    await this.usersService.update(userId, { refreshToken: null });
   }
 
   async activate(token: string, password: string) {
