@@ -10,7 +10,7 @@ import {
   HttpCode,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Throttle } from '@nestjs/throttler';
+import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -96,6 +96,9 @@ export class AuthController {
     return { ok: true };
   }
 
+  // /auth/me is called on every page load - the global 'auth' throttler (5/min)
+  // is meant for brute-forceable endpoints like login, not session checks.
+  @SkipThrottle({ auth: true })
   @UseGuards(JwtAuthGuard)
   @Get('me')
   me(@Req() req: Request) {
@@ -103,6 +106,7 @@ export class AuthController {
     return { id: user.id, email: user.email, role: user.role };
   }
 
+  @SkipThrottle({ auth: true })
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   @HttpCode(204)
