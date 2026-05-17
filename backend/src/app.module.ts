@@ -34,11 +34,11 @@ import { ContactModule } from './contact.module';
     ]),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'sani',
-      password: 'sani123',
-      database: 'ecom',
+      host: process.env.DB_HOST ?? 'localhost',
+      port: parseInt(process.env.DB_PORT ?? '3306', 10),
+      username: process.env.DB_USER ?? 'sani',
+      password: process.env.DB_PASSWORD ?? 'sani123',
+      database: process.env.DB_NAME ?? 'ecom',
       entities: [
         User,
         Application,
