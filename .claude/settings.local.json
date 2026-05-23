@@ -8,7 +8,16 @@
       "Read(//tmp/**)",
       "Bash(npx shadcn@latest add spinner --yes)",
       "Bash(npx shadcn@latest add aspect-ratio --yes)",
-      "PowerShell(npm install *)"
+      "PowerShell(npm install *)",
+      "Bash(npx tsc *)",
+      "Bash(docker compose up *)",
+      "Bash(echo \"Exit: $?\")",
+      "Bash(docker compose *)",
+      "Bash(curl -sS -o /dev/null -w \"frontend: HTTP %{http_code}\\\\n\" http://localhost:8080/)",
+      "Bash(curl -sS -o /dev/null -w \"backend root: HTTP %{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(curl -sS http://localhost:3000/test-tebug)",
+      "Bash(curl -sS http://localhost:3000/applications)",
+      "Bash(curl -sS http://localhost:3000/products)"
     ]
   }
 }
