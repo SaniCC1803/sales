@@ -10,8 +10,8 @@ i18n.use(initReactI18next).init({
     en: { translation: enTranslation },
     mk: { translation: mkTranslation },
   },
-  lng: storedLang === 'en' || storedLang === 'mk' ? storedLang : 'en',
-  fallbackLng: 'en',
+  lng: storedLang === 'en' || storedLang === 'mk' ? storedLang : 'mk',
+  fallbackLng: 'mk',
   interpolation: { escapeValue: false },
 });
 

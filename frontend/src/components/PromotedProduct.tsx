@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { useLanguage } from "@/context/LanguageContext";
 import type { Product } from "@/types/product";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,8 +11,13 @@ interface PromotedProductProps {
 
 const PromotedProduct: React.FC<PromotedProductProps> = ({ product }) => {
   const { t } = useTranslation();
+  const { language } = useLanguage();
 
   if (!product.images?.[0]) return null;
+
+  const name =
+    product.translations.find((tr) => tr.language === language)?.name ||
+    product.translations[0]?.name;
 
   return (
     <div className="w-full mb-8">
@@ -21,7 +27,7 @@ const PromotedProduct: React.FC<PromotedProductProps> = ({ product }) => {
             <div className="relative w-full">
               <img
                 src={product.images[0]}
-                alt={product.translations[0]?.name || "Promoted Product"}
+                alt={name || "Promoted Product"}
                 className="w-full h-80 object-cover transition-transform duration-300 group-hover:scale-105"
               />
 
@@ -32,7 +38,7 @@ const PromotedProduct: React.FC<PromotedProductProps> = ({ product }) => {
 
               {/* Product Name Overlay */}
               <div className="absolute bottom-4 left-4 bg-black/60 text-white px-4 py-2 rounded-lg text-xl font-semibold backdrop-blur-sm">
-                {product.translations[0]?.name}
+                {name}
               </div>
             </div>
           </CardContent>
