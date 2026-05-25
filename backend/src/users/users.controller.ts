@@ -34,8 +34,7 @@ export class UsersController {
     return { exists: count > 0 };
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.SUPERADMIN)
+  @UseGuards(JwtAuthGuard)
   @Get()
   async getAll() {
     return await this.usersService.findAll();

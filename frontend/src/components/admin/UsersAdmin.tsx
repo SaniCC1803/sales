@@ -99,7 +99,7 @@ export default function UsersAdmin() {
   return (
     <>
       <PageHeader
-        title={t('categories')}
+        title={t('users')}
         onAdd={() => {
           setEditingUser(null);
           setCreateDrawerOpen(true);

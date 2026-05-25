@@ -107,5 +107,12 @@
   "cancel": "Cancel",
   "thisItem": "this item",
   "confirmDelete": "Are you sure you want to delete",
-  "actionCannotBeUndone": "This action cannot be undone."
+  "actionCannotBeUndone": "This action cannot be undone.",
+  "contactEmail": "Contact Email",
+  "contentRequired": "Content is required",
+  "excerptRequired": "Excerpt is required",
+  "loading": "Loading...",
+  "priceInvalid": "Please enter a valid price (numbers only)",
+  "titleRequired": "Title is required",
+  "unknownAuthor": "Unknown author"
 }
