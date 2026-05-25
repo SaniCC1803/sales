@@ -61,9 +61,7 @@ import { CategoriesService } from './categories/categories.service';
 import { CreateCategoryDto } from './categories/categories.dto';
 import { Category } from './categories/category.entity';
 import { CategoryTranslation } from './categories/category-translations.entity';
-// import { User, Role } from './users/user.entity';
-// import { CreateUserDto } from './users/users.dto';
-// import { UsersService } from './users/users.service';
+import { CreateUserDto } from './users/users.dto';
 import { Application } from './applications/application.entity';
 import { CreateApplicationDto } from './applications/applications.dto';
 import { ApplicationsService } from './applications/applications.service';
@@ -78,35 +76,32 @@ import { UsersService } from './users/users.service';
 import { ContactMessage } from './contact.entity';
 import { Language } from './shared-types';
 
-// async function seedUsers() {
-//   const app = await NestFactory.createApplicationContext(AppModule);
-//   const dataSource = app.get(DataSource);
+async function seedUsers() {
+  const app = await NestFactory.createApplicationContext(AppModule);
+  const userService = app.get(UsersService);
 
-//   const userRepo = dataSource.getRepository(User);
-//   const userService = app.get(UsersService);
+  const superAdminDtos: CreateUserDto[] = [
+    {
+      email: 'a.gj.sani@gmail.com',
+      password: 'sani$123',
+      role: Role.SUPERADMIN,
+    },
+    {
+      email: 'kistmebel.mk@gmail.com',
+      password: 'kire$123',
+      role: Role.SUPERADMIN,
+    },
+  ];
 
-//   // --- CLEAR EXISTING DATA ---
-//   await userRepo.createQueryBuilder().delete().execute();
-//   console.log('Database cleared ✅');
+  for (const dto of superAdminDtos) {
+    const user = await userService.create(dto);
+    // Skip the email-confirmation step so the seeded account can log in immediately.
+    await userService.confirmUser(user.id);
+  }
 
-//   // ---- Users Category ----
-//   const userDto1: CreateUserDto = {
-//     email: 'a.gj.sani@gmail.com',
-//     password: 'sani$123',
-//     role: Role.SUPERADMIN,
-//   };
-//   await userService.create(userDto1);
-
-//   const userDto2: CreateUserDto = {
-//     email: 'sani@codechem.com',
-//     password: 'sani$123',
-//     role: Role.USER,
-//   };
-//   await userService.create(userDto2);
-
-//   console.log('Users seeded ✅');
-//   await app.close();
-// }
+  console.log('Users seeded ✅');
+  await app.close();
+}
 
 async function seedApplication() {
   const app = await NestFactory.createApplicationContext(AppModule);
@@ -458,16 +453,12 @@ async function seedBlogs() {
   await blogRepo.createQueryBuilder().delete().execute();
   console.log('Blog database cleared ✅');
 
-  // Get the first user to be the author (create one if none exists)
-  let author = await userRepo.findOne({ where: {} });
+  // seedUsers runs before this and creates the superadmin accounts; we just look one up.
+  const author = await userRepo.findOne({
+    where: { email: 'a.gj.sani@gmail.com' },
+  });
   if (!author) {
-    const userService = app.get(UsersService);
-    author = await userService.create({
-      email: 'a.gj.sani@gmail.com',
-      password: 'sani$123',
-      role: Role.SUPERADMIN,
-    });
-    await userService.confirmUser(author.id);
+    throw new Error('Blog author not found - run seedUsers before seedBlogs.');
   }
 
   // Blog 1: Welcome Post
@@ -726,7 +717,7 @@ async function seedAll() {
     await app.close();
 
     // Now run the actual seeders
-    // await seedUsers();
+    await seedUsers();
     await seedApplication();
     await seedCategories();
     await seedProducts();
