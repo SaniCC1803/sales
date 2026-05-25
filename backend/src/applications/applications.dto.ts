@@ -18,6 +18,10 @@ export class CreateApplicationTranslationDto {
 
   @IsOptional()
   description?: string;
+
+  @IsOptional()
+  @IsString()
+  aboutUs?: string;
 }
 
 export class CreateApplicationDto {

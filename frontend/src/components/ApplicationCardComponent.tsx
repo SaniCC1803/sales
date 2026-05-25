@@ -105,6 +105,18 @@ export default function ApplicationCardComponent({
           </div>
         </div>
 
+        <div className="border-t pt-8">
+          <label className="text-sm font-bold text-primary mb-3 block uppercase tracking-wide">
+            {t('aboutUs')}
+          </label>
+          <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">
+            {application.translations.find((t) => t.language === currentLanguage)?.aboutUs ||
+              application.translations.find((t) => t.language === 'en')?.aboutUs ||
+              application.translations[0]?.aboutUs ||
+              '—'}
+          </p>
+        </div>
+
         {/* Carousel Images Section */}
         {application.carousel && application.carousel.length > 0 && (
           <div className="mt-8">

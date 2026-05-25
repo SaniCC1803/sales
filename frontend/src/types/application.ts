@@ -4,6 +4,7 @@ export interface ApplicationTranslation {
   language: Language;
   name: string;
   description: string;
+  aboutUs?: string;
 }
 
 export interface Application {

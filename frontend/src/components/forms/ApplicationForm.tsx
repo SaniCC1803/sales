@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
 
 import SingleImageUpload from '@/components/SingleImageUpload';
 import MultiImageDropzone from '@/components/MultiImageDropzone';
@@ -26,6 +27,7 @@ export type ApplicationFormValues = {
     language: Language;
     name: string;
     description?: string;
+    aboutUs?: string;
   }[];
   contactEmail: string;
   logo: File | null;
@@ -151,6 +153,21 @@ export default function ApplicationForm({
 
       <Separator />
 
+      {/* ---------- ABOUT US ---------- */}
+      <Label>{t('aboutUs')}</Label>
+      {LANGUAGES.map((lang, idx) => (
+        <Controller
+          key={lang}
+          name={`translations.${idx}.aboutUs` as const}
+          control={control}
+          render={({ field }) => (
+            <Textarea {...field} value={field.value ?? ''} placeholder={lang.toUpperCase()} rows={5} />
+          )}
+        />
+      ))}
+
+      <Separator />
+
       {/* ---------- CONTACT EMAIL ---------- */}
       <Label>{t('contactEmail', 'Contact Email')}</Label>
       <Controller
@@ -249,6 +266,7 @@ function getDefaultValues(editApplication: Application | null | undefined): Appl
           language: lang,
           name: existing?.name || '',
           description: existing?.description || '',
+          aboutUs: existing?.aboutUs || '',
         };
       }),
       contactEmail: editApplication.contactEmail || '',
@@ -262,6 +280,7 @@ function getDefaultValues(editApplication: Application | null | undefined): Appl
       language: lang,
       name: '',
       description: '',
+      aboutUs: '',
     })),
     contactEmail: '',
     logo: null,

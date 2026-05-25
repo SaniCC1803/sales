@@ -102,7 +102,7 @@ export default function BlogForm({
       let res: Response;
       if (editBlog) {
         res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/blogs/${editBlog.id}`, {
-          method: 'PATCH',
+          method: 'PUT',
           body: formData,
         });
       } else {

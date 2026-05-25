@@ -123,11 +123,15 @@ async function seedApplication() {
         language: Language.EN,
         name: 'Furniture Application',
         description: 'Welcome to furniture application',
+        aboutUs:
+          'We are a family-owned furniture business with decades of experience crafting quality pieces for homes and offices. From ergonomic chairs to elegant dining tables, every item in our catalog is hand-picked for comfort, durability, and timeless design.\n\nOur mission is simple: bring beautiful, well-made furniture to people who care about the spaces they live and work in. We work directly with trusted suppliers and stand behind everything we sell.\n\nThanks for stopping by — feel free to reach out if you have any questions.',
       },
       {
         language: Language.MK,
         name: 'Мебел Апликација',
         description: 'Добредојдовте во мебел апликацијата',
+        aboutUs:
+          'Ние сме семеен бизнис за мебел со децении искуство во изработка на квалитетни парчиња за домови и канцеларии. Од ергономски столици до елегантни трпезариски маси, секој производ во нашиот каталог е внимателно избран за удобност, издржливост и безвременски дизајн.\n\nНашата мисија е едноставна: да донесеме убав и квалитетен мебел до луѓето кои се грижат за просторите во кои живеат и работат. Соработуваме директно со доверливи добавувачи и стоиме зад сè што продаваме.\n\nВи благодариме што нè посетивте — слободно контактирајте нè доколку имате прашања.',
       },
     ],
     carousel: [

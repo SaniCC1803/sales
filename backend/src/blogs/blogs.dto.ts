@@ -55,8 +55,8 @@ export class UpdateBlogDto {
   slug?: string;
 
   @IsString()
-  @IsNotEmpty()
-  featuredImage!: string;
+  @IsOptional()
+  featuredImage?: string;
 
   @IsEnum(BlogStatus)
   @IsOptional()

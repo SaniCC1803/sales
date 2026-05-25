@@ -35,6 +35,7 @@ export class ApplicationsService {
           translation.language = t.language;
           translation.name = t.name;
           translation.description = t.description ?? '';
+          translation.aboutUs = t.aboutUs;
           return translation;
         },
       ),
@@ -72,6 +73,7 @@ export class ApplicationsService {
           translation.language = t.language;
           translation.name = t.name;
           translation.description = t.description ?? '';
+          translation.aboutUs = t.aboutUs;
           return translation;
         },
       );

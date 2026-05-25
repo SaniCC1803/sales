@@ -18,6 +18,9 @@ export class ApplicationTranslation {
   @Column()
   description!: string;
 
+  @Column({ type: 'text', nullable: true })
+  aboutUs?: string;
+
   @ManyToOne(() => Application, (application) => application.translations, {
     onDelete: 'CASCADE',
   })
