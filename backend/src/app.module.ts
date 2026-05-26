@@ -17,6 +17,7 @@ import { ProductTranslation } from './products/product-translations.entity';
 import { BlogTranslation } from './blogs/blog-translations.entity';
 import { ContactMessage } from './contact.entity';
 import { ContactModule } from './contact.module';
+import { OgModule } from './og/og.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { ContactModule } from './contact.module';
     BlogsModule,
     AuthModule,
     ContactModule,
+    OgModule,
   ],
 })
 export class AppModule {}

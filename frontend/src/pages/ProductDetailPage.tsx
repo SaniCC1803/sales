@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Facebook } from "lucide-react";
 
 import ImageGallery from "@/components/ImageGallery";
 
@@ -79,6 +81,10 @@ const ProductDetailPage: React.FC = () => {
   const productTranslation = product.translations.find(t => t.language === language) || product.translations[0];
   const productName = productTranslation?.name ?? "Product";
   const productDescription = productTranslation?.description ?? "";
+
+  // Share the canonical product URL. Facebook scrapes it server-side (see the
+  // backend /product/:id OG route) to pull the title and image into the preview.
+  const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
 
   return (
     <div className="container mx-auto px-6 py-12 space-y-6">
@@ -144,6 +150,20 @@ const ProductDetailPage: React.FC = () => {
           <div className="text-xs text-muted-foreground">
             {t('productId', 'Product ID')}: {product.id}
           </div>
+
+          <Button
+            asChild
+            className="bg-[#1877F2] text-white hover:bg-[#166fe0]"
+          >
+            <a
+              href={facebookShareUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Facebook className="size-4" />
+              {t('shareOnFacebook', 'Share on Facebook')}
+            </a>
+          </Button>
         </CardContent>
       </Card>
 
