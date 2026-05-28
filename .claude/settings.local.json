@@ -29,7 +29,8 @@
       "Bash(curl -s http://localhost:3000/products)",
       "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\).on\\('end',\\(\\)=>{try{const p=JSON.parse\\(d\\);console.log\\('count:',p.length\\);console.log\\(p.slice\\(0,5\\).map\\(x=>\\({id:x.id,name:x.translations?.find\\(t=>t.language==='en'\\)?.name||x.translations?.[0]?.name,img:x.images?.[0]}\\)\\)\\)}catch\\(e\\){console.log\\('raw:',d.slice\\(0,300\\)\\)}}\\)\")",
       "Bash(curl *)",
-      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\).on\\('end',\\(\\)=>{try{const p=JSON.parse\\(d\\);console.log\\('VPS product IDs:',p.map\\(x=>x.id\\).join\\(', '\\)\\)}catch\\(e\\){console.log\\('raw:',d.slice\\(0,200\\)\\)}}\\)\")"
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\).on\\('end',\\(\\)=>{try{const p=JSON.parse\\(d\\);console.log\\('VPS product IDs:',p.map\\(x=>x.id\\).join\\(', '\\)\\)}catch\\(e\\){console.log\\('raw:',d.slice\\(0,200\\)\\)}}\\)\")",
+      "Bash(xargs -I {} grep -l \"max-h\\\\|overflow\\\\|scroll\" {})"
     ]
   }
 }
