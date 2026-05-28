@@ -38,6 +38,7 @@ export default function Header({ application }: HeaderProps) {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const [userEmail, setUserEmail] = useState<string>('Unknown');
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     const refresh = () => fetchMyEmail().then(setUserEmail);
@@ -48,9 +49,23 @@ export default function Header({ application }: HeaderProps) {
     };
   }, []);
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
     <>
-      <header className="bg-background text-foreground sticky top-0 z-50 h-28">
+      <header
+        className="text-foreground sticky top-0 z-50 h-28 backdrop-blur-md transition-colors duration-200"
+        style={{
+          backgroundColor: scrolled
+            ? 'color-mix(in oklch, var(--background) 75%, transparent)'
+            : 'var(--background)',
+        }}
+      >
         <div className="w-full max-w-screen-2xl mx-auto px-6 h-full flex items-center justify-between relative">
         <Link to="/">
           <img

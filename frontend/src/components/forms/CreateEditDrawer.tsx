@@ -70,7 +70,7 @@ export default function CreateEditDrawer({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="flex flex-col w-full max-w-none sm:max-w-none md:w-[400px] md:max-w-md bg-background z-[100]">
+      <SheetContent className="flex flex-col w-full max-w-none sm:max-w-none md:w-[480px] md:max-w-lg bg-background z-[100]">
         <SheetHeader>
           <SheetTitle>{title}</SheetTitle>
         </SheetHeader>
