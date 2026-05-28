@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { getImageUrl } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { CardDescription, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { Plus } from 'lucide-react';
 import type { Application } from '@/types/application';
 
@@ -47,7 +48,7 @@ export default function ApplicationCardComponent({
     <div className="bg-card border rounded-xl p-8 shadow-sm">
       <div className="space-y-8">
         <div className="flex justify-between items-start">
-          <h2 className="text-3xl font-bold text-foreground">{t('applicationInformation')}</h2>
+          <h1 className="text-3xl font-bold text-foreground">{t('applicationInformation')}</h1>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -79,6 +80,8 @@ export default function ApplicationCardComponent({
               </p>
             </div>
 
+            <Separator />
+
             <div>
               <label className="text-sm font-bold text-primary mb-3 block uppercase tracking-wide">
                 {t('description')}
@@ -91,6 +94,8 @@ export default function ApplicationCardComponent({
                   'No description provided'}
               </p>
             </div>
+
+            <Separator />
 
             <div>
               <label className="text-sm font-bold text-primary mb-3 block uppercase tracking-wide">

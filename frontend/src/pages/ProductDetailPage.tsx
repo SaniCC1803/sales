@@ -147,10 +147,6 @@ const ProductDetailPage: React.FC = () => {
             {productDescription}
           </p>
 
-          <div className="text-xs text-muted-foreground">
-            {t('productId', 'Product ID')}: {product.id}
-          </div>
-
           <Button
             asChild
             className="bg-[#1877F2] text-white hover:bg-[#166fe0]"

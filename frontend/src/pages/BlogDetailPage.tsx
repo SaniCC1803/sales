@@ -5,7 +5,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useTranslation } from 'react-i18next';
 import type { Blog } from '@/types/blog';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Facebook } from 'lucide-react';
 import { getImageUrl } from '@/lib/utils';
 
 export default function BlogDetailPage() {
@@ -76,6 +76,7 @@ export default function BlogDetailPage() {
   }
 
   const translation = getBlogTranslation(blog);
+  const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -121,6 +122,16 @@ export default function BlogDetailPage() {
           className="prose prose-lg max-w-none dark:prose-invert"
           dangerouslySetInnerHTML={{ __html: translation.content }}
         />
+
+        <Button
+          asChild
+          className="mt-8 bg-[#1877F2] text-white hover:bg-[#166fe0]"
+        >
+          <a href={facebookShareUrl} target="_blank" rel="noopener noreferrer">
+            <Facebook className="size-4" />
+            {t('shareOnFacebook', 'Share on Facebook')}
+          </a>
+        </Button>
       </article>
     </div>
   );
