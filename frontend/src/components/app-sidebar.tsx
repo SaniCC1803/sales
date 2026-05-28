@@ -8,6 +8,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import { useTranslation } from 'react-i18next';
 
@@ -21,6 +22,7 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 export function AppSidebar({ onSectionChange, ...props }: AppSidebarProps) {
   const { t } = useTranslation();
   const location = useLocation();
+  const { isMobile, setOpenMobile } = useSidebar();
 
   const navItems = [
     { title: 'users', value: 'users', path: '/admin/users' },
@@ -33,10 +35,10 @@ export function AppSidebar({ onSectionChange, ...props }: AppSidebarProps) {
 
   return (
     <Sidebar className="relative" {...props}>
-      <SidebarContent>
+      <SidebarContent className="px-3 py-4">
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="gap-1">
               {navItems.map((item) => {
                 const isActive = location.pathname === item.path;
                 return (
@@ -53,7 +55,7 @@ export function AppSidebar({ onSectionChange, ...props }: AppSidebarProps) {
                       <Link
                         to={item.path}
                         className="w-full text-left"
-                        onClick={() =>
+                        onClick={() => {
                           onSectionChange(
                             item.value as
                               | 'categories'
@@ -62,8 +64,9 @@ export function AppSidebar({ onSectionChange, ...props }: AppSidebarProps) {
                               | 'users'
                               | 'blogs'
                               | 'contacts'
-                          )
-                        }
+                          );
+                          if (isMobile) setOpenMobile(false);
+                        }}
                       >
                         {t(item.title)}
                       </Link>

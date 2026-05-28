@@ -98,7 +98,7 @@ export default function CardComponent({ item, onDelete, onEdit, onPromote, curre
   return (
     <Card
       key={item.id}
-      className={`overflow-hidden bg-background flex flex-col h-full ${isUser(item) ? 'min-h-[180px] text-center' : 'min-h-[320px] text-left'} text-sm text-muted-foreground transition-transform duration-300 hover:scale-105`}
+      className={`overflow-hidden bg-background flex flex-col h-full ${isUser(item) ? 'min-h-[180px] text-center' : 'min-h-[320px] text-left'} text-sm text-muted-foreground transition-transform duration-300 md:hover:scale-105`}
     >
       {/* Image */}
       {isUser(item) ? (
@@ -168,8 +168,7 @@ export default function CardComponent({ item, onDelete, onEdit, onPromote, curre
                 <Button
                   size="sm"
                   variant={item.promoted ? 'secondary' : 'outline'}
-                  className="mb-2"
-                  disabled={item.promoted}
+                  className={`mb-2 ${item.promoted ? 'border-2 border-yellow-400' : ''}`}
                   onClick={async (e) => {
                     e.stopPropagation();
                     if (onPromote) {
@@ -177,7 +176,7 @@ export default function CardComponent({ item, onDelete, onEdit, onPromote, curre
                     }
                   }}
                 >
-                  {item.promoted ? t('promoted', 'Promoted') : t('promote', 'Promote')}
+                  {item.promoted ? t('unpromote', 'Unpromote') : t('promote', 'Promote')}
                 </Button>
               </>
             )}

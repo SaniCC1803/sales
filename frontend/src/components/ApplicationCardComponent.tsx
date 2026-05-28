@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { getImageUrl } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { CardDescription, CardTitle } from '@/components/ui/card';
-import { Edit3, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import type { Application } from '@/types/application';
 
 type ApplicationCardProps = {
@@ -48,10 +48,6 @@ export default function ApplicationCardComponent({
       <div className="space-y-8">
         <div className="flex justify-between items-start">
           <h2 className="text-3xl font-bold text-foreground">{t('applicationInformation')}</h2>
-          <Button onClick={onEdit} variant="outline" size="lg">
-            <Edit3 className="h-4 w-4 mr-2" />
-            {t('edit')}
-          </Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

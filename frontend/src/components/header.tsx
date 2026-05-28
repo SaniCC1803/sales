@@ -50,12 +50,13 @@ export default function Header({ application }: HeaderProps) {
 
   return (
     <>
-      <header className="bg-background text-foreground sticky top-0 z-50 px-6 h-20 flex items-center justify-between relative">
+      <header className="bg-background text-foreground sticky top-0 z-50 h-28">
+        <div className="w-full max-w-screen-2xl mx-auto px-6 h-full flex items-center justify-between relative">
         <Link to="/">
           <img
             src={getImageUrl(application.logo)}
             alt={`${application.translations.find((t) => t.language === language)?.name} logo`}
-            className="h-8 w-auto object-contain cursor-pointer"
+            className="h-16 w-auto object-contain cursor-pointer"
           />
         </Link>
 
@@ -69,6 +70,7 @@ export default function Header({ application }: HeaderProps) {
             >
               {t('blogs')}
             </Link>
+            <span className="h-5 w-px bg-border" aria-hidden="true" />
             <Link
               to="/contact"
               className="text-foreground hover:text-foreground"
@@ -76,6 +78,7 @@ export default function Header({ application }: HeaderProps) {
             >
               {t('contactUs')}
             </Link>
+            <span className="h-5 w-px bg-border" aria-hidden="true" />
             <Link
               to="/about-us"
               className="text-foreground hover:text-foreground"
@@ -139,6 +142,7 @@ export default function Header({ application }: HeaderProps) {
             </nav>
           </div>
         )}
+        </div>
       </header>
       <CategoryNav />
     </>

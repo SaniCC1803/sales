@@ -123,10 +123,14 @@ export class ProductsService {
   }
 
   async setPromoted(id: number) {
-    // Unset all promoted products
-    await this.productRepo.update({ promoted: true }, { promoted: false });
-    // Set the selected product as promoted
-    await this.productRepo.update({ id }, { promoted: true });
+    const product = await this.productRepo.findOne({ where: { id } });
+    if (!product) return null;
+    if (product.promoted) {
+      await this.productRepo.update({ id }, { promoted: false });
+    } else {
+      await this.productRepo.update({ promoted: true }, { promoted: false });
+      await this.productRepo.update({ id }, { promoted: true });
+    }
     return this.productRepo.findOne({ where: { id } });
   }
   

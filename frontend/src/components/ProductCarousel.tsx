@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { getImageUrl } from '@/lib/utils';
 
 type ProductCarouselProps = {
   images: string[];
@@ -18,11 +19,11 @@ export default function ProductCarousel({ images }: ProductCarouselProps) {
   if (!images || images.length === 0) return null;
 
   return (
-    <div className="relative w-full h-80 md:h-[32rem] flex items-center justify-center overflow-hidden bg-neutral-200">
+    <div className="relative w-screen left-1/2 -translate-x-1/2 h-80 md:h-[32rem] flex items-center justify-center overflow-hidden bg-neutral-200">
       {images.map((img, i) => (
         <img
           key={img}
-          src={img}
+          src={getImageUrl(img)}
           alt={`Promotional ${i + 1}`}
           className={`absolute w-full h-full object-cover transition-opacity duration-700 ${i === index ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
           style={{ pointerEvents: i === index ? 'auto' : 'none' }}

@@ -60,6 +60,7 @@ export default function App() {
           <div className="flex flex-col w-full">
             <Header application={applications[0]} />
             <main className="flex-grow bg-muted text-background-foreground">
+              <div className="w-full max-w-screen-2xl mx-auto">
               <Routes>
                 <Route path="/" element={<HomePage application={applications[0]} />} />
                 <Route path="/about-us" element={<AboutPage />} />
@@ -120,6 +121,7 @@ export default function App() {
                 <Route path="/activate" element={<ActivatePage />} />
                 <Route path="/confirm" element={<ConfirmPage />} />
               </Routes>
+              </div>
             </main>
             <Footer 
               availableLanguages={applications[0].languages}

@@ -222,7 +222,7 @@ export default function ApplicationForm({
                       />
                       <Button
                         type="button"
-                        variant="destructive"
+                        variant="secondary"
                         size="icon"
                         className="absolute top-0 right-0"
                         onClick={() => {

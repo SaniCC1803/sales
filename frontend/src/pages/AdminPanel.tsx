@@ -53,7 +53,7 @@ export default function Page() {
 
   return (
     <SidebarProvider>
-        <AppSidebar onSectionChange={setActiveSection} className="h-screen fixed left-0 top-24 z-30" />
+        <AppSidebar onSectionChange={setActiveSection} className="fixed left-[max(0px,calc((100vw-1536px)/2))] top-28 bottom-12 h-auto z-30" />
         <SidebarInset className="bg-muted text-muted-foreground min-h-screen">
           <section className="flex flex-col container mx-auto px-6 py-6 gap-6">{renderActiveSection()}</section>
       </SidebarInset>

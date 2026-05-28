@@ -5,9 +5,12 @@ import CreateEditDrawer from '@/components/forms/CreateEditDrawer';
 import ImageGallery from '@/components/ImageGallery';
 import type { Application } from '@/types/application';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
+import { PageHeader } from './pageParts/PageHeader';
 
 export default function ApplicationsAdmin() {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [application, setApplication] = useState<Application | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [editingApplication, setEditingApplication] = useState<boolean>(false);
@@ -74,6 +77,11 @@ export default function ApplicationsAdmin() {
 
   return (
     <>
+      <PageHeader
+        title={t('application')}
+        onEdit={application ? handleApplicationEdit : undefined}
+      />
+
       <div className="w-full">
         <ApplicationCardComponent
           application={application}

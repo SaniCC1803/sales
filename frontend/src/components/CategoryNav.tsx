@@ -41,27 +41,29 @@ export default function CategoryNav() {
 
   return (
     <nav
-      className="w-full overflow-x-auto whitespace-nowrap bg-primary text-primary-foreground border-b-2 border-[color:var(--background)] py-2 px-8 flex justify-between items-center"
+      className="w-full bg-primary text-primary-foreground border-b-2 border-[color:var(--background)]"
       style={{ minHeight: '2.5rem', borderBottomColor: 'var(--background)' }}
     >
-      {navItems.map((item, idx) => (
-        <React.Fragment key={item.id}>
-          <Link
-            to={item.to}
-            className={
-              item.isMain
-                ? 'font-medium hover:underline px-2'
-                : 'text-muted-foreground hover:underline px-2'
-            }
-            style={{ color: 'inherit' }}
-          >
-            {item.name}
-          </Link>
-          {idx < navItems.length - 1 && (
-            <span className="border-r-2" style={{ borderColor: 'var(--background)', height: '2rem', margin: '0 1rem' }} />
-          )}
-        </React.Fragment>
-      ))}
+      <div className="w-full max-w-screen-2xl mx-auto overflow-x-auto whitespace-nowrap py-2 px-8 flex justify-between items-center">
+        {navItems.map((item, idx) => (
+          <React.Fragment key={item.id}>
+            <Link
+              to={item.to}
+              className={
+                item.isMain
+                  ? 'font-medium hover:underline px-2'
+                  : 'text-muted-foreground hover:underline px-2'
+              }
+              style={{ color: 'inherit' }}
+            >
+              {item.name}
+            </Link>
+            {idx < navItems.length - 1 && (
+              <span className="border-r-2" style={{ borderColor: 'var(--background)', height: '2rem', margin: '0 1rem' }} />
+            )}
+          </React.Fragment>
+        ))}
+      </div>
     </nav>
   );
 }
