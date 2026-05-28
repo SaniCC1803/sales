@@ -15,7 +15,6 @@ type ApplicationCardProps = {
 
 export default function ApplicationCardComponent({
   application,
-  onEdit,
   onCreate,
   onCarouselImageClick,
 }: ApplicationCardProps) {
