@@ -17,7 +17,7 @@ export class OgController {
     @Param('id') id: string,
     @Req() req: Request,
   ): Promise<string> {
-    const host = this.headerValue(req.headers.host) ?? 'km.kistmebel.mk';
+    const host = this.headerValue(req.headers.host) ?? 'kistmebel.mk';
     const proto = this.headerValue(req.headers['x-forwarded-proto']) ?? 'https';
     const origin = `${proto}://${host}`;
     const url = `${origin}/product/${encodeURIComponent(id)}`;
