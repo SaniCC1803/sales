@@ -27,17 +27,21 @@ export default function UsersAdmin() {
     name: '',
   });
 
-  // Get current user from JWT
-  let currentUser: { id: number; role: string } | null = null;
-  try {
-    const token = localStorage.getItem('userToken');
-    if (token) {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      currentUser = { id: payload.id, role: payload.role };
-    }
-  } catch {
-    console.log("Error while fetching current user")
-  }
+  // Auth is cookie-based (no token in localStorage), so the current user's
+  // id/role come from /auth/me. Needed to decide who can edit/delete whom.
+  const [currentUser, setCurrentUser] = useState<{
+    id: number;
+    role: string;
+  } | null>(null);
+
+  useEffect(() => {
+    fetchWithAuth(`${import.meta.env.VITE_API_URL}/auth/me`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data) setCurrentUser({ id: data.id, role: data.role });
+      })
+      .catch(() => {});
+  }, []);
 
   const fetchUsers = () => {
     fetchWithAuth(`${import.meta.env.VITE_API_URL}/users`)
