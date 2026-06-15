@@ -66,6 +66,12 @@ services:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
       - letsencrypt:/etc/letsencrypt:ro
       - certbot-www:/var/www/certbot:ro
+    networks:
+      # default - reach this project's own frontend/backend.
+      # shared  - reach other compose projects (e.g. the wedding app) so the
+      #           proxy can route their domains too.
+      - default
+      - shared
     depends_on:
       - frontend
       - backend
@@ -86,3 +92,11 @@ volumes:
   logs:
   letsencrypt:
   certbot-www:
+
+networks:
+  default:
+  # Pre-created on the host with `docker network create web`. Lets the proxy
+  # reach containers from other compose projects (the wedding app).
+  shared:
+    external: true
+    name: web
